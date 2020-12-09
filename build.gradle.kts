@@ -3,9 +3,20 @@ plugins {
     kotlin("plugin.serialization") version Dependencies.Versions.kotlin apply false
 }
 
+buildscript {
+    repositories {
+        maven("https://plugins.gradle.org/m2/")
+    }
+    dependencies {
+        classpath("org.jlleitschuh.gradle:ktlint-gradle:${Dependencies.Versions.ktlintGradle}")
+    }
+}
+
 allprojects {
     group = Config.group
     version = Config.version
+
+    apply(plugin = "org.jlleitschuh.gradle.ktlint")
 
     repositories {
         mavenLocal()
