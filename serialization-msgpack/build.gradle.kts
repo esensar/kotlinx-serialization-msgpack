@@ -33,8 +33,13 @@ kotlin {
 
     fun kotlinx(name: String, version: String): String = "org.jetbrains.kotlinx:kotlinx-$name:$version"
     fun kotlinxSerialization(name: String) = kotlinx("serialization-$name", Dependencies.Versions.serialization)
-    
+
     sourceSets {
+        all {
+            languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
+            languageSettings.useExperimentalAnnotation("kotlinx.serialization.ExperimentalSerializationApi")
+        }
+
         val commonMain by getting {
             dependencies {
                 api(kotlinxSerialization("core"))
