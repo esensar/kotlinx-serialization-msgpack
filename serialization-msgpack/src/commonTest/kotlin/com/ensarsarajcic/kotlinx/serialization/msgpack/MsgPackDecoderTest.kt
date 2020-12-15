@@ -16,4 +16,10 @@ internal class MsgPackDecoderTest {
         val decoder = MsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, byteArrayOf(0xc2.toByte()))
         assertEquals(false, decoder.decodeBoolean())
     }
+
+    @Test
+    fun testNullDecode() {
+        val decoder = MsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, byteArrayOf(0xc0.toByte()))
+        assertEquals(null, decoder.decodeNull())
+    }
 }

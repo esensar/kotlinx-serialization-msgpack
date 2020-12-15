@@ -19,5 +19,12 @@ internal class MsgPackEncoderTest {
         assertEquals("c2", encoder.result.toByteArray().toHexString())
     }
 
+    @Test
+    fun testNullEncode() {
+        val encoder = MsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})
+        encoder.encodeNull()
+        assertEquals("c0", encoder.result.toByteArray().toHexString())
+    }
+
     private fun ByteArray.toHexString() = asUByteArray().joinToString("") { it.toString(16).padStart(2, '0') }
 }

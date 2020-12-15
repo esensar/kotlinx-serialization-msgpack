@@ -18,6 +18,11 @@ internal class MsgPackDecoder(
         return 0
     }
 
+    override fun decodeNotNullMark(): Boolean {
+        val next = byteArray.getOrNull(index) ?: throw Exception("End of stream")
+        return next != MsgPackType.NULL
+    }
+
     override fun decodeBoolean(): Boolean {
         val next = nextByteOrNull() ?: throw Exception("End of stream")
         return when (next) {
@@ -25,5 +30,10 @@ internal class MsgPackDecoder(
             MsgPackType.Boolean.FALSE -> false
             else -> throw Exception("Invalid boolean $next")
         }
+    }
+
+    override fun decodeNull(): Nothing? {
+        val next = nextByteOrNull() ?: throw Exception("End of stream")
+        return if (next == MsgPackType.NULL) null else throw Exception("Invalid null $next")
     }
 }
