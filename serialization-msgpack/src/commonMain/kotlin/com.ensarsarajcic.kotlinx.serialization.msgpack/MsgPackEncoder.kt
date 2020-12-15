@@ -17,4 +17,13 @@ internal class MsgPackEncoder(
     override fun encodeNull() {
         result.add(MsgPackType.NULL)
     }
+
+    override fun encodeByte(value: Byte) {
+        if (value >= MsgPackType.Int.MIN_NEGATIVE_BYTE) {
+            result.add(value)
+        } else {
+            result.add(MsgPackType.Int.INT8)
+            result.add(value)
+        }
+    }
 }

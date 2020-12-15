@@ -23,6 +23,11 @@ internal class MsgPackDecoder(
         return next != MsgPackType.NULL
     }
 
+    override fun decodeNull(): Nothing? {
+        val next = nextByteOrNull() ?: throw Exception("End of stream")
+        return if (next == MsgPackType.NULL) null else throw Exception("Invalid null $next")
+    }
+
     override fun decodeBoolean(): Boolean {
         val next = nextByteOrNull() ?: throw Exception("End of stream")
         return when (next) {
@@ -32,8 +37,13 @@ internal class MsgPackDecoder(
         }
     }
 
-    override fun decodeNull(): Nothing? {
+    override fun decodeByte(): Byte {
+        // Check is it a single byte value
         val next = nextByteOrNull() ?: throw Exception("End of stream")
-        return if (next == MsgPackType.NULL) null else throw Exception("Invalid null $next")
+        return when {
+            MsgPackType.Int.POSITIVE_FIXNUM_MASK.test(next) or MsgPackType.Int.NEGATIVE_FIXNUM_MASK.test(next) -> next
+            next == MsgPackType.Int.INT8 -> nextByteOrNull() ?: throw Exception("End of stream")
+            else -> throw TODO("Add a more descriptive error when wrong type is found!")
+        }
     }
 }
