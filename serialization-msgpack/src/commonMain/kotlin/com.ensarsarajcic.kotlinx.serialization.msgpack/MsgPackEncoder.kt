@@ -13,4 +13,8 @@ internal class MsgPackEncoder(
     override fun encodeBoolean(value: Boolean) {
         result.add(MsgPackType.Boolean(value))
     }
+
+    override fun encodeNull() {
+        result.add(MsgPackType.NULL)
+    }
 }
