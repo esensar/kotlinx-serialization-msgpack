@@ -43,5 +43,19 @@ internal class MsgPackEncoderTest {
         testByteEncoding(-127, "d081")
     }
 
+    @Test
+    fun testShortEncode() {
+        fun testShortEncoding(input: Short, expectedResult: String) = MsgPackEncoder(MsgPackConfiguration.default, SerializersModule {}).also {
+            it.encodeShort(input)
+            assertEquals(expectedResult, it.result.toByteArray().toHexString())
+        }
+        testShortEncoding(55, "37")
+        testShortEncoding(32767, "cd7fff")
+        testShortEncoding(-32767, "d18001")
+        testShortEncoding(123, "7b")
+        testShortEncoding(-1234, "d1fb2e")
+        testShortEncoding(0, "00")
+    }
+
     private fun ByteArray.toHexString() = asUByteArray().joinToString("") { it.toString(16).padStart(2, '0') }
 }

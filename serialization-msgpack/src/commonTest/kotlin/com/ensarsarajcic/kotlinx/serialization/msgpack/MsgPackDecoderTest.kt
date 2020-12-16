@@ -26,7 +26,6 @@ internal class MsgPackDecoderTest {
     @Test
     fun testByteDecode() {
         fun testByteDecoding(input: ByteArray, expectedResult: Byte) = MsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input).also {
-            println("${input.toList()}, $expectedResult")
             assertEquals(expectedResult, it.decodeByte())
         }
         fun testByteDecoding(input: Byte, expectedResult: Byte) = testByteDecoding(byteArrayOf(input), expectedResult)
@@ -40,5 +39,20 @@ internal class MsgPackDecoderTest {
         testByteDecoding(byteArrayOf(0xd0.toByte(), 0xdf.toByte()), -33)
         testByteDecoding(byteArrayOf(0xd0.toByte(), 0xce.toByte()), -50)
         testByteDecoding(byteArrayOf(0xd0.toByte(), 0x81.toByte()), -127)
+    }
+
+    @Test
+    fun testShortDecode() {
+        fun testShortDecoding(input: ByteArray, expectedResult: Short) = MsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input).also {
+            assertEquals(expectedResult, it.decodeShort())
+        }
+        fun testShortDecoding(input: Byte, expectedResult: Short) = testShortDecoding(byteArrayOf(input), expectedResult)
+
+        testShortDecoding(0x37, 55)
+        testShortDecoding(byteArrayOf(0xcd.toByte(), 0x7f, 0xff.toByte()), 32767)
+        testShortDecoding(byteArrayOf(0xd1.toByte(), 0x80.toByte(), 0x01), -32767)
+        testShortDecoding(0x7b, 123)
+        testShortDecoding(byteArrayOf(0xd1.toByte(), 0xfb.toByte(), 0x2e), -1234)
+        testShortDecoding(0x00, 0)
     }
 }

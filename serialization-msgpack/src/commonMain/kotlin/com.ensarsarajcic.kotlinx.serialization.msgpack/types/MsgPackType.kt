@@ -39,6 +39,11 @@ internal object MsgPackType {
             override fun unMaskValue(value: Byte): Byte = (mask xor value.toInt()).toByte()
         }
         const val MIN_NEGATIVE_BYTE = -32
+
+        fun isByte(byte: Byte) = byte == INT8 || byte == UINT8
+        fun isShort(byte: Byte) = byte == INT16 || byte == UINT16
+        fun isInt(byte: Byte) = byte == INT32 || byte == UINT32
+        fun isLong(byte: Byte) = byte == INT64 || byte == UINT64
     }
 
     const val NULL = 0xc0.toByte()

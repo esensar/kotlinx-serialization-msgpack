@@ -26,4 +26,20 @@ internal class MsgPackEncoder(
             result.add(value)
         }
     }
+
+    override fun encodeShort(value: Short) {
+        if (value in Byte.MIN_VALUE..Byte.MAX_VALUE) {
+            encodeByte(value.toByte())
+        } else {
+            if (value < 0) {
+                result.add(MsgPackType.Int.INT16)
+                result.add((value.toInt() shr 8).toByte())
+                result.add(value.toByte())
+            } else {
+                result.add(MsgPackType.Int.UINT16)
+                result.add((value.toInt() shr 8).toByte())
+                result.add(value.toByte())
+            }
+        }
+    }
 }
