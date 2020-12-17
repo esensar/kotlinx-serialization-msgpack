@@ -1,8 +1,5 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack.types
 
-import kotlin.experimental.and
-import kotlin.experimental.or
-
 internal object MsgPackType {
     internal object Boolean {
         operator fun invoke(value: kotlin.Boolean) = if (value) TRUE else FALSE
@@ -28,9 +25,9 @@ internal object MsgPackType {
         const val UINT64 = 0xcf.toByte()
 
         val POSITIVE_FIXNUM_MASK = object : Mask<Byte> {
-            private val mask = 0b01111111.toByte()
-            override fun maskValue(value: Byte): Byte = mask and value
-            override fun test(value: Byte): kotlin.Boolean = (mask or value) == mask
+            private val mask = 0b01111111
+            override fun maskValue(value: Byte): Byte = (mask and value.toInt()).toByte()
+            override fun test(value: Byte): kotlin.Boolean = (mask or value.toInt()) == mask
         }
         val NEGATIVE_FIXNUM_MASK = object : Mask<Byte> {
             private val mask = 0b11100000
@@ -39,6 +36,10 @@ internal object MsgPackType {
             override fun unMaskValue(value: Byte): Byte = (mask xor value.toInt()).toByte()
         }
         const val MIN_NEGATIVE_BYTE = -32
+        const val MAX_UBYTE = 255
+        const val MAX_USHORT = 65535
+        const val MAX_UINT = 4294967295
+        const val MAX_ULONG = -1 // Can't do it without unsigned types or BigInteger
 
         fun isByte(byte: Byte) = byte == INT8 || byte == UINT8
         fun isShort(byte: Byte) = byte == INT16 || byte == UINT16

@@ -8,6 +8,8 @@ internal class MsgPackEncoder(
     private val configuration: MsgPackConfiguration,
     override val serializersModule: SerializersModule
 ) : AbstractEncoder() {
+    // TODO this may not be a list in the end
+    //      It sould probably be delegated to something
     val result = mutableListOf<Byte>()
 
     override fun encodeBoolean(value: Boolean) {
@@ -31,15 +33,55 @@ internal class MsgPackEncoder(
         if (value in Byte.MIN_VALUE..Byte.MAX_VALUE) {
             encodeByte(value.toByte())
         } else {
-            if (value < 0) {
-                result.add(MsgPackType.Int.INT16)
-                result.add((value.toInt() shr 8).toByte())
-                result.add(value.toByte())
+            var uByte = false
+            result.add(
+                when {
+                    value < 0 -> MsgPackType.Int.INT16
+                    value <= MsgPackType.Int.MAX_UBYTE -> MsgPackType.Int.UINT8.also { uByte = true }
+                    else -> MsgPackType.Int.UINT16
+                }
+            )
+            if (uByte) {
+                result.add((value.toInt() and 0xff).toByte())
             } else {
-                result.add(MsgPackType.Int.UINT16)
-                result.add((value.toInt() shr 8).toByte())
-                result.add(value.toByte())
+                result.addAll(value.splitToByteArray().toList())
             }
         }
+    }
+
+    override fun encodeInt(value: Int) {
+        if (value in Short.MIN_VALUE..Short.MAX_VALUE) {
+            encodeShort(value.toShort())
+        } else {
+            var uShort = false
+            result.add(
+                when {
+                    value < 0 -> MsgPackType.Int.INT32
+                    value <= MsgPackType.Int.MAX_USHORT -> MsgPackType.Int.UINT16.also { uShort = true }
+                    else -> MsgPackType.Int.UINT32
+                }
+            )
+            if (uShort) {
+                result.addAll(value.toShort().splitToByteArray().toList())
+            } else {
+                result.addAll(value.splitToByteArray().toList())
+            }
+        }
+    }
+
+    private inline fun <reified T : Number> T.splitToByteArray(): ByteArray {
+        val byteCount = when (T::class) {
+            Byte::class -> 1
+            Short::class -> 2
+            Int::class -> 4
+            Long::class -> 8
+            else -> throw UnsupportedOperationException("Can't split number of type ${T::class} to bytes!")
+        }
+
+        val result = ByteArray(byteCount)
+        (byteCount - 1).downTo(0).forEach {
+            result[byteCount - (it + 1)] = ((this.toLong() shr (8 * it)) and 0xff).toByte()
+        }
+        return result
     }
 }
