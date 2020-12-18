@@ -57,7 +57,6 @@ internal class MsgPackDecoder(
     }
 
     override fun decodeShort(): Short {
-        // Check is it a single byte value
         val next = byteArray.getOrNull(index) ?: throw Exception("End of stream")
         return when {
             MsgPackType.Int.isShort(next) -> {
@@ -73,7 +72,6 @@ internal class MsgPackDecoder(
     }
 
     override fun decodeInt(): Int {
-        // Check is it a single byte value
         val next = byteArray.getOrNull(index) ?: throw Exception("End of stream")
         return when {
             MsgPackType.Int.isInt(next) -> {
@@ -89,7 +87,6 @@ internal class MsgPackDecoder(
     }
 
     override fun decodeLong(): Long {
-        // Check is it a single byte value
         val next = byteArray.getOrNull(index) ?: throw Exception("End of stream")
         return when {
             MsgPackType.Int.isLong(next) -> {
@@ -101,6 +98,29 @@ internal class MsgPackDecoder(
                 takeNext(4).joinToNumber()
             }
             else -> decodeInt().toLong()
+        }
+    }
+
+    override fun decodeFloat(): Float {
+        val next = byteArray.getOrNull(index) ?: throw Exception("End of stream")
+        return when (next) {
+            MsgPackType.Float.FLOAT -> {
+                index++
+                Float.fromBits(takeNext(4).joinToNumber())
+            }
+            else -> TODO("Add a more descriptive error when wrong type is found!")
+        }
+    }
+
+    override fun decodeDouble(): Double {
+        val next = byteArray.getOrNull(index) ?: throw Exception("End of stream")
+        return when (next) {
+            MsgPackType.Float.DOUBLE -> {
+                index++
+                Double.fromBits(takeNext(8).joinToNumber())
+            }
+            MsgPackType.Float.FLOAT -> decodeFloat().toDouble()
+            else -> TODO("Add a more descriptive error when wrong type is found!")
         }
     }
 

@@ -64,6 +64,22 @@ internal class MsgPackEncoderTest {
         )
     }
 
+    @Test
+    fun testFloatEncode() {
+        testPairs(
+            MsgPackEncoder::encodeFloat,
+            *TestData.floatTestPairs
+        )
+    }
+
+    @Test
+    fun testDoubleEncode() {
+        testPairs(
+            MsgPackEncoder::encodeDouble,
+            *TestData.doubleTestPairs
+        )
+    }
+
     private fun <INPUT> testPairs(encodeFunction: MsgPackEncoder.(INPUT) -> Unit, vararg pairs: Pair<String, INPUT>) {
         pairs.forEach { (result, input) ->
             MsgPackEncoder(MsgPackConfiguration.default, SerializersModule {}).also {

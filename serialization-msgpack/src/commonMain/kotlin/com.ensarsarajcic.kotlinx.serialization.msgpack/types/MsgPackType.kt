@@ -48,5 +48,10 @@ internal object MsgPackType {
         fun isLong(byte: Byte) = byte == INT64 || byte == UINT64
     }
 
+    internal object Float {
+        const val FLOAT = 0xca.toByte()
+        const val DOUBLE = 0xcb.toByte()
+    }
+
     const val NULL = 0xc0.toByte()
 }
