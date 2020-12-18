@@ -88,11 +88,27 @@ internal class MsgPackDecoder(
         }
     }
 
+    override fun decodeLong(): Long {
+        // Check is it a single byte value
+        val next = byteArray.getOrNull(index) ?: throw Exception("End of stream")
+        return when {
+            MsgPackType.Int.isLong(next) -> {
+                index++
+                takeNext(8).joinToNumber()
+            }
+            next == MsgPackType.Int.UINT32 -> {
+                index++
+                takeNext(4).joinToNumber()
+            }
+            else -> decodeInt().toLong()
+        }
+    }
+
     private inline fun <reified T : Number> ByteArray.joinToNumber(): T {
         val number = mapIndexed { index, byte ->
-            (byte.toInt() and 0xff) shl (8 * (size - (index + 1)))
+            (byte.toLong() and 0xff) shl (8 * (size - (index + 1)))
         }.fold(0L) { acc, it ->
-            acc or it.toLong()
+            acc or it
         }
         return when (T::class) {
             Byte::class -> number.toByte()

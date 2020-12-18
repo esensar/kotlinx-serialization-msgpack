@@ -35,7 +35,8 @@ internal object MsgPackType {
             override fun test(value: Byte): kotlin.Boolean = (mask and value.toInt()) == mask
             override fun unMaskValue(value: Byte): Byte = (mask xor value.toInt()).toByte()
         }
-        const val MIN_NEGATIVE_BYTE = -32
+        const val MIN_NEGATIVE_SINGLE_BYTE = -32
+        const val MIN_NEGATIVE_BYTE = -127
         const val MAX_UBYTE = 255
         const val MAX_USHORT = 65535
         const val MAX_UINT = 4294967295

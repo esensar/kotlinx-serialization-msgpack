@@ -50,6 +50,20 @@ internal class MsgPackEncoderTest {
         )
     }
 
+    @Test
+    fun testLongEncode() {
+        testPairs(
+            MsgPackEncoder::encodeLong,
+            *TestData.byteTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.shortTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.uByteTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.intTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.uShortTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.longTestPairs,
+            *TestData.uIntTestPairs
+        )
+    }
+
     private fun <INPUT> testPairs(encodeFunction: MsgPackEncoder.(INPUT) -> Unit, vararg pairs: Pair<String, INPUT>) {
         pairs.forEach { (result, input) ->
             MsgPackEncoder(MsgPackConfiguration.default, SerializersModule {}).also {

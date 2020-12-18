@@ -93,6 +93,34 @@ internal class MsgPackTest {
         )
     }
 
+    @Test
+    fun testLongEncode() {
+        testEncodePairs(
+            Long.serializer(),
+            *TestData.byteTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.shortTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.uByteTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.intTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.uShortTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.longTestPairs,
+            *TestData.uIntTestPairs
+        )
+    }
+
+    @Test
+    fun testLongDecode() {
+        testDecodePairs(
+            Long.serializer(),
+            *TestData.byteTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.shortTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.uByteTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.intTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.uShortTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.longTestPairs,
+            *TestData.uIntTestPairs
+        )
+    }
+
     private fun <T> testEncodePairs(serializer: KSerializer<T>, vararg pairs: Pair<String, T>) {
         pairs.forEach { (expectedResult, value) ->
             assertEquals(expectedResult, MsgPack.default.encodeToByteArray(serializer, value).toHex())

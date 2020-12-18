@@ -49,6 +49,20 @@ internal class MsgPackDecoderTest {
         )
     }
 
+    @Test
+    fun testLongDecode() {
+        testPairs(
+            MsgPackDecoder::decodeLong,
+            *TestData.byteTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.shortTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.uByteTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.intTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.uShortTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.longTestPairs,
+            *TestData.uIntTestPairs
+        )
+    }
+
     private fun <RESULT> testPairs(decodeFunction: MsgPackDecoder.() -> RESULT, vararg pairs: Pair<String, RESULT>) {
         pairs.forEach { (input, result) ->
             MsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray()).also {

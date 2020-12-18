@@ -21,7 +21,7 @@ internal class MsgPackEncoder(
     }
 
     override fun encodeByte(value: Byte) {
-        if (value >= MsgPackType.Int.MIN_NEGATIVE_BYTE) {
+        if (value >= MsgPackType.Int.MIN_NEGATIVE_SINGLE_BYTE) {
             result.add(value)
         } else {
             result.add(MsgPackType.Int.INT8)
@@ -30,7 +30,7 @@ internal class MsgPackEncoder(
     }
 
     override fun encodeShort(value: Short) {
-        if (value in Byte.MIN_VALUE..Byte.MAX_VALUE) {
+        if (value in MsgPackType.Int.MIN_NEGATIVE_BYTE..Byte.MAX_VALUE) {
             encodeByte(value.toByte())
         } else {
             var uByte = false
@@ -63,6 +63,26 @@ internal class MsgPackEncoder(
             )
             if (uShort) {
                 result.addAll(value.toShort().splitToByteArray().toList())
+            } else {
+                result.addAll(value.splitToByteArray().toList())
+            }
+        }
+    }
+
+    override fun encodeLong(value: Long) {
+        if (value in Int.MIN_VALUE..Int.MAX_VALUE) {
+            encodeInt(value.toInt())
+        } else {
+            var uInt = false
+            result.add(
+                when {
+                    value < 0 -> MsgPackType.Int.INT64
+                    value <= MsgPackType.Int.MAX_UINT -> MsgPackType.Int.UINT32.also { uInt = true }
+                    else -> MsgPackType.Int.UINT64
+                }
+            )
+            if (uInt) {
+                result.addAll(value.toInt().splitToByteArray().toList())
             } else {
                 result.addAll(value.splitToByteArray().toList())
             }
