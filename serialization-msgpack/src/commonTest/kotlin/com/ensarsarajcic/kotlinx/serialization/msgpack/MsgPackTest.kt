@@ -1,5 +1,6 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 import kotlin.test.Test
@@ -8,14 +9,18 @@ import kotlin.test.assertEquals
 internal class MsgPackTest {
     @Test
     fun testBooleanEncode() {
-        assertEquals("c3", MsgPack.default.encodeToByteArray(Boolean.serializer(), true).toHexString())
-        assertEquals("c2", MsgPack.default.encodeToByteArray(Boolean.serializer(), false).toHexString())
+        testEncodePairs(
+            Boolean.serializer(),
+            *TestData.booleanTestPairs
+        )
     }
 
     @Test
     fun testBooleanDecode() {
-        assertEquals(true, MsgPack.default.decodeFromByteArray(Boolean.serializer(), byteArrayOf(0xc3.toByte())))
-        assertEquals(false, MsgPack.default.decodeFromByteArray(Boolean.serializer(), byteArrayOf(0xc2.toByte())))
+        testDecodePairs(
+            Boolean.serializer(),
+            *TestData.booleanTestPairs
+        )
     }
 
     @Test
@@ -25,8 +30,105 @@ internal class MsgPackTest {
 
     @Test
     fun testNullEncode() {
-        assertEquals("c0", MsgPack.default.encodeToByteArray(Boolean.serializer().nullable, null).toHexString())
+        assertEquals("c0", MsgPack.default.encodeToByteArray(Boolean.serializer().nullable, null).toHex())
     }
 
-    private fun ByteArray.toHexString() = asUByteArray().joinToString("") { it.toString(16).padStart(2, '0') }
+    @Test
+    fun testByteEncode() {
+        testEncodePairs(
+            Byte.serializer(),
+            *TestData.byteTestPairs
+        )
+    }
+
+    @Test
+    fun testByteDecode() {
+        testDecodePairs(
+            Byte.serializer(),
+            *TestData.byteTestPairs
+        )
+    }
+
+    @Test
+    fun testShortEncode() {
+        testEncodePairs(
+            Short.serializer(),
+            *TestData.byteTestPairs.map { it.first to it.second.toShort() }.toTypedArray(),
+            *TestData.shortTestPairs,
+            *TestData.uByteTestPairs
+        )
+    }
+
+    @Test
+    fun testShortDecode() {
+        testDecodePairs(
+            Short.serializer(),
+            *TestData.byteTestPairs.map { it.first to it.second.toShort() }.toTypedArray(),
+            *TestData.shortTestPairs,
+            *TestData.uByteTestPairs
+        )
+    }
+
+    @Test
+    fun testIntEncode() {
+        testEncodePairs(
+            Int.serializer(),
+            *TestData.byteTestPairs.map { it.first to it.second.toInt() }.toTypedArray(),
+            *TestData.shortTestPairs.map { it.first to it.second.toInt() }.toTypedArray(),
+            *TestData.uByteTestPairs.map { it.first to it.second.toInt() }.toTypedArray(),
+            *TestData.intTestPairs,
+            *TestData.uShortTestPairs
+        )
+    }
+
+    @Test
+    fun testIntDecode() {
+        testDecodePairs(
+            Int.serializer(),
+            *TestData.byteTestPairs.map { it.first to it.second.toInt() }.toTypedArray(),
+            *TestData.shortTestPairs.map { it.first to it.second.toInt() }.toTypedArray(),
+            *TestData.uByteTestPairs.map { it.first to it.second.toInt() }.toTypedArray(),
+            *TestData.intTestPairs,
+            *TestData.uShortTestPairs
+        )
+    }
+
+    @Test
+    fun testLongEncode() {
+        testEncodePairs(
+            Long.serializer(),
+            *TestData.byteTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.shortTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.uByteTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.intTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.uShortTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.longTestPairs,
+            *TestData.uIntTestPairs
+        )
+    }
+
+    @Test
+    fun testLongDecode() {
+        testDecodePairs(
+            Long.serializer(),
+            *TestData.byteTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.shortTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.uByteTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.intTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.uShortTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
+            *TestData.longTestPairs,
+            *TestData.uIntTestPairs
+        )
+    }
+
+    private fun <T> testEncodePairs(serializer: KSerializer<T>, vararg pairs: Pair<String, T>) {
+        pairs.forEach { (expectedResult, value) ->
+            assertEquals(expectedResult, MsgPack.default.encodeToByteArray(serializer, value).toHex())
+        }
+    }
+    private fun <T> testDecodePairs(serializer: KSerializer<T>, vararg pairs: Pair<String, T>) {
+        pairs.forEach { (value, expectedResult) ->
+            assertEquals(expectedResult, MsgPack.default.decodeFromByteArray(serializer, value.hexStringToByteArray()))
+        }
+    }
 }
