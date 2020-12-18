@@ -89,6 +89,16 @@ internal class MsgPackEncoder(
         }
     }
 
+    override fun encodeFloat(value: Float) {
+        result.add(MsgPackType.Float.FLOAT)
+        result.addAll(value.toRawBits().splitToByteArray().toList())
+    }
+
+    override fun encodeDouble(value: Double) {
+        result.add(MsgPackType.Float.DOUBLE)
+        result.addAll(value.toRawBits().splitToByteArray().toList())
+    }
+
     private inline fun <reified T : Number> T.splitToByteArray(): ByteArray {
         val byteCount = when (T::class) {
             Byte::class -> 1

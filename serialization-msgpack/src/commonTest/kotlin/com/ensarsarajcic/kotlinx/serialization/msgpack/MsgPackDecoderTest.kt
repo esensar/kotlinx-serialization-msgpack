@@ -63,6 +63,22 @@ internal class MsgPackDecoderTest {
         )
     }
 
+    @Test
+    fun testFloatDecode() {
+        testPairs(
+            MsgPackDecoder::decodeFloat,
+            *TestData.floatTestPairs
+        )
+    }
+
+    @Test
+    fun testDoubleDecode() {
+        testPairs(
+            MsgPackDecoder::decodeDouble,
+            *TestData.doubleTestPairs
+        )
+    }
+
     private fun <RESULT> testPairs(decodeFunction: MsgPackDecoder.() -> RESULT, vararg pairs: Pair<String, RESULT>) {
         pairs.forEach { (input, result) ->
             MsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray()).also {

@@ -54,4 +54,16 @@ object TestData {
         "d3ffffffff7fffffff" to -2147483649,
         "d3fffffffed5fa0e00" to -5000000000
     )
+    val floatTestPairs = arrayOf(
+        "ca3dfbe76d" to 0.123f,
+        "cabdfbe76d" to -0.123f,
+        "ca42f6e979" to 123.456f,
+        "cac2f6e979" to -123.456f,
+    )
+    val doubleTestPairs = arrayOf(
+        "cb3fbf7ced916872b0" to 0.123,
+        "cbbfbf7ced916872b0" to -0.123,
+        "cb405edd2f1a9fbe77" to 123.456,
+        "cbc05edd2f1a9fbe77" to -123.456,
+    )
 }
