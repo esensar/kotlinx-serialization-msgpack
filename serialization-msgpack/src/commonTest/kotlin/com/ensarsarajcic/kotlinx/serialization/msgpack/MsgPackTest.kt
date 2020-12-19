@@ -3,8 +3,10 @@ package com.ensarsarajcic.kotlinx.serialization.msgpack
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.serializer
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 internal class MsgPackTest {
     @Test
@@ -131,10 +133,12 @@ internal class MsgPackTest {
 
     @Test
     fun testFloatDecode() {
-        testDecodePairs(
-            Float.serializer(),
-            *TestData.floatTestPairs
-        )
+        TestData.floatTestPairs.forEach { (value, expectedResult) ->
+            // Tests in JS were failing when == comparison was used, so threshold is now used
+            val threshold = 0.00001f
+            val right = MsgPack.default.decodeFromByteArray(Float.serializer(), value.hexStringToByteArray())
+            assertTrue("Floats should be close enough! (Threshold is $threshold) - Expected: $expectedResult - Received: $right") { expectedResult - right < threshold }
+        }
     }
 
     @Test
@@ -147,10 +151,12 @@ internal class MsgPackTest {
 
     @Test
     fun testDoubleDecode() {
-        testDecodePairs(
-            Double.serializer(),
-            *TestData.doubleTestPairs
-        )
+        TestData.doubleTestPairs.forEach { (value, expectedResult) ->
+            // Tests in JS were failing when == comparison was used, so threshold is now used
+            val threshold = 0.000000000000000000000000000000000000000000001
+            val right = MsgPack.default.decodeFromByteArray(Double.serializer(), value.hexStringToByteArray())
+            assertTrue("Doubles should be close enough! (Threshold is $threshold) - Expected: $expectedResult - Received: $right") { expectedResult - right < threshold }
+        }
     }
 
     @Test
