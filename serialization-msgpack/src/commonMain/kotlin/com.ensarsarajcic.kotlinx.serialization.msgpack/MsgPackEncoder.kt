@@ -2,6 +2,7 @@ package com.ensarsarajcic.kotlinx.serialization.msgpack
 
 import com.ensarsarajcic.kotlinx.serialization.msgpack.types.MsgPackType
 import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractEncoder
 import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.modules.SerializersModule
@@ -125,25 +126,45 @@ internal class MsgPackEncoder(
     }
 
     override fun beginCollection(descriptor: SerialDescriptor, collectionSize: Int): CompositeEncoder {
-        when {
-            collectionSize <= MsgPackType.Array.MAX_FIXARRAY_SIZE -> {
-                result.add(MsgPackType.Array.FIXARRAY_SIZE_MASK.maskValue(collectionSize.toByte()))
-            }
-            collectionSize <= MsgPackType.Array.MAX_ARRAY16_LENGTH -> {
-                result.add(MsgPackType.Array.ARRAY16)
-                result.addAll(collectionSize.toShort().splitToByteArray().toList())
-            }
-            collectionSize <= MsgPackType.Array.MAX_ARRAY32_LENGTH -> {
-                result.add(MsgPackType.Array.ARRAY32)
-                result.addAll(collectionSize.toInt().splitToByteArray().toList())
-            }
-            else -> TODO("TOO LONG COLLECTION")
+        when (descriptor.kind) {
+            StructureKind.LIST ->
+                when {
+                    collectionSize <= MsgPackType.Array.MAX_FIXARRAY_SIZE -> {
+                        result.add(MsgPackType.Array.FIXARRAY_SIZE_MASK.maskValue(collectionSize.toByte()))
+                    }
+                    collectionSize <= MsgPackType.Array.MAX_ARRAY16_LENGTH -> {
+                        result.add(MsgPackType.Array.ARRAY16)
+                        result.addAll(collectionSize.toShort().splitToByteArray().toList())
+                    }
+                    collectionSize <= MsgPackType.Array.MAX_ARRAY32_LENGTH -> {
+                        result.add(MsgPackType.Array.ARRAY32)
+                        result.addAll(collectionSize.toInt().splitToByteArray().toList())
+                    }
+                    else -> TODO("TOO LONG COLLECTION")
+                }
+
+            StructureKind.CLASS, StructureKind.OBJECT, StructureKind.MAP ->
+                when {
+                    collectionSize <= MsgPackType.Map.MAX_FIXMAP_SIZE -> {
+                        result.add(MsgPackType.Map.FIXMAP_SIZE_MASK.maskValue(collectionSize.toByte()))
+                    }
+                    collectionSize <= MsgPackType.Map.MAX_MAP16_LENGTH -> {
+                        result.add(MsgPackType.Map.MAP16)
+                        result.addAll(collectionSize.toShort().splitToByteArray().toList())
+                    }
+                    collectionSize <= MsgPackType.Map.MAX_MAP32_LENGTH -> {
+                        result.add(MsgPackType.Map.MAP32)
+                        result.addAll(collectionSize.toInt().splitToByteArray().toList())
+                    }
+                    else -> TODO("TOO LONG COLLECTION")
+                }
+
+            else -> TODO("UNSUPPORTED COLLECTION!")
         }
         return this
     }
 
     override fun endStructure(descriptor: SerialDescriptor) {
-        super.endStructure(descriptor)
     }
 
     private inline fun <reified T : Number> T.splitToByteArray(): ByteArray {

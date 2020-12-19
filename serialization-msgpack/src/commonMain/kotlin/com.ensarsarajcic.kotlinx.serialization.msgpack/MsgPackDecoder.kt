@@ -2,6 +2,7 @@ package com.ensarsarajcic.kotlinx.serialization.msgpack
 
 import com.ensarsarajcic.kotlinx.serialization.msgpack.types.MsgPackType
 import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractDecoder
 import kotlinx.serialization.modules.SerializersModule
 
@@ -147,14 +148,35 @@ internal class MsgPackDecoder(
     override fun decodeCollectionSize(descriptor: SerialDescriptor): Int {
         val next = byteArray.getOrNull(index) ?: throw Exception("End of stream")
         index++
-        return when {
-            MsgPackType.Array.FIXARRAY_SIZE_MASK.test(next) -> MsgPackType.Array.FIXARRAY_SIZE_MASK.unMaskValue(next).toInt()
-            next == MsgPackType.Array.ARRAY16 -> takeNext(2).joinToNumber()
-            // TODO: this may have issues with long arrays, since size will overflow
-            next == MsgPackType.Array.ARRAY32 -> takeNext(4).joinToNumber()
+
+        return when (descriptor.kind) {
+            StructureKind.LIST ->
+                when {
+                    MsgPackType.Array.FIXARRAY_SIZE_MASK.test(next) -> MsgPackType.Array.FIXARRAY_SIZE_MASK.unMaskValue(next).toInt()
+                    next == MsgPackType.Array.ARRAY16 -> takeNext(2).joinToNumber()
+                    // TODO: this may have issues with long arrays, since size will overflow
+                    next == MsgPackType.Array.ARRAY32 -> takeNext(4).joinToNumber()
+                    else -> {
+                        index--
+                        throw TODO("Add a more descriptive error when wrong type is found!")
+                    }
+                }
+
+            StructureKind.CLASS, StructureKind.OBJECT, StructureKind.MAP ->
+                when {
+                    MsgPackType.Map.FIXMAP_SIZE_MASK.test(next) -> MsgPackType.Map.FIXMAP_SIZE_MASK.unMaskValue(next).toInt()
+                    next == MsgPackType.Map.MAP16 -> takeNext(2).joinToNumber()
+                    // TODO: this may have issues with long objects, since size will overflow
+                    next == MsgPackType.Map.MAP16 -> takeNext(4).joinToNumber()
+                    else -> {
+                        index--
+                        throw TODO("Add a more descriptive error when wrong type is found!")
+                    }
+                }
+
             else -> {
                 index--
-                throw TODO("Add a more descriptive error when wrong type is found!")
+                TODO("Unsupported collection")
             }
         }
     }
