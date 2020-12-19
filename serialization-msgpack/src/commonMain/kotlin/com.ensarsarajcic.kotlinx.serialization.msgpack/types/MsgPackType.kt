@@ -53,5 +53,22 @@ internal object MsgPackType {
         const val DOUBLE = 0xcb.toByte()
     }
 
+    internal object String {
+        const val STR8 = 0xd9.toByte()
+        const val STR16 = 0xda.toByte()
+        const val STR32 = 0xdb.toByte()
+
+        val FIXSTR_SIZE_MASK = object : Mask<Byte> {
+            private val mask = 0b10100000
+            override fun maskValue(value: Byte): Byte = (mask or value.toInt()).toByte()
+            override fun test(value: Byte): kotlin.Boolean = (mask and value.toInt()) == mask
+            override fun unMaskValue(value: Byte): Byte = (mask xor value.toInt()).toByte()
+        }
+        const val MAX_FIXSTR_LENGTH = 31
+        const val MAX_STR8_LENGTH = Int.MAX_UBYTE
+        const val MAX_STR16_LENGTH = Int.MAX_USHORT
+        const val MAX_STR32_LENGTH = Int.MAX_UINT
+    }
+
     const val NULL = 0xc0.toByte()
 }

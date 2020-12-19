@@ -121,6 +121,26 @@ internal class MsgPackTest {
         )
     }
 
+    @Test
+    fun testStringEncode() {
+        testEncodePairs(
+            String.serializer(),
+            *TestData.fixStrTestPairs,
+            *TestData.str8TestPairs,
+            *TestData.str16TestPairs
+        )
+    }
+
+    @Test
+    fun testStringDecode() {
+        testDecodePairs(
+            String.serializer(),
+            *TestData.fixStrTestPairs,
+            *TestData.str8TestPairs,
+            *TestData.str16TestPairs
+        )
+    }
+
     private fun <T> testEncodePairs(serializer: KSerializer<T>, vararg pairs: Pair<String, T>) {
         pairs.forEach { (expectedResult, value) ->
             assertEquals(expectedResult, MsgPack.default.encodeToByteArray(serializer, value).toHex())

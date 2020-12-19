@@ -80,6 +80,16 @@ internal class MsgPackEncoderTest {
         )
     }
 
+    @Test
+    fun testStringEncode() {
+        testPairs(
+            MsgPackEncoder::encodeString,
+            *TestData.fixStrTestPairs,
+            *TestData.str8TestPairs,
+            *TestData.str16TestPairs
+        )
+    }
+
     private fun <INPUT> testPairs(encodeFunction: MsgPackEncoder.(INPUT) -> Unit, vararg pairs: Pair<String, INPUT>) {
         pairs.forEach { (result, input) ->
             MsgPackEncoder(MsgPackConfiguration.default, SerializersModule {}).also {

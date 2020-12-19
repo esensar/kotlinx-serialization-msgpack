@@ -124,6 +124,24 @@ internal class MsgPackDecoder(
         }
     }
 
+    override fun decodeString(): String {
+        val next = byteArray.getOrNull(index) ?: throw Exception("End of stream")
+        index++
+        val length = when {
+            MsgPackType.String.FIXSTR_SIZE_MASK.test(next) -> MsgPackType.String.FIXSTR_SIZE_MASK.unMaskValue(next).toInt()
+            next == MsgPackType.String.STR8 -> requireNextByte().toInt() and 0xff
+            next == MsgPackType.String.STR16 -> takeNext(2).joinToNumber()
+            // TODO: this may have issues with long strings, since size will overflow
+            next == MsgPackType.String.STR32 -> takeNext(4).joinToNumber()
+            else -> {
+                index--
+                throw TODO("Add a more descriptive error when wrong type is found!")
+            }
+        }
+        if (length == 0) return ""
+        return takeNext(length).decodeToString()
+    }
+
     private inline fun <reified T : Number> ByteArray.joinToNumber(): T {
         val number = mapIndexed { index, byte ->
             (byte.toLong() and 0xff) shl (8 * (size - (index + 1)))
