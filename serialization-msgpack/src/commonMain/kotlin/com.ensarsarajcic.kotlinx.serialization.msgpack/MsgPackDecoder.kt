@@ -27,6 +27,8 @@ internal class MsgPackDecoder(
         return 0
     }
 
+    override fun decodeSequentially(): Boolean = true
+
     override fun decodeNotNullMark(): Boolean {
         val next = byteArray.getOrNull(index) ?: throw Exception("End of stream")
         return next != MsgPackType.NULL
@@ -140,6 +142,21 @@ internal class MsgPackDecoder(
         }
         if (length == 0) return ""
         return takeNext(length).decodeToString()
+    }
+
+    override fun decodeCollectionSize(descriptor: SerialDescriptor): Int {
+        val next = byteArray.getOrNull(index) ?: throw Exception("End of stream")
+        index++
+        return when {
+            MsgPackType.Array.FIXARRAY_SIZE_MASK.test(next) -> MsgPackType.Array.FIXARRAY_SIZE_MASK.unMaskValue(next).toInt()
+            next == MsgPackType.Array.ARRAY16 -> takeNext(2).joinToNumber()
+            // TODO: this may have issues with long arrays, since size will overflow
+            next == MsgPackType.Array.ARRAY32 -> takeNext(4).joinToNumber()
+            else -> {
+                index--
+                throw TODO("Add a more descriptive error when wrong type is found!")
+            }
+        }
     }
 
     private inline fun <reified T : Number> ByteArray.joinToNumber(): T {

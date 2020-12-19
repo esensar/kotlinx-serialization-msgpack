@@ -1,6 +1,7 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.ArraySerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.serializer
@@ -177,6 +178,30 @@ internal class MsgPackTest {
             *TestData.str8TestPairs,
             *TestData.str16TestPairs
         )
+    }
+
+    @Test
+    fun testArrayEncode() {
+        testEncodePairs(
+            ArraySerializer(String.serializer()),
+            *TestData.stringArrayTestPairs
+        )
+        testEncodePairs(
+            ArraySerializer(Int.serializer()),
+            *TestData.intArrayTestPairs
+        )
+    }
+
+    @Test
+    fun testArrayDecode() {
+        TestData.stringArrayTestPairs.forEach { (value, expectedResult) ->
+            val right = MsgPack.default.decodeFromByteArray(ArraySerializer(String.serializer()), value.hexStringToByteArray())
+            assertEquals(expectedResult.toList(), right.toList())
+        }
+        TestData.intArrayTestPairs.forEach { (value, expectedResult) ->
+            val right = MsgPack.default.decodeFromByteArray(ArraySerializer(Int.serializer()), value.hexStringToByteArray())
+            assertEquals(expectedResult.toList(), right.toList())
+        }
     }
 
     private fun <T> testEncodePairs(serializer: KSerializer<T>, vararg pairs: Pair<String, T>) {

@@ -1,5 +1,7 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
+import kotlinx.serialization.builtins.ArraySerializer
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.modules.SerializersModule
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -96,6 +98,24 @@ internal class MsgPackDecoderTest {
             *TestData.str8TestPairs,
             *TestData.str16TestPairs
         )
+    }
+
+    @Test
+    fun testArrayDecodeStringArrays() {
+        TestData.stringArrayTestPairs.forEach { (input, result) ->
+            val decoder = MsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray())
+            val serializer = ArraySerializer(String.serializer())
+            assertEquals(result.toList(), serializer.deserialize(decoder).toList())
+        }
+    }
+
+    @Test
+    fun testArrayDecodeIntArrays() {
+        TestData.intArrayTestPairs.forEach { (input, result) ->
+            val decoder = MsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray())
+            val serializer = ArraySerializer(Int.serializer())
+            assertEquals(result.toList(), serializer.deserialize(decoder).toList())
+        }
     }
 
     private fun <RESULT> testPairs(decodeFunction: MsgPackDecoder.() -> RESULT, vararg pairs: Pair<String, RESULT>) {
