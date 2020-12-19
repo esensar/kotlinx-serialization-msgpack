@@ -1,6 +1,7 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
 import kotlinx.serialization.builtins.ArraySerializer
+import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.modules.SerializersModule
 import kotlin.test.Test
@@ -107,6 +108,16 @@ internal class MsgPackEncoderTest {
         TestData.intArrayTestPairs.forEach { (result, input) ->
             val encoder = MsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})
             val serializer = ArraySerializer(Int.serializer())
+            serializer.serialize(encoder, input)
+            assertEquals(result, encoder.result.toByteArray().toHex())
+        }
+    }
+
+    @Test
+    fun testMapEncode() {
+        TestData.mapTestPairs.forEach { (result, input) ->
+            val encoder = MsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})
+            val serializer = MapSerializer(String.serializer(), String.serializer())
             serializer.serialize(encoder, input)
             assertEquals(result, encoder.result.toByteArray().toHex())
         }

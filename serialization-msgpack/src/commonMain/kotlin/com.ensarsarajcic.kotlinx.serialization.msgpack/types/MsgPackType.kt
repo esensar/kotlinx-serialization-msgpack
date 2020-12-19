@@ -85,5 +85,20 @@ internal object MsgPackType {
         const val MAX_ARRAY32_LENGTH = Int.MAX_UINT
     }
 
+    internal object Map {
+        const val MAP16 = 0xde.toByte()
+        const val MAP32 = 0xdf.toByte()
+
+        val FIXMAP_SIZE_MASK = object : Mask<Byte> {
+            private val mask = 0b10000000
+            override fun maskValue(value: Byte): Byte = (mask or value.toInt()).toByte()
+            override fun test(value: Byte): kotlin.Boolean = (mask and value.toInt()) == mask
+            override fun unMaskValue(value: Byte): Byte = (mask xor value.toInt()).toByte()
+        }
+        const val MAX_FIXMAP_SIZE = 15
+        const val MAX_MAP16_LENGTH = Int.MAX_USHORT
+        const val MAX_MAP32_LENGTH = Int.MAX_UINT
+    }
+
     const val NULL = 0xc0.toByte()
 }

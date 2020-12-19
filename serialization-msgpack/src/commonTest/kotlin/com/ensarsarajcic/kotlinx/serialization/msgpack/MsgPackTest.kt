@@ -2,9 +2,9 @@ package com.ensarsarajcic.kotlinx.serialization.msgpack
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ArraySerializer
+import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.serializer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -202,6 +202,22 @@ internal class MsgPackTest {
             val right = MsgPack.default.decodeFromByteArray(ArraySerializer(Int.serializer()), value.hexStringToByteArray())
             assertEquals(expectedResult.toList(), right.toList())
         }
+    }
+
+    @Test
+    fun testMapEncode() {
+        testEncodePairs(
+            MapSerializer(String.serializer(), String.serializer()),
+            *TestData.mapTestPairs
+        )
+    }
+
+    @Test
+    fun testMapDecode() {
+        testDecodePairs(
+            MapSerializer(String.serializer(), String.serializer()),
+            *TestData.mapTestPairs
+        )
     }
 
     private fun <T> testEncodePairs(serializer: KSerializer<T>, vararg pairs: Pair<String, T>) {
