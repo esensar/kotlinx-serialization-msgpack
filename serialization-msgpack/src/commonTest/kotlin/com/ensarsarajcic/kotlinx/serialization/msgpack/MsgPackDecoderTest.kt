@@ -88,9 +88,20 @@ internal class MsgPackDecoderTest {
         }
     }
 
+    @Test
+    fun testStringDecode() {
+        testPairs(
+            MsgPackDecoder::decodeString,
+            *TestData.fixStrTestPairs,
+            *TestData.str8TestPairs,
+            *TestData.str16TestPairs
+        )
+    }
+
     private fun <RESULT> testPairs(decodeFunction: MsgPackDecoder.() -> RESULT, vararg pairs: Pair<String, RESULT>) {
         pairs.forEach { (input, result) ->
             MsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray()).also {
+                println(input)
                 assertEquals(result, it.decodeFunction())
             }
         }

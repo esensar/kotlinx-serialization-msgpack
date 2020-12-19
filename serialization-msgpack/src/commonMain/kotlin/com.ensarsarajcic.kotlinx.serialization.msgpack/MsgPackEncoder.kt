@@ -99,6 +99,29 @@ internal class MsgPackEncoder(
         result.addAll(value.toRawBits().splitToByteArray().toList())
     }
 
+    override fun encodeString(value: String) {
+        val bytes = value.encodeToByteArray()
+        when {
+            bytes.size <= MsgPackType.String.MAX_FIXSTR_LENGTH -> {
+                result.add(MsgPackType.String.FIXSTR_SIZE_MASK.maskValue(bytes.size.toByte()))
+            }
+            bytes.size <= MsgPackType.String.MAX_STR8_LENGTH -> {
+                result.add(MsgPackType.String.STR8)
+                result.addAll(bytes.size.toByte().splitToByteArray().toList())
+            }
+            bytes.size <= MsgPackType.String.MAX_STR16_LENGTH -> {
+                result.add(MsgPackType.String.STR16)
+                result.addAll(bytes.size.toShort().splitToByteArray().toList())
+            }
+            bytes.size <= MsgPackType.String.MAX_STR32_LENGTH -> {
+                result.add(MsgPackType.String.STR32)
+                result.addAll(bytes.size.toInt().splitToByteArray().toList())
+            }
+            else -> TODO("TOO LONG STRING")
+        }
+        result.addAll(bytes.toList())
+    }
+
     private inline fun <reified T : Number> T.splitToByteArray(): ByteArray {
         val byteCount = when (T::class) {
             Byte::class -> 1
