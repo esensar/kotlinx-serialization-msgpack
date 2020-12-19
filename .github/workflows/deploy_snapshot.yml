@@ -18,6 +18,6 @@ jobs:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
       - name: Deploy snapshot to GitHub packages
-        run: ./gradlew publishAllPublicationsToSnapshotRepository
+        run: ./gradlew publishAllPublicationsToGitHubPackagesRepository
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
