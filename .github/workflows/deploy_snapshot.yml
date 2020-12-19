@@ -1,0 +1,23 @@
+name: Deploy to GitHub packages and Sonatype Snapshots
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run tests with Gradle
+        run: ./gradlew allTests
+      - name: Deploy snapshot to Sonatype Snapshots
+        run: ./gradlew publishAllPublicationsToSnapshotRepository
+        env: 
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+      - name: Deploy snapshot to GitHub packages
+        run: ./gradlew publishAllPublicationsToSnapshotRepository
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
