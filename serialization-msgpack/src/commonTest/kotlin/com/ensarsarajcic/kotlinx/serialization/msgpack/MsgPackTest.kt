@@ -122,6 +122,38 @@ internal class MsgPackTest {
     }
 
     @Test
+    fun testFloatEncode() {
+        testEncodePairs(
+            Float.serializer(),
+            *TestData.floatTestPairs
+        )
+    }
+
+    @Test
+    fun testFloatDecode() {
+        testDecodePairs(
+            Float.serializer(),
+            *TestData.floatTestPairs
+        )
+    }
+
+    @Test
+    fun testDoubleEncode() {
+        testEncodePairs(
+            Double.serializer(),
+            *TestData.doubleTestPairs
+        )
+    }
+
+    @Test
+    fun testDoubleDecode() {
+        testDecodePairs(
+            Double.serializer(),
+            *TestData.doubleTestPairs
+        )
+    }
+
+    @Test
     fun testStringEncode() {
         testEncodePairs(
             String.serializer(),
