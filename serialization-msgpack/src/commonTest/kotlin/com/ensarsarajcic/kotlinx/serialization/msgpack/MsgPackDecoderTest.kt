@@ -128,6 +128,15 @@ internal class MsgPackDecoderTest {
         }
     }
 
+    @Test
+    fun testSampleClassDecode() {
+        TestData.sampleClassTestPairs.forEach { (input, result) ->
+            val decoder = MsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray())
+            val serializer = TestData.SampleClass.serializer()
+            assertEquals(result, serializer.deserialize(decoder))
+        }
+    }
+
     private fun <RESULT> testPairs(decodeFunction: MsgPackDecoder.() -> RESULT, vararg pairs: Pair<String, RESULT>) {
         pairs.forEach { (input, result) ->
             MsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray()).also {

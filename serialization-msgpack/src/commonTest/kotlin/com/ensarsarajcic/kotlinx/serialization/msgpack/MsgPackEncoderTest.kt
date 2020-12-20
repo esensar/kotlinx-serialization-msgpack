@@ -123,6 +123,16 @@ internal class MsgPackEncoderTest {
         }
     }
 
+    @Test
+    fun testSampleClassEncode() {
+        TestData.sampleClassTestPairs.forEach { (result, input) ->
+            val encoder = MsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})
+            val serializer = TestData.SampleClass.serializer()
+            serializer.serialize(encoder, input)
+            assertEquals(result, encoder.result.toByteArray().toHex())
+        }
+    }
+
     private fun <INPUT> testPairs(encodeFunction: MsgPackEncoder.(INPUT) -> Unit, vararg pairs: Pair<String, INPUT>) {
         pairs.forEach { (result, input) ->
             MsgPackEncoder(MsgPackConfiguration.default, SerializersModule {}).also {
