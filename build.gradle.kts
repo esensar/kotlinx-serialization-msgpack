@@ -14,7 +14,7 @@ buildscript {
 
 allprojects {
     group = Config.group
-    version = Config.version
+    version = version
 
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
 
