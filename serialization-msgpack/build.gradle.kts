@@ -3,6 +3,7 @@ plugins {
     kotlin("plugin.serialization")
     id("maven-publish")
     id("signing")
+    id("org.jetbrains.dokka")
 }
 
 val sonatypeStaging = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
@@ -79,6 +80,14 @@ kotlin {
     }
 }
 
+tasks {
+    create<Jar>("javadocJar") {
+        dependsOn(dokkaJavadoc)
+        archiveClassifier.set("javadoc")
+        from(dokkaJavadoc.get().outputDirectory)
+    }
+}
+
 signing {
     isRequired = false
     sign(publishing.publications)
@@ -86,6 +95,7 @@ signing {
 
 publishing {
     publications.withType(MavenPublication::class) {
+        artifact(tasks["javadocJar"])
         pom {
             name.set("Kotlinx Serialization MsgPack")
             description.set("MsgPack format support for kotlinx.serialization")
@@ -113,7 +123,9 @@ publishing {
     }
     repositories {
         maven {
-
+            signing {
+                isRequired = true
+            }
             url = uri(sonatypeStaging)
             credentials {
                 username = sonatypeUsername ?: sonatypeUsernameEnv ?: ""
