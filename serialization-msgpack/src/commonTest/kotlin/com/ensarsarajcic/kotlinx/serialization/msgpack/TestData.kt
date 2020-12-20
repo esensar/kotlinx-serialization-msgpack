@@ -1,5 +1,8 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
 object TestData {
     val booleanTestPairs = arrayOf(
         "c3" to true,
@@ -96,5 +99,17 @@ object TestData {
     )
     val mapTestPairs = arrayOf(
         "81a3616263a3646566" to mapOf("abc" to "def")
+    )
+
+    @Serializable
+    data class SampleClass(
+        @SerialName("testString")
+        val testString: String,
+        val testInt: Int,
+        val testBoolean: Boolean
+    )
+
+    val sampleClassTestPairs = arrayOf(
+        "83aa74657374537472696e67a3646566a774657374496e747bab74657374426f6f6c65616ec3" to SampleClass("def", 123, true)
     )
 }

@@ -4,6 +4,7 @@ import com.ensarsarajcic.kotlinx.serialization.msgpack.types.MsgPackType
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractDecoder
+import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.modules.SerializersModule
 
 internal class MsgPackDecoder(
@@ -24,11 +25,20 @@ internal class MsgPackDecoder(
         return result
     }
 
+    // TODO Don't use flags, separate composite decoders for classes, lists and maps
+    private var decodingClass = false
+
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
+        if (descriptor.kind in arrayOf(StructureKind.CLASS, StructureKind.OBJECT)) {
+            // TODO Improve structure end logic
+            //      This will probably fail in nested structures
+            val fieldName = kotlin.runCatching { decodeString() }.getOrNull() ?: return CompositeDecoder.DECODE_DONE
+            return descriptor.getElementIndex(fieldName)
+        }
         return 0
     }
 
-    override fun decodeSequentially(): Boolean = true
+    override fun decodeSequentially(): Boolean = !decodingClass
 
     override fun decodeNotNullMark(): Boolean {
         val next = byteArray.getOrNull(index) ?: throw Exception("End of stream")
@@ -179,6 +189,19 @@ internal class MsgPackDecoder(
                 TODO("Unsupported collection")
             }
         }
+    }
+
+    override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder {
+        if (descriptor.kind in arrayOf(StructureKind.CLASS, StructureKind.OBJECT)) {
+            decodingClass = true
+            decodeCollectionSize(descriptor)
+        }
+        return this
+    }
+
+    override fun endStructure(descriptor: SerialDescriptor) {
+        decodingClass = false
+        super.endStructure(descriptor)
     }
 
     private inline fun <reified T : Number> ByteArray.joinToNumber(): T {

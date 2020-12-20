@@ -1,6 +1,8 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
 import com.ensarsarajcic.kotlinx.serialization.msgpack.types.MsgPackType
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractEncoder
@@ -125,6 +127,15 @@ internal class MsgPackEncoder(
         result.addAll(bytes.toList())
     }
 
+    override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder {
+        return if (descriptor.kind in arrayOf(StructureKind.CLASS, StructureKind.OBJECT)) {
+            beginCollection(descriptor, descriptor.elementsCount)
+            MsgPackClassEncoder()
+        } else {
+            this
+        }
+    }
+
     override fun beginCollection(descriptor: SerialDescriptor, collectionSize: Int): CompositeEncoder {
         when (descriptor.kind) {
             StructureKind.LIST ->
@@ -165,6 +176,86 @@ internal class MsgPackEncoder(
     }
 
     override fun endStructure(descriptor: SerialDescriptor) {
+        // no-op, everything is handled when starting structure/collection
+    }
+
+    // TODO Refactor as a completely separate class
+    internal inner class MsgPackClassEncoder : CompositeEncoder {
+        override val serializersModule: SerializersModule = this@MsgPackEncoder.serializersModule
+
+        private fun encodeName(descriptor: SerialDescriptor, index: Int) {
+            encodeString(descriptor.getElementName(index))
+        }
+
+        override fun encodeBooleanElement(descriptor: SerialDescriptor, index: Int, value: Boolean) {
+            encodeName(descriptor, index)
+            encodeBoolean(value)
+        }
+
+        override fun encodeByteElement(descriptor: SerialDescriptor, index: Int, value: Byte) {
+            encodeName(descriptor, index)
+            encodeByte(value)
+        }
+
+        override fun encodeCharElement(descriptor: SerialDescriptor, index: Int, value: Char) {
+            encodeName(descriptor, index)
+            encodeChar(value)
+        }
+
+        override fun encodeDoubleElement(descriptor: SerialDescriptor, index: Int, value: Double) {
+            encodeName(descriptor, index)
+            encodeDouble(value)
+        }
+
+        override fun encodeFloatElement(descriptor: SerialDescriptor, index: Int, value: Float) {
+            encodeName(descriptor, index)
+            encodeFloat(value)
+        }
+
+        override fun encodeIntElement(descriptor: SerialDescriptor, index: Int, value: Int) {
+            encodeName(descriptor, index)
+            encodeInt(value)
+        }
+
+        override fun encodeLongElement(descriptor: SerialDescriptor, index: Int, value: Long) {
+            encodeName(descriptor, index)
+            encodeLong(value)
+        }
+
+        override fun encodeShortElement(descriptor: SerialDescriptor, index: Int, value: Short) {
+            encodeName(descriptor, index)
+            encodeShort(value)
+        }
+
+        override fun encodeStringElement(descriptor: SerialDescriptor, index: Int, value: String) {
+            encodeName(descriptor, index)
+            encodeString(value)
+        }
+
+        override fun endStructure(descriptor: SerialDescriptor) {
+            // No-op
+        }
+
+        @ExperimentalSerializationApi
+        override fun <T : Any> encodeNullableSerializableElement(
+            descriptor: SerialDescriptor,
+            index: Int,
+            serializer: SerializationStrategy<T>,
+            value: T?
+        ) {
+            encodeName(descriptor, index)
+            encodeNullableSerializableValue(serializer, value)
+        }
+
+        override fun <T> encodeSerializableElement(
+            descriptor: SerialDescriptor,
+            index: Int,
+            serializer: SerializationStrategy<T>,
+            value: T
+        ) {
+            encodeName(descriptor, index)
+            encodeSerializableValue(serializer, value)
+        }
     }
 
     private inline fun <reified T : Number> T.splitToByteArray(): ByteArray {
