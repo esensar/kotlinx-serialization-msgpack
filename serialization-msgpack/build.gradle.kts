@@ -123,9 +123,6 @@ publishing {
     }
     repositories {
         maven {
-            signing {
-                isRequired = true
-            }
             url = uri(sonatypeStaging)
             credentials {
                 username = sonatypeUsername ?: sonatypeUsernameEnv ?: ""
