@@ -1,0 +1,4 @@
+contact_links:  
+  - name: Discussions
+    url: https://github.com/esensar/kotlinx-serialization-msgpack/discussions
+    about: Please ask and answer questions here, as well as discuss potential improvements and ideas.
