@@ -70,6 +70,16 @@ internal object MsgPackType {
         const val MAX_STR32_LENGTH = Int.MAX_UINT
     }
 
+    internal object Bin {
+        const val BIN8 = 0xc4.toByte()
+        const val BIN16 = 0xc5.toByte()
+        const val BIN32 = 0xc6.toByte()
+
+        const val MAX_BIN8_LENGTH = Int.MAX_UBYTE
+        const val MAX_BIN16_LENGTH = Int.MAX_USHORT
+        const val MAX_BIN32_LENGTH = Int.MAX_UINT
+    }
+
     internal object Array {
         const val ARRAY16 = 0xdc.toByte()
         const val ARRAY32 = 0xdd.toByte()

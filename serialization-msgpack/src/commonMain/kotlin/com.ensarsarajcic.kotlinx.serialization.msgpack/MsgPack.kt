@@ -39,13 +39,13 @@ class MsgPack @JvmOverloads constructor(
 
     override fun <T> decodeFromByteArray(deserializer: DeserializationStrategy<T>, bytes: ByteArray): T {
         val decoder = MsgPackDecoder(configuration, serializersModule, bytes)
-        return deserializer.deserialize(decoder)
+        return decoder.decodeSerializableValue(deserializer)
     }
 
     override fun <T> encodeToByteArray(serializer: SerializationStrategy<T>, value: T): ByteArray {
         val encoder = MsgPackEncoder(configuration, serializersModule)
         kotlin.runCatching {
-            serializer.serialize(encoder, value)
+            encoder.encodeSerializableValue(serializer, value)
         }.fold(
             onSuccess = { return encoder.result.toByteArray() },
             onFailure = {

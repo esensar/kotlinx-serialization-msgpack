@@ -2,9 +2,11 @@ package com.ensarsarajcic.kotlinx.serialization.msgpack
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ArraySerializer
+import kotlinx.serialization.builtins.ByteArraySerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.serializer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -178,6 +180,21 @@ internal class MsgPackTest {
             *TestData.str8TestPairs,
             *TestData.str16TestPairs
         )
+    }
+
+    @Test
+    fun testBinaryEncode() {
+        testEncodePairs(
+            ByteArraySerializer(),
+            *TestData.bin8TestPairs
+        )
+    }
+
+    @Test
+    fun testBinaryDecode() {
+        TestData.bin8TestPairs.forEach { (value, expectedResult) ->
+            assertTrue { expectedResult.contentEquals(MsgPack.default.decodeFromByteArray(ByteArraySerializer(), value.hexStringToByteArray())) }
+        }
     }
 
     @Test

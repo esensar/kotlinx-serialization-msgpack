@@ -4,6 +4,7 @@ import kotlinx.serialization.builtins.ArraySerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.serializer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -90,6 +91,14 @@ internal class MsgPackEncoderTest {
             *TestData.fixStrTestPairs,
             *TestData.str8TestPairs,
             *TestData.str16TestPairs
+        )
+    }
+
+    @Test
+    fun testBinaryEncode() {
+        testPairs(
+            { this.encodeSerializableValue(serializer<ByteArray>(), it) },
+            *TestData.bin8TestPairs
         )
     }
 
