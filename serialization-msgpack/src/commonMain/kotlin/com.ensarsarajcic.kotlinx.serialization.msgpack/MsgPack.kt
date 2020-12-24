@@ -21,6 +21,7 @@ import kotlin.jvm.JvmStatic
  *
  * // parsing from [ByteArray] to an object
  * msgPack.parse(Message.serializer(), binaryData)
+ * ```
  *
  * @see MsgPack.default The instance using default configurations.
  */
