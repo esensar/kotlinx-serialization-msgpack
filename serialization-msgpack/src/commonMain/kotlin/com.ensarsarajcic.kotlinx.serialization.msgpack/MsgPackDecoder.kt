@@ -1,6 +1,8 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
 import com.ensarsarajcic.kotlinx.serialization.msgpack.types.MsgPackType
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.builtins.ByteArraySerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractDecoder
@@ -155,6 +157,23 @@ internal class MsgPackDecoder(
         return takeNext(length).decodeToString()
     }
 
+    fun decodeByteArray(): ByteArray {
+        val next = byteArray.getOrNull(index) ?: throw Exception("End of stream")
+        index++
+        val length = when (next) {
+            MsgPackType.Bin.BIN8 -> requireNextByte().toInt() and 0xff
+            MsgPackType.Bin.BIN16 -> takeNext(2).joinToNumber()
+            // TODO: this may have issues with long byte arrays, since size will overflow
+            MsgPackType.Bin.BIN32 -> takeNext(4).joinToNumber()
+            else -> {
+                index--
+                throw TODO("Add a more descriptive error when wrong type is found!")
+            }
+        }
+        if (length == 0) return byteArrayOf()
+        return takeNext(length)
+    }
+
     override fun decodeCollectionSize(descriptor: SerialDescriptor): Int {
         val next = byteArray.getOrNull(index) ?: throw Exception("End of stream")
         index++
@@ -188,6 +207,14 @@ internal class MsgPackDecoder(
                 index--
                 TODO("Unsupported collection")
             }
+        }
+    }
+
+    override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
+        return if (deserializer == ByteArraySerializer()) {
+            decodeByteArray() as T
+        } else {
+            super.decodeSerializableValue(deserializer)
         }
     }
 

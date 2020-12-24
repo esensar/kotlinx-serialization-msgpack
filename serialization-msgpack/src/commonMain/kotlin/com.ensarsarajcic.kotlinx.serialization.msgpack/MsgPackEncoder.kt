@@ -3,6 +3,7 @@ package com.ensarsarajcic.kotlinx.serialization.msgpack
 import com.ensarsarajcic.kotlinx.serialization.msgpack.types.MsgPackType
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.builtins.ByteArraySerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractEncoder
@@ -127,6 +128,25 @@ internal class MsgPackEncoder(
         result.addAll(bytes.toList())
     }
 
+    fun encodeByteArray(value: ByteArray) {
+        when {
+            value.size <= MsgPackType.Bin.MAX_BIN8_LENGTH -> {
+                result.add(MsgPackType.Bin.BIN8)
+                result.addAll(value.size.toByte().splitToByteArray().toList())
+            }
+            value.size <= MsgPackType.Bin.MAX_BIN16_LENGTH -> {
+                result.add(MsgPackType.Bin.BIN16)
+                result.addAll(value.size.toShort().splitToByteArray().toList())
+            }
+            value.size <= MsgPackType.Bin.MAX_BIN32_LENGTH -> {
+                result.add(MsgPackType.Bin.BIN32)
+                result.addAll(value.size.toInt().splitToByteArray().toList())
+            }
+            else -> TODO("TOO LONG STRING")
+        }
+        result.addAll(value.toList())
+    }
+
     override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder {
         return if (descriptor.kind in arrayOf(StructureKind.CLASS, StructureKind.OBJECT)) {
             beginCollection(descriptor, descriptor.elementsCount)
@@ -175,8 +195,25 @@ internal class MsgPackEncoder(
         return this
     }
 
+    override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
+        if (serializer == ByteArraySerializer()) {
+            encodeByteArray(value as ByteArray)
+        } else {
+            super.encodeSerializableValue(serializer, value)
+        }
+    }
+
     override fun endStructure(descriptor: SerialDescriptor) {
         // no-op, everything is handled when starting structure/collection
+    }
+
+    // TODO Refactor as a completely separate class
+    internal inner class ByteArrayEncoder : CompositeEncoder, AbstractEncoder() {
+        override val serializersModule: SerializersModule = this@MsgPackEncoder.serializersModule
+
+        override fun encodeByte(value: Byte) {
+            result.add(value)
+        }
     }
 
     // TODO Refactor as a completely separate class

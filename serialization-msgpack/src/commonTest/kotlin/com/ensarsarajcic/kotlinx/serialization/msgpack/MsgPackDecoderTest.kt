@@ -4,6 +4,7 @@ import kotlinx.serialization.builtins.ArraySerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.serializer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -102,6 +103,15 @@ internal class MsgPackDecoderTest {
     }
 
     @Test
+    fun testByteArrayDecode() {
+        TestData.bin8TestPairs.forEach { (input, result) ->
+            MsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray()).also {
+                assertTrue { result.contentEquals(it.decodeSerializableValue(serializer())) }
+            }
+        }
+    }
+
+    @Test
     fun testArrayDecodeStringArrays() {
         TestData.stringArrayTestPairs.forEach { (input, result) ->
             val decoder = MsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray())
@@ -140,7 +150,6 @@ internal class MsgPackDecoderTest {
     private fun <RESULT> testPairs(decodeFunction: MsgPackDecoder.() -> RESULT, vararg pairs: Pair<String, RESULT>) {
         pairs.forEach { (input, result) ->
             MsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray()).also {
-                println(input)
                 assertEquals(result, it.decodeFunction())
             }
         }
