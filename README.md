@@ -62,3 +62,11 @@ Library should be used in same way as any other kotlinx.serialization library. C
         ) // Outputs: SampleClass(testString=def, testInt=123, testBoolean=true)
     }
 ```
+
+## Contributing
+
+Check out [contributing guidelines](CONTRIBUTING.md).
+
+## License
+
+[MIT](LICENSE)
