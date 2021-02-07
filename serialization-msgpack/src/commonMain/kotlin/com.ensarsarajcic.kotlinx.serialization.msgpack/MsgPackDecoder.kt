@@ -1,6 +1,6 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
-import com.ensarsarajcic.kotlinx.serialization.msgpack.stream.MsgPackDataBuffer
+import com.ensarsarajcic.kotlinx.serialization.msgpack.stream.MsgPackDataInputBuffer
 import com.ensarsarajcic.kotlinx.serialization.msgpack.types.MsgPackType
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.builtins.ByteArraySerializer
@@ -13,7 +13,7 @@ import kotlinx.serialization.modules.SerializersModule
 internal class MsgPackDecoder(
     private val configuration: MsgPackConfiguration,
     override val serializersModule: SerializersModule,
-    private val dataBuffer: MsgPackDataBuffer
+    private val dataBuffer: MsgPackDataInputBuffer
 ) : AbstractDecoder() {
 
     // TODO Don't use flags, separate composite decoders for classes, lists and maps

@@ -5,11 +5,11 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.fail
 
-internal class MsgPackDataBufferTest {
+internal class MsgPackDataInputBufferTest {
 
     @Test
     fun testEmptyBuffer() {
-        val buffer = MsgPackDataBuffer(byteArrayOf())
+        val buffer = MsgPackDataInputBuffer(byteArrayOf())
 
         try {
             buffer.peek()
@@ -28,7 +28,7 @@ internal class MsgPackDataBufferTest {
 
     @Test
     fun testBuffer() {
-        val buffer = MsgPackDataBuffer(byteArrayOf(0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06))
+        val buffer = MsgPackDataInputBuffer(byteArrayOf(0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06))
 
         assertEquals(0x00, buffer.peek())
         assertEquals(0x00, buffer.nextByteOrNull())

@@ -1,8 +1,20 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack.stream
 
-internal class MsgPackDataBuffer(
-    private val byteArray: ByteArray
-) {
+internal interface MsgPackDataBuffer {
+    fun toByteArray(): ByteArray
+}
+
+internal class MsgPackDataOutputBuffer() : MsgPackDataBuffer {
+    private val bytes = mutableListOf<Byte>()
+
+    fun add(byte: Byte) = bytes.add(byte)
+    fun addAll(bytes: List<Byte>) = this.bytes.addAll(bytes)
+    fun addAll(bytes: ByteArray) = this.bytes.addAll(bytes.toList())
+
+    override fun toByteArray() = bytes.toByteArray()
+}
+
+internal class MsgPackDataInputBuffer(private val byteArray: ByteArray) : MsgPackDataBuffer {
     private var index = 0
 
     fun skip(bytes: Int) {
@@ -24,6 +36,8 @@ internal class MsgPackDataBuffer(
         }
         return result
     }
+
+    override fun toByteArray() = byteArray
 }
 
-internal fun ByteArray.toMsgPackBuffer() = MsgPackDataBuffer(this)
+internal fun ByteArray.toMsgPackBuffer() = MsgPackDataInputBuffer(this)

@@ -1,5 +1,6 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
+import com.ensarsarajcic.kotlinx.serialization.msgpack.stream.MsgPackDataOutputBuffer
 import com.ensarsarajcic.kotlinx.serialization.msgpack.types.MsgPackType
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationStrategy
@@ -14,9 +15,7 @@ internal class MsgPackEncoder(
     private val configuration: MsgPackConfiguration,
     override val serializersModule: SerializersModule
 ) : AbstractEncoder() {
-    // TODO this may not be a list in the end
-    //      It sould probably be delegated to something
-    val result = mutableListOf<Byte>()
+    val result = MsgPackDataOutputBuffer()
 
     override fun encodeBoolean(value: Boolean) {
         result.add(MsgPackType.Boolean(value))
