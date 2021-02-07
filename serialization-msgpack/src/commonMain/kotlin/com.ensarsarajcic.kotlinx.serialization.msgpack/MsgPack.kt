@@ -1,6 +1,5 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
-import com.ensarsarajcic.kotlinx.serialization.msgpack.stream.MsgPackDataBuffer
 import com.ensarsarajcic.kotlinx.serialization.msgpack.stream.toMsgPackBuffer
 import kotlinx.serialization.BinaryFormat
 import kotlinx.serialization.DeserializationStrategy

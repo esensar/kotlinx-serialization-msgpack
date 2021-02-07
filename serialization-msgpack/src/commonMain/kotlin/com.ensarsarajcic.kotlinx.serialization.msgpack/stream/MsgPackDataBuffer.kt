@@ -13,9 +13,9 @@ internal class MsgPackDataBuffer(
 
     // Increases index only if next byte is not null
     fun nextByteOrNull(): Byte? = byteArray.getOrNull(index)?.also { index++ }
-    
+
     fun requireNextByte(): Byte = nextByteOrNull() ?: throw Exception("End of stream")
-    
+
     fun takeNext(next: Int): ByteArray {
         require(next > 0) { "Number of bytes to take must be greater than 0!" }
         val result = ByteArray(next)

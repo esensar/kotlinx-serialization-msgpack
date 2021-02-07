@@ -10,13 +10,13 @@ internal class MsgPackDataBufferTest {
     @Test
     fun testEmptyBuffer() {
         val buffer = MsgPackDataBuffer(byteArrayOf())
-        
+
         try {
             buffer.peek()
             fail("Peeking in empty buffer should fail!")
         } catch (e: Exception) {
         }
-        
+
         try {
             buffer.requireNextByte()
             fail("Requiring next byte in empty buffer should fail!")
