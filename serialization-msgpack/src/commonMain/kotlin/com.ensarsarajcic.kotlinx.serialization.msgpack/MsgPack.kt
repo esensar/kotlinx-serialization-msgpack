@@ -1,5 +1,6 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
+import com.ensarsarajcic.kotlinx.serialization.msgpack.stream.toMsgPackBuffer
 import kotlinx.serialization.BinaryFormat
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -38,7 +39,7 @@ class MsgPack @JvmOverloads constructor(
     }
 
     override fun <T> decodeFromByteArray(deserializer: DeserializationStrategy<T>, bytes: ByteArray): T {
-        val decoder = MsgPackDecoder(configuration, serializersModule, bytes)
+        val decoder = MsgPackDecoder(configuration, serializersModule, bytes.toMsgPackBuffer())
         return decoder.decodeSerializableValue(deserializer)
     }
 
