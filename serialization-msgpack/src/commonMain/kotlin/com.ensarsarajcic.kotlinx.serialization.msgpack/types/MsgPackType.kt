@@ -110,5 +110,36 @@ internal object MsgPackType {
         const val MAX_MAP32_LENGTH = Int.MAX_UINT
     }
 
+    internal object Ext {
+        const val FIXEXT1 = 0xd4.toByte()
+        const val FIXEXT2 = 0xd5.toByte()
+        const val FIXEXT4 = 0xd6.toByte()
+        const val FIXEXT8 = 0xd7.toByte()
+        const val FIXEXT16 = 0xd8.toByte()
+        const val EXT8 = 0xc7.toByte()
+        const val EXT16 = 0xc8.toByte()
+        const val EXT32 = 0xc9.toByte()
+
+        val SIZES = hashMapOf(
+            FIXEXT1 to 1,
+            FIXEXT2 to 2,
+            FIXEXT4 to 4,
+            FIXEXT8 to 8,
+            FIXEXT16 to 16
+        )
+
+        val SIZE_SIZE = hashMapOf(
+            EXT8 to 1,
+            EXT16 to 2,
+            EXT32 to 4
+        )
+
+        val TYPES = SIZES.keys + listOf(EXT8, EXT16, EXT32)
+
+        const val MAX_EXT8_LENGTH = Int.MAX_UBYTE
+        const val MAX_EXT16_LENGTH = Int.MAX_USHORT
+        const val MAX_EXT32_LENGTH = Int.MAX_UINT
+    }
+
     const val NULL = 0xc0.toByte()
 }

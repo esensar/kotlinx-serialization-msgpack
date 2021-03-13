@@ -198,7 +198,12 @@ internal class MsgPackDecoder(
 
     override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder {
         if (descriptor.kind in arrayOf(StructureKind.CLASS, StructureKind.OBJECT)) {
+            if (descriptor.serialName == "com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackExtension") {
+                return ExtensionTypeDecoder()
+            }
+            // Handle extension types as arrays
             decodingClass = true
+            // TODO compare with descriptor.elementsCount
             decodeCollectionSize(descriptor)
         }
         return this
@@ -207,6 +212,53 @@ internal class MsgPackDecoder(
     override fun endStructure(descriptor: SerialDescriptor) {
         decodingClass = false
         super.endStructure(descriptor)
+    }
+
+    private inner class ExtensionTypeDecoder : CompositeDecoder, AbstractDecoder() {
+        var type: Byte? = null
+        var typeId: Byte? = null
+        var size: Int? = null
+        var bytesRead = 0
+
+        override val serializersModule: SerializersModule = this@MsgPackDecoder.serializersModule
+
+        override fun decodeByte(): Byte {
+            return if (bytesRead == 0) {
+                val byte = dataBuffer.requireNextByte()
+                bytesRead++
+                if (!MsgPackType.Ext.TYPES.contains(byte)) {
+                    throw TODO("Unexpected byte")
+                }
+                type = byte
+                if (MsgPackType.Ext.SIZES.containsKey(type)) {
+                    size = MsgPackType.Ext.SIZES[type]
+                }
+                type!!
+            } else if (bytesRead == 1 && size != null) {
+                val byte = dataBuffer.requireNextByte()
+                bytesRead++
+                typeId = byte
+                typeId!!
+            } else if (bytesRead == 1 && size == null) {
+                val sizeSize = MsgPackType.Ext.SIZE_SIZE[type]
+                bytesRead += sizeSize!!
+                size = dataBuffer.takeNext(sizeSize).joinToNumber()
+                val byte = dataBuffer.requireNextByte()
+                bytesRead++
+                typeId = byte
+                typeId!!
+            } else {
+                throw TODO("Handle?")
+            }
+        }
+        override fun decodeElementIndex(descriptor: SerialDescriptor): Int = if (bytesRead <= 2) bytesRead else CompositeDecoder.DECODE_DONE
+
+        override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
+            bytesRead += 1
+            return dataBuffer.takeNext(
+                size!!
+            ) as T
+        }
     }
 
     private inline fun <reified T : Number> ByteArray.joinToNumber(): T {
