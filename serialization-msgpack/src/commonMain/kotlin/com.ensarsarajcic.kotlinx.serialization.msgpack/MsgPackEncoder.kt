@@ -148,8 +148,12 @@ internal class MsgPackEncoder(
 
     override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder {
         return if (descriptor.kind in arrayOf(StructureKind.CLASS, StructureKind.OBJECT)) {
-            beginCollection(descriptor, descriptor.elementsCount)
-            MsgPackClassEncoder()
+            if (descriptor.serialName == "com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackExtension") {
+                ExtensionTypeEncoder()
+            } else {
+                beginCollection(descriptor, descriptor.elementsCount)
+                MsgPackClassEncoder()
+            }
         } else {
             this
         }
@@ -212,6 +216,56 @@ internal class MsgPackEncoder(
 
         override fun encodeByte(value: Byte) {
             result.add(value)
+        }
+    }
+
+    internal inner class ExtensionTypeEncoder : CompositeEncoder, AbstractEncoder() {
+        override val serializersModule: SerializersModule = this@MsgPackEncoder.serializersModule
+
+        // TODO refactor
+        private var bytesWritten = 0
+        private var type: Byte? = null
+        private var size: Int? = null
+        private var typeId: Byte? = null
+
+        override fun encodeByte(value: Byte) {
+            if (bytesWritten == 0) {
+                result.add(value)
+                type = value
+            } else if (bytesWritten == 1) {
+                if (MsgPackType.Ext.SIZES.containsKey(type)) {
+                    result.add(value)
+                    size = MsgPackType.Ext.SIZES[type]
+                }
+                typeId = value
+            }
+            bytesWritten += 1
+        }
+
+        override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
+            val value = value as ByteArray
+            if (size == null) {
+                size = value.size
+                val maxSize = when (type) {
+                    MsgPackType.Ext.EXT8 -> MsgPackType.Ext.MAX_EXT8_LENGTH
+                    MsgPackType.Ext.EXT16 -> MsgPackType.Ext.MAX_EXT16_LENGTH
+                    MsgPackType.Ext.EXT32 -> MsgPackType.Ext.MAX_EXT32_LENGTH
+                    else -> TODO("HANDLE")
+                }.toLong()
+                if (size!!.toLong() > maxSize) throw TODO("Size exceeded")
+                result.addAll(
+                    when (type) {
+                        MsgPackType.Ext.EXT8 -> size!!.toByte()
+                        MsgPackType.Ext.EXT16 -> size!!.toShort()
+                        MsgPackType.Ext.EXT32 -> size!!.toInt()
+                        else -> TODO("HANDLE")
+                    }.splitToByteArray()
+                )
+                result.add(typeId!!)
+            } else {
+                if (value.size != size) throw TODO("Invalid size")
+            }
+            result.addAll(value)
         }
     }
 
