@@ -35,32 +35,32 @@ Library should be used in same way as any other kotlinx.serialization library. C
 
 **Example:**
 ```kotlin
-    @Serializable
-    data class SampleClass(
-        val testString: String,
-        val testInt: Int,
-        val testBoolean: Boolean
-    )
+@Serializable
+data class SampleClass(
+    val testString: String,
+    val testInt: Int,
+    val testBoolean: Boolean
+)
 
-    fun encode() {
-        println(
-            MsgPack.default.encodeToByteArray(
-                SampleClass.serializer(),
-                SampleClass("def", 123, true)
-            ).joinToString(separator = "") { it.toInt().and(0xff).toString(16).padStart(2, '0') }
-        ) // Outputs: 83aa74657374537472696e67a3646566a774657374496e747bab74657374426f6f6c65616ec3
-    }
+fun encode() {
+    println(
+        MsgPack.default.encodeToByteArray(
+            SampleClass.serializer(),
+            SampleClass("def", 123, true)
+        ).joinToString(separator = "") { it.toInt().and(0xff).toString(16).padStart(2, '0') }
+    ) // Outputs: 83aa74657374537472696e67a3646566a774657374496e747bab74657374426f6f6c65616ec3
+}
 
-    fun decode() {
-        println(
-            MsgPack.default.decodeFromByteArray(
-                SampleClass.serializer(),
-                "83aa74657374537472696e67a3646566a774657374496e747bab74657374426f6f6c65616ec3".let { bytesString ->
-                    ByteArray(bytesString.length / 2) { bytesString.substring(it * 2, it * 2 + 2).toInt(16).toByte() }
-                }
-            )
-        ) // Outputs: SampleClass(testString=def, testInt=123, testBoolean=true)
-    }
+fun decode() {
+    println(
+        MsgPack.default.decodeFromByteArray(
+            SampleClass.serializer(),
+            "83aa74657374537472696e67a3646566a774657374496e747bab74657374426f6f6c65616ec3".let { bytesString ->
+                ByteArray(bytesString.length / 2) { bytesString.substring(it * 2, it * 2 + 2).toInt(16).toByte() }
+            }
+        )
+    ) // Outputs: SampleClass(testString=def, testInt=123, testBoolean=true)
+}
 ```
 
 ## Contributing
