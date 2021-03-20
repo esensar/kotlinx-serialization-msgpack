@@ -1,5 +1,6 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack.extension
 
+import com.ensarsarajcic.kotlinx.serialization.msgpack.CustomExtensionType
 import com.ensarsarajcic.kotlinx.serialization.msgpack.MsgPackConfiguration
 import com.ensarsarajcic.kotlinx.serialization.msgpack.MsgPackDecoder
 import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackExtension
@@ -21,6 +22,16 @@ internal class MsgPackExtensionDecoderTest {
         val result = serializer.deserialize(decoder)
         assertEquals(expectedOutput.type, result.type)
         assertEquals(expectedOutput.extTypeId, result.extTypeId)
+        assertEquals(expectedOutput.data.toList(), result.data.toList())
+    }
+
+    @Test
+    fun testCustomExtensionDecode() {
+        val input = "d5030102"
+        val expectedOutput = CustomExtensionType(listOf(0x01, 0x02))
+        val decoder = MsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
+        val serializer = CustomExtensionType.serializer()
+        val result = serializer.deserialize(decoder)
         assertEquals(expectedOutput.data.toList(), result.data.toList())
     }
 }
