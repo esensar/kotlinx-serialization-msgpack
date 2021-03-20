@@ -1,5 +1,8 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
+import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.BaseMsgPackExtensionSerializer
+import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackExtension
+import com.ensarsarajcic.kotlinx.serialization.msgpack.types.MsgPackType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -117,4 +120,17 @@ object TestData {
     val sampleClassTestPairs = arrayOf(
         "83aa74657374537472696e67a3646566a774657374496e747bab74657374426f6f6c65616ec3" to SampleClass("def", 123, true)
     )
+}
+
+@Serializable(with = CustomExtensionSerializer::class)
+data class CustomExtensionType(val data: List<Byte>)
+
+class CustomExtensionSerializer() :
+    BaseMsgPackExtensionSerializer<CustomExtensionType>() {
+    override val type: Byte = MsgPackType.Ext.FIXEXT2
+    override val extTypeId: Byte = 3
+
+    override fun deserialize(extension: MsgPackExtension): CustomExtensionType = CustomExtensionType(extension.data.toList())
+
+    override fun serialize(extension: CustomExtensionType): MsgPackExtension = MsgPackExtension(type, extTypeId, extension.data.toByteArray())
 }
