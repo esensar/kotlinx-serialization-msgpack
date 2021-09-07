@@ -2,7 +2,7 @@ name: Deploy to GitHub packages and Sonatype Snapshots
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -14,10 +14,10 @@ jobs:
         run: ./gradlew allTests
       - name: Deploy snapshot to Sonatype Snapshots
         run: ./gradlew publishAllPublicationsToSnapshotRepository
-        env: 
+        env:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
       - name: Deploy snapshot to GitHub packages
         run: ./gradlew publishAllPublicationsToGitHubPackagesRepository
-        env: 
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
