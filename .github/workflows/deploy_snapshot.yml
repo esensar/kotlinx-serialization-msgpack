@@ -13,11 +13,11 @@ jobs:
       - name: Run tests with Gradle
         run: ./gradlew allTests
       - name: Deploy snapshot to Sonatype Snapshots
-        run: ./gradlew publishAllPublicationsToSnapshotRepository
+        run: ./gradlew -Psnapshot=true publishAllPublicationsToSnapshotRepository
         env:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
       - name: Deploy snapshot to GitHub packages
-        run: ./gradlew publishAllPublicationsToGitHubPackagesRepository
+        run: ./gradlew -Psnapshot=true publishAllPublicationsToGitHubPackagesRepository
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

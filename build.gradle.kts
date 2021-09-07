@@ -13,9 +13,11 @@ buildscript {
     }
 }
 
+val snapshot: String? by project
+
 allprojects {
     group = Config.group
-    version = version
+    version = version.toString() + if (snapshot == "true") "-SNAPSHOT" else ""
 
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
 
