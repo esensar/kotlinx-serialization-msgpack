@@ -18,7 +18,7 @@ jobs:
         run: |
           mkdir -p ~/.gradle
           echo "${{secrets.SIGNING_SECRET_KEY_RING_FILE}}" > ~/.gradle/secring.gpg.b64
-          base64 -d ~/.gradle/secring.gpg.b64 > ~/.gradle/secring.gpg
+          base64 -di ~/.gradle/secring.gpg.b64 > ~/.gradle/secring.gpg
       - name: Deploy to maven central
         run: |
           NEW_VERSION=$(./gradlew properties | grep version: | cut -d " " -f2 | sed "s/-SNAPSHOT//")
