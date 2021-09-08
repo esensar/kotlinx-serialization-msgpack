@@ -14,7 +14,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Decode secret key
+      - name: Run tests with Gradle
+        run: ./gradlew allTests
+      - name: Decode signing key
         run: |
           mkdir -p ~/.gradle
           echo "${{secrets.SIGNING_SECRET_KEY_RING_FILE}}" > ~/.gradle/secring.gpg.b64
