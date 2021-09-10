@@ -85,9 +85,9 @@ kotlin {
 
 tasks {
     create<Jar>("javadocJar") {
-        dependsOn(dokkaJavadoc)
+        dependsOn(dokkaHtml)
         archiveClassifier.set("javadoc")
-        from(dokkaJavadoc.get().outputDirectory)
+        from(dokkaHtml.get().outputDirectory)
     }
 }
 
