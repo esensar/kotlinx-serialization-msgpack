@@ -245,14 +245,19 @@ internal class MsgPackDecoder(
                 bytesRead += sizeSize!!
                 size = dataBuffer.takeNext(sizeSize).joinToNumber()
                 val byte = dataBuffer.requireNextByte()
-                bytesRead++
                 typeId = byte
                 typeId!!
             } else {
                 throw TODO("Handle?")
             }
         }
-        override fun decodeElementIndex(descriptor: SerialDescriptor): Int = if (bytesRead <= 2) bytesRead else CompositeDecoder.DECODE_DONE
+        override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
+            return if (bytesRead <= 2) bytesRead else CompositeDecoder.DECODE_DONE
+        }
+
+        override fun decodeCollectionSize(descriptor: SerialDescriptor): Int {
+            return size ?: 0
+        }
 
         override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
             bytesRead += 1

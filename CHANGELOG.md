@@ -2,9 +2,13 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+### Added
 - Upgraded kotlin version to 1.5.0
 - Upgraded kotlinx-serialization version to 1.2.2
 - Added support for timestamp extension ([#10][i10])
+
+### Fixed
+- Bug with failing to decode extension types with variable data size
 
 ## [0.2.1] - 2020-09-07
 ### Added
