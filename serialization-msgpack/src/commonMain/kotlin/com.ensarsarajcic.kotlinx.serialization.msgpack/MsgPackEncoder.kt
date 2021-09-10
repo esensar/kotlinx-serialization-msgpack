@@ -9,6 +9,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractEncoder
 import kotlinx.serialization.encoding.CompositeEncoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.SerializersModule
 
 internal class MsgPackEncoder(
@@ -300,6 +301,11 @@ internal class MsgPackEncoder(
         override fun encodeFloatElement(descriptor: SerialDescriptor, index: Int, value: Float) {
             encodeName(descriptor, index)
             encodeFloat(value)
+        }
+
+        @ExperimentalSerializationApi
+        override fun encodeInlineElement(descriptor: SerialDescriptor, index: Int): Encoder {
+            return this@MsgPackEncoder
         }
 
         override fun encodeIntElement(descriptor: SerialDescriptor, index: Int, value: Int) {

@@ -73,11 +73,11 @@ internal class MsgPackDecoderTest {
     fun testFloatDecode() {
         TestData.floatTestPairs.forEach { (input, result) ->
             MsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer()).also {
-                // Tests in JS were failing when == comparison was used, so threshold is now used
-                val threshold = 0.00001f
-                val right = it.decodeFloat()
-                assertTrue("Floats should be close enough! (Threshold is $threshold) - Expected: $result - Received: $right") { result - right < threshold }
-            }
+            // Tests in JS were failing when == comparison was used, so threshold is now used
+            val threshold = 0.00001f
+            val right = it.decodeFloat()
+            assertTrue("Floats should be close enough! (Threshold is $threshold) - Expected: $result - Received: $right") { result - right < threshold }
+        }
         }
     }
 
@@ -85,11 +85,11 @@ internal class MsgPackDecoderTest {
     fun testDoubleDecode() {
         TestData.doubleTestPairs.forEach { (input, result) ->
             MsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer()).also {
-                // Tests in JS were failing when == comparison was used, so threshold is now used
-                val threshold = 0.000000000000000000000000000000000000000000001
-                val right = it.decodeDouble()
-                assertTrue("Doubles should be close enough! (Threshold is $threshold) - Expected: $result - Received: $right") { result - right < threshold }
-            }
+            // Tests in JS were failing when == comparison was used, so threshold is now used
+            val threshold = 0.000000000000000000000000000000000000000000001
+            val right = it.decodeDouble()
+            assertTrue("Doubles should be close enough! (Threshold is $threshold) - Expected: $result - Received: $right") { result - right < threshold }
+        }
         }
     }
 
@@ -107,8 +107,8 @@ internal class MsgPackDecoderTest {
     fun testByteArrayDecode() {
         TestData.bin8TestPairs.forEach { (input, result) ->
             MsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer()).also {
-                assertTrue { result.contentEquals(it.decodeSerializableValue(serializer())) }
-            }
+            assertTrue { result.contentEquals(it.decodeSerializableValue(serializer())) }
+        }
         }
     }
 
@@ -151,8 +151,8 @@ internal class MsgPackDecoderTest {
     private fun <RESULT> testPairs(decodeFunction: MsgPackDecoder.() -> RESULT, vararg pairs: Pair<String, RESULT>) {
         pairs.forEach { (input, result) ->
             MsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer()).also {
-                assertEquals(result, it.decodeFunction())
-            }
+            assertEquals(result, it.decodeFunction())
+        }
         }
     }
 }
