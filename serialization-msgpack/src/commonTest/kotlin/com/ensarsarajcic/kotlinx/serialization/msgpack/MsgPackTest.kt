@@ -1,5 +1,6 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
+import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackTimestamp
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ArraySerializer
 import kotlinx.serialization.builtins.ByteArraySerializer
@@ -250,6 +251,22 @@ internal class MsgPackTest {
         testDecodePairs(
             TestData.SampleClass.serializer(),
             *TestData.sampleClassTestPairs
+        )
+    }
+
+    @Test
+    fun testTimestampEncode() {
+        testEncodePairs(
+            MsgPackTimestamp.serializer(),
+            *TestData.timestampTestPairs
+        )
+    }
+
+    @Test
+    fun testTimestampDecode() {
+        testDecodePairs(
+            MsgPackTimestamp.serializer(),
+            *TestData.timestampTestPairs
         )
     }
 
