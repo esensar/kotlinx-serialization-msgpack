@@ -2,6 +2,7 @@ package com.ensarsarajcic.kotlinx.serialization.msgpack
 
 import com.ensarsarajcic.kotlinx.serialization.msgpack.stream.MsgPackDataOutputBuffer
 import com.ensarsarajcic.kotlinx.serialization.msgpack.types.MsgPackType
+import com.ensarsarajcic.kotlinx.serialization.msgpack.utils.splitToByteArray
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.builtins.ByteArraySerializer
@@ -256,11 +257,11 @@ internal class MsgPackEncoder(
                 if (size!!.toLong() > maxSize) throw TODO("Size exceeded")
                 result.addAll(
                     when (type) {
-                        MsgPackType.Ext.EXT8 -> size!!.toByte()
-                        MsgPackType.Ext.EXT16 -> size!!.toShort()
-                        MsgPackType.Ext.EXT32 -> size!!.toInt()
+                        MsgPackType.Ext.EXT8 -> size!!.toByte().splitToByteArray()
+                        MsgPackType.Ext.EXT16 -> size!!.toShort().splitToByteArray()
+                        MsgPackType.Ext.EXT32 -> size!!.toInt().splitToByteArray()
                         else -> TODO("HANDLE")
-                    }.splitToByteArray()
+                    }
                 )
                 result.add(typeId!!)
             } else {
@@ -352,21 +353,5 @@ internal class MsgPackEncoder(
             encodeName(descriptor, index)
             encodeSerializableValue(serializer, value)
         }
-    }
-
-    private inline fun <reified T : Number> T.splitToByteArray(): ByteArray {
-        val byteCount = when (T::class) {
-            Byte::class -> 1
-            Short::class -> 2
-            Int::class -> 4
-            Long::class -> 8
-            else -> throw UnsupportedOperationException("Can't split number of type ${T::class} to bytes!")
-        }
-
-        val result = ByteArray(byteCount)
-        (byteCount - 1).downTo(0).forEach {
-            result[byteCount - (it + 1)] = ((this.toLong() shr (8 * it)) and 0xff).toByte()
-        }
-        return result
     }
 }

@@ -13,9 +13,6 @@ abstract class BaseMsgPackExtensionSerializer<T> : KSerializer<T> {
         if (extension.extTypeId != extTypeId) {
             throw TODO("Add more info")
         }
-        if (extension.type != type) {
-            throw TODO("Add more info")
-        }
         return deserialize(extension)
     }
 
@@ -26,14 +23,10 @@ abstract class BaseMsgPackExtensionSerializer<T> : KSerializer<T> {
         if (extension.extTypeId != extTypeId) {
             throw TODO("Add more info")
         }
-        if (extension.type != type) {
-            throw TODO("Add more info")
-        }
         encoder.encodeSerializableValue(serializer, serialize(value))
     }
 
     abstract fun deserialize(extension: MsgPackExtension): T
     abstract fun serialize(extension: T): MsgPackExtension
     abstract val extTypeId: Byte
-    abstract val type: Byte
 }

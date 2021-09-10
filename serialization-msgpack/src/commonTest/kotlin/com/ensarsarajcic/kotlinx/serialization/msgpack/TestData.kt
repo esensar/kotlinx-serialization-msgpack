@@ -2,6 +2,7 @@ package com.ensarsarajcic.kotlinx.serialization.msgpack
 
 import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.BaseMsgPackExtensionSerializer
 import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackExtension
+import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackTimestamp
 import com.ensarsarajcic.kotlinx.serialization.msgpack.types.MsgPackType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -108,6 +109,17 @@ object TestData {
     val mapTestPairs = arrayOf(
         "81a3616263a3646566" to mapOf("abc" to "def")
     )
+    val timestampTestPairs = arrayOf(
+        "d6ff00000000" to MsgPackTimestamp.T32(0),
+        "d6ff000003e8" to MsgPackTimestamp.T32(1000),
+        "d6ffffffffff" to MsgPackTimestamp.T32(4_294_967_295),
+        "d7ffee6b27fc00000000" to MsgPackTimestamp.T64(0, 999_999_999),
+        "d7ff00000fa00000c350" to MsgPackTimestamp.T64(50000, 1000),
+        "c70cff00000000fffffffffffffc18" to MsgPackTimestamp.T92(-1000),
+        "c70cff000003e8fffffffffffffc18" to MsgPackTimestamp.T92(-1000, 1000),
+        "c70cff000000007fffffffffffffff" to MsgPackTimestamp.T92(9_223_372_036_854_775_807),
+        "c70cff000000008000000000000001" to MsgPackTimestamp.T92(-9_223_372_036_854_775_807),
+    )
 
     @Serializable
     data class SampleClass(
@@ -127,10 +139,9 @@ data class CustomExtensionType(val data: List<Byte>)
 
 class CustomExtensionSerializer() :
     BaseMsgPackExtensionSerializer<CustomExtensionType>() {
-    override val type: Byte = MsgPackType.Ext.FIXEXT2
     override val extTypeId: Byte = 3
 
     override fun deserialize(extension: MsgPackExtension): CustomExtensionType = CustomExtensionType(extension.data.toList())
 
-    override fun serialize(extension: CustomExtensionType): MsgPackExtension = MsgPackExtension(type, extTypeId, extension.data.toByteArray())
+    override fun serialize(extension: CustomExtensionType): MsgPackExtension = MsgPackExtension(MsgPackType.Ext.FIXEXT2, extTypeId, extension.data.toByteArray())
 }

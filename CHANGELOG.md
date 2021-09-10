@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file. This change
 ## [Unreleased]
 - Upgraded kotlin version to 1.5.0
 - Upgraded kotlinx-serialization version to 1.2.2
+- Added support for timestamp extension ([#10][i10])
 
 ## [0.2.1] - 2020-09-07
 ### Added
@@ -36,6 +37,7 @@ All notable changes to this project will be documented in this file. This change
 [0.2.1]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.2.0...0.2.1
 [i6]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/6
 [i9]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/9
+[i10]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/10
 [i11]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/11
 [i13]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/13
 [i14]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/14

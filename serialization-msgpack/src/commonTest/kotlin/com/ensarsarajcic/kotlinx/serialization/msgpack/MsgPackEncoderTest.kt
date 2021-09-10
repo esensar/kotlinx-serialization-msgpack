@@ -1,5 +1,6 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
+import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackTimestamp
 import kotlinx.serialization.builtins.ArraySerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
@@ -137,6 +138,16 @@ internal class MsgPackEncoderTest {
         TestData.sampleClassTestPairs.forEach { (result, input) ->
             val encoder = MsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})
             val serializer = TestData.SampleClass.serializer()
+            serializer.serialize(encoder, input)
+            assertEquals(result, encoder.result.toByteArray().toHex())
+        }
+    }
+
+    @Test
+    fun testTimestampEncode() {
+        TestData.timestampTestPairs.forEach { (result, input) ->
+            val encoder = MsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})
+            val serializer = MsgPackTimestamp.serializer()
             serializer.serialize(encoder, input)
             assertEquals(result, encoder.result.toByteArray().toHex())
         }
