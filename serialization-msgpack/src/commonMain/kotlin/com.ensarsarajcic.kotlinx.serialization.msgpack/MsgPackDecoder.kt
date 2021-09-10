@@ -2,6 +2,7 @@ package com.ensarsarajcic.kotlinx.serialization.msgpack
 
 import com.ensarsarajcic.kotlinx.serialization.msgpack.stream.MsgPackDataInputBuffer
 import com.ensarsarajcic.kotlinx.serialization.msgpack.types.MsgPackType
+import com.ensarsarajcic.kotlinx.serialization.msgpack.utils.joinToNumber
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.builtins.ByteArraySerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -259,20 +260,5 @@ internal class MsgPackDecoder(
                 size!!
             ) as T
         }
-    }
-
-    private inline fun <reified T : Number> ByteArray.joinToNumber(): T {
-        val number = mapIndexed { index, byte ->
-            (byte.toLong() and 0xff) shl (8 * (size - (index + 1)))
-        }.fold(0L) { acc, it ->
-            acc or it
-        }
-        return when (T::class) {
-            Byte::class -> number.toByte()
-            Short::class -> number.toShort()
-            Int::class -> number.toInt()
-            Long::class -> number
-            else -> throw UnsupportedOperationException("Can't build ${T::class} from ByteArray (${this.toList()})")
-        } as T
     }
 }

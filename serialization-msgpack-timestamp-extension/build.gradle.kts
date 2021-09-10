@@ -40,7 +40,8 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                api(kotlinxSerialization("core"))
+                implementation(project(":serialization-msgpack"))
+                implementation(kotlinx("datetime", Dependencies.Versions.datetime))
             }
         }
         val commonTest by getting {
@@ -49,19 +50,5 @@ kotlin {
                 implementation(kotlin("test-annotations-common"))
             }
         }
-        val jvmTest by getting {
-            dependencies {
-                implementation(kotlin("test-junit"))
-            }
-        }
-        val jsTest by getting {
-            dependencies {
-                implementation(kotlin("test-js"))
-            }
-        }
-        val nativeMain by getting
-        val nativeTest by getting
-        val iosMain by getting
-        val iosTest by getting
     }
 }
