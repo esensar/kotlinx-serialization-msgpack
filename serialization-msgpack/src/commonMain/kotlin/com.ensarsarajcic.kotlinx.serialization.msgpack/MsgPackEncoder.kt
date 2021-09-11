@@ -1,5 +1,7 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
+import com.ensarsarajcic.kotlinx.serialization.msgpack.internal.BasicMsgPacker
+import com.ensarsarajcic.kotlinx.serialization.msgpack.internal.MsgPacker
 import com.ensarsarajcic.kotlinx.serialization.msgpack.stream.MsgPackDataOutputBuffer
 import com.ensarsarajcic.kotlinx.serialization.msgpack.types.MsgPackType
 import com.ensarsarajcic.kotlinx.serialization.msgpack.utils.splitToByteArray
@@ -15,137 +17,49 @@ import kotlinx.serialization.modules.SerializersModule
 
 internal class MsgPackEncoder(
     private val configuration: MsgPackConfiguration,
-    override val serializersModule: SerializersModule
+    override val serializersModule: SerializersModule,
+    private val packer: MsgPacker = BasicMsgPacker()
 ) : AbstractEncoder() {
     val result = MsgPackDataOutputBuffer()
 
     override fun encodeBoolean(value: Boolean) {
-        result.add(MsgPackType.Boolean(value))
+        result.addAll(packer.packBoolean(value))
     }
 
     override fun encodeNull() {
-        result.add(MsgPackType.NULL)
+        result.addAll(packer.packNull())
     }
 
     override fun encodeByte(value: Byte) {
-        if (value >= MsgPackType.Int.MIN_NEGATIVE_SINGLE_BYTE) {
-            result.add(value)
-        } else {
-            result.add(MsgPackType.Int.INT8)
-            result.add(value)
-        }
+        result.addAll(packer.packByte(value))
     }
 
     override fun encodeShort(value: Short) {
-        if (value in MsgPackType.Int.MIN_NEGATIVE_BYTE..Byte.MAX_VALUE) {
-            encodeByte(value.toByte())
-        } else {
-            var uByte = false
-            result.add(
-                when {
-                    value < 0 -> MsgPackType.Int.INT16
-                    value <= MsgPackType.Int.MAX_UBYTE -> MsgPackType.Int.UINT8.also { uByte = true }
-                    else -> MsgPackType.Int.UINT16
-                }
-            )
-            if (uByte) {
-                result.add((value.toInt() and 0xff).toByte())
-            } else {
-                result.addAll(value.splitToByteArray().toList())
-            }
-        }
+        result.addAll(packer.packShort(value))
     }
 
     override fun encodeInt(value: Int) {
-        if (value in Short.MIN_VALUE..Short.MAX_VALUE) {
-            encodeShort(value.toShort())
-        } else {
-            var uShort = false
-            result.add(
-                when {
-                    value < 0 -> MsgPackType.Int.INT32
-                    value <= MsgPackType.Int.MAX_USHORT -> MsgPackType.Int.UINT16.also { uShort = true }
-                    else -> MsgPackType.Int.UINT32
-                }
-            )
-            if (uShort) {
-                result.addAll(value.toShort().splitToByteArray().toList())
-            } else {
-                result.addAll(value.splitToByteArray().toList())
-            }
-        }
+        result.addAll(packer.packInt(value))
     }
 
     override fun encodeLong(value: Long) {
-        if (value in Int.MIN_VALUE..Int.MAX_VALUE) {
-            encodeInt(value.toInt())
-        } else {
-            var uInt = false
-            result.add(
-                when {
-                    value < 0 -> MsgPackType.Int.INT64
-                    value <= MsgPackType.Int.MAX_UINT -> MsgPackType.Int.UINT32.also { uInt = true }
-                    else -> MsgPackType.Int.UINT64
-                }
-            )
-            if (uInt) {
-                result.addAll(value.toInt().splitToByteArray().toList())
-            } else {
-                result.addAll(value.splitToByteArray().toList())
-            }
-        }
+        result.addAll(packer.packLong(value))
     }
 
     override fun encodeFloat(value: Float) {
-        result.add(MsgPackType.Float.FLOAT)
-        result.addAll(value.toRawBits().splitToByteArray().toList())
+        result.addAll(packer.packFloat(value))
     }
 
     override fun encodeDouble(value: Double) {
-        result.add(MsgPackType.Float.DOUBLE)
-        result.addAll(value.toRawBits().splitToByteArray().toList())
+        result.addAll(packer.packDouble(value))
     }
 
     override fun encodeString(value: String) {
-        val bytes = value.encodeToByteArray()
-        when {
-            bytes.size <= MsgPackType.String.MAX_FIXSTR_LENGTH -> {
-                result.add(MsgPackType.String.FIXSTR_SIZE_MASK.maskValue(bytes.size.toByte()))
-            }
-            bytes.size <= MsgPackType.String.MAX_STR8_LENGTH -> {
-                result.add(MsgPackType.String.STR8)
-                result.addAll(bytes.size.toByte().splitToByteArray().toList())
-            }
-            bytes.size <= MsgPackType.String.MAX_STR16_LENGTH -> {
-                result.add(MsgPackType.String.STR16)
-                result.addAll(bytes.size.toShort().splitToByteArray().toList())
-            }
-            bytes.size <= MsgPackType.String.MAX_STR32_LENGTH -> {
-                result.add(MsgPackType.String.STR32)
-                result.addAll(bytes.size.toInt().splitToByteArray().toList())
-            }
-            else -> TODO("TOO LONG STRING")
-        }
-        result.addAll(bytes.toList())
+        result.addAll(packer.packString(value))
     }
 
     fun encodeByteArray(value: ByteArray) {
-        when {
-            value.size <= MsgPackType.Bin.MAX_BIN8_LENGTH -> {
-                result.add(MsgPackType.Bin.BIN8)
-                result.addAll(value.size.toByte().splitToByteArray().toList())
-            }
-            value.size <= MsgPackType.Bin.MAX_BIN16_LENGTH -> {
-                result.add(MsgPackType.Bin.BIN16)
-                result.addAll(value.size.toShort().splitToByteArray().toList())
-            }
-            value.size <= MsgPackType.Bin.MAX_BIN32_LENGTH -> {
-                result.add(MsgPackType.Bin.BIN32)
-                result.addAll(value.size.toInt().splitToByteArray().toList())
-            }
-            else -> TODO("TOO LONG STRING")
-        }
-        result.addAll(value.toList())
+        result.addAll(packer.packByteArray(value))
     }
 
     override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder {
