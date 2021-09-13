@@ -10,6 +10,10 @@ import kotlin.jvm.JvmStatic
  * @see MsgPackConfiguration.default The default configuration
  */
 data class MsgPackConfiguration(
+    /**
+     * Enables backwards compatibility with MsgPack 1.0 spec which has raw type instead of string
+     * Disables use of bin types and str8 types in serialization and support deserializing string types as bytearrays
+     */
     val rawCompatibility: Boolean = false
 ) {
     companion object {

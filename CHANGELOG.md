@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file. This change
 - Upgraded kotlin version to 1.5.0
 - Upgraded kotlinx-serialization version to 1.2.2
 - Added support for timestamp extension ([#10][i10])
+- Added configuration for raw (old str) type compatibility ([#12][i12])
 
 ### Fixed
 - Bug with failing to decode extension types with variable data size
@@ -43,6 +44,7 @@ All notable changes to this project will be documented in this file. This change
 [i9]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/9
 [i10]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/10
 [i11]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/11
+[i12]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/12
 [i13]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/13
 [i14]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/14
 [p40]: https://github.com/esensar/kotlinx-serialization-msgpack/pull/40
