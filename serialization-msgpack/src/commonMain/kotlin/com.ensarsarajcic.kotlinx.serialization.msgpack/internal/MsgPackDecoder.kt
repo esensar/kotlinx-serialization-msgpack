@@ -1,7 +1,6 @@
-package com.ensarsarajcic.kotlinx.serialization.msgpack
+package com.ensarsarajcic.kotlinx.serialization.msgpack.internal
 
-import com.ensarsarajcic.kotlinx.serialization.msgpack.internal.BasicMsgUnpacker
-import com.ensarsarajcic.kotlinx.serialization.msgpack.internal.MsgUnpacker
+import com.ensarsarajcic.kotlinx.serialization.msgpack.MsgPackConfiguration
 import com.ensarsarajcic.kotlinx.serialization.msgpack.stream.MsgPackDataInputBuffer
 import com.ensarsarajcic.kotlinx.serialization.msgpack.types.MsgPackType
 import com.ensarsarajcic.kotlinx.serialization.msgpack.utils.joinToNumber
@@ -11,17 +10,15 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractDecoder
 import kotlinx.serialization.encoding.CompositeDecoder
+import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.modules.SerializersModule
 
-internal class MsgPackDecoder(
+internal class BasicMsgPackDecoder(
     private val configuration: MsgPackConfiguration,
     override val serializersModule: SerializersModule,
-    private val dataBuffer: MsgPackDataInputBuffer,
+    val dataBuffer: MsgPackDataInputBuffer,
     private val msgUnpacker: MsgUnpacker = BasicMsgUnpacker(dataBuffer)
 ) : AbstractDecoder() {
-
-    // TODO Don't use flags, separate composite decoders for classes, lists and maps
-    private var decodingClass = false
 
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
         if (descriptor.kind in arrayOf(StructureKind.CLASS, StructureKind.OBJECT)) {
@@ -33,7 +30,7 @@ internal class MsgPackDecoder(
         return 0
     }
 
-    override fun decodeSequentially(): Boolean = !decodingClass
+    override fun decodeSequentially(): Boolean = true
 
     override fun decodeNotNullMark(): Boolean {
         val next = dataBuffer.peek()
@@ -123,70 +120,84 @@ internal class MsgPackDecoder(
     override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder {
         if (descriptor.kind in arrayOf(StructureKind.CLASS, StructureKind.OBJECT)) {
             if (descriptor.serialName == "com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackExtension") {
-                return ExtensionTypeDecoder()
+                return ExtensionTypeDecoder(this)
             }
             // Handle extension types as arrays
-            decodingClass = true
-            // TODO compare with descriptor.elementsCount
             decodeCollectionSize(descriptor)
+            return ClassMsgPackDecoder(this)
+            // TODO compare with descriptor.elementsCount
         }
         return this
     }
+}
 
-    override fun endStructure(descriptor: SerialDescriptor) {
-        decodingClass = false
-        super.endStructure(descriptor)
+internal class MsgPackDecoder(
+    private val basicMsgPackDecoder: BasicMsgPackDecoder
+) : Decoder by basicMsgPackDecoder, CompositeDecoder by basicMsgPackDecoder {
+    override val serializersModule: SerializersModule = basicMsgPackDecoder.serializersModule
+}
+
+internal class ClassMsgPackDecoder(
+    private val basicMsgPackDecoder: BasicMsgPackDecoder
+) : Decoder by basicMsgPackDecoder, CompositeDecoder by basicMsgPackDecoder {
+    override val serializersModule: SerializersModule = basicMsgPackDecoder.serializersModule
+
+    override fun decodeSequentially(): Boolean = false
+}
+
+internal class ExtensionTypeDecoder(
+    private val basicMsgPackDecoder: BasicMsgPackDecoder
+) : CompositeDecoder, AbstractDecoder() {
+    private val dataBuffer = basicMsgPackDecoder.dataBuffer
+    var type: Byte? = null
+    var typeId: Byte? = null
+    var size: Int? = null
+    var bytesRead = 0
+
+    override val serializersModule: SerializersModule = basicMsgPackDecoder.serializersModule
+
+    override fun decodeSequentially(): Boolean = false
+
+    override fun decodeByte(): Byte {
+        return if (bytesRead == 0) {
+            val byte = dataBuffer.requireNextByte()
+            bytesRead++
+            if (!MsgPackType.Ext.TYPES.contains(byte)) {
+                throw TODO("Unexpected byte")
+            }
+            type = byte
+            if (MsgPackType.Ext.SIZES.containsKey(type)) {
+                size = MsgPackType.Ext.SIZES[type]
+            }
+            type!!
+        } else if (bytesRead == 1 && size != null) {
+            val byte = dataBuffer.requireNextByte()
+            bytesRead++
+            typeId = byte
+            typeId!!
+        } else if (bytesRead == 1 && size == null) {
+            val sizeSize = MsgPackType.Ext.SIZE_SIZE[type]
+            bytesRead += sizeSize!!
+            size = dataBuffer.takeNext(sizeSize).joinToNumber()
+            val byte = dataBuffer.requireNextByte()
+            typeId = byte
+            typeId!!
+        } else {
+            throw TODO("Handle?")
+        }
+    }
+    override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
+        return if (bytesRead <= 2) bytesRead else CompositeDecoder.DECODE_DONE
     }
 
-    private inner class ExtensionTypeDecoder : CompositeDecoder, AbstractDecoder() {
-        var type: Byte? = null
-        var typeId: Byte? = null
-        var size: Int? = null
-        var bytesRead = 0
+    override fun decodeCollectionSize(descriptor: SerialDescriptor): Int {
+        return size ?: 0
+    }
 
-        override val serializersModule: SerializersModule = this@MsgPackDecoder.serializersModule
-
-        override fun decodeByte(): Byte {
-            return if (bytesRead == 0) {
-                val byte = dataBuffer.requireNextByte()
-                bytesRead++
-                if (!MsgPackType.Ext.TYPES.contains(byte)) {
-                    throw TODO("Unexpected byte")
-                }
-                type = byte
-                if (MsgPackType.Ext.SIZES.containsKey(type)) {
-                    size = MsgPackType.Ext.SIZES[type]
-                }
-                type!!
-            } else if (bytesRead == 1 && size != null) {
-                val byte = dataBuffer.requireNextByte()
-                bytesRead++
-                typeId = byte
-                typeId!!
-            } else if (bytesRead == 1 && size == null) {
-                val sizeSize = MsgPackType.Ext.SIZE_SIZE[type]
-                bytesRead += sizeSize!!
-                size = dataBuffer.takeNext(sizeSize).joinToNumber()
-                val byte = dataBuffer.requireNextByte()
-                typeId = byte
-                typeId!!
-            } else {
-                throw TODO("Handle?")
-            }
-        }
-        override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
-            return if (bytesRead <= 2) bytesRead else CompositeDecoder.DECODE_DONE
-        }
-
-        override fun decodeCollectionSize(descriptor: SerialDescriptor): Int {
-            return size ?: 0
-        }
-
-        override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
-            bytesRead += 1
-            return dataBuffer.takeNext(
-                size!!
-            ) as T
-        }
+    override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
+        bytesRead += 1
+        return dataBuffer.takeNext(
+            size!!
+        ) as T
     }
 }

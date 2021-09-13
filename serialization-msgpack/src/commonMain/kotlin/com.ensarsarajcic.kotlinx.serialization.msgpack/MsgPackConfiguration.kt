@@ -9,7 +9,9 @@ import kotlin.jvm.JvmStatic
  *
  * @see MsgPackConfiguration.default The default configuration
  */
-class MsgPackConfiguration {
+data class MsgPackConfiguration(
+    val rawCompatibility: Boolean = false
+) {
     companion object {
         @JvmStatic
         val default: MsgPackConfiguration = MsgPackConfiguration()
