@@ -47,27 +47,27 @@ internal class BasicMsgPackDecoder(
     }
 
     override fun decodeByte(): Byte {
-        return msgUnpacker.unpackByte()
+        return msgUnpacker.unpackByte(configuration.strictTypes)
     }
 
     override fun decodeShort(): Short {
-        return msgUnpacker.unpackShort()
+        return msgUnpacker.unpackShort(configuration.strictTypes)
     }
 
     override fun decodeInt(): Int {
-        return msgUnpacker.unpackInt()
+        return msgUnpacker.unpackInt(configuration.strictTypes)
     }
 
     override fun decodeLong(): Long {
-        return msgUnpacker.unpackLong()
+        return msgUnpacker.unpackLong(configuration.strictTypes)
     }
 
     override fun decodeFloat(): Float {
-        return msgUnpacker.unpackFloat()
+        return msgUnpacker.unpackFloat(configuration.strictTypes)
     }
 
     override fun decodeDouble(): Double {
-        return msgUnpacker.unpackDouble()
+        return msgUnpacker.unpackDouble(configuration.strictTypes)
     }
 
     override fun decodeString(): String {
