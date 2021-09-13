@@ -14,7 +14,12 @@ data class MsgPackConfiguration(
      * Enables backwards compatibility with MsgPack 1.0 spec which has raw type instead of string
      * Disables use of bin types and str8 types in serialization and support deserializing string types as bytearrays
      */
-    val rawCompatibility: Boolean = false
+    val rawCompatibility: Boolean = false,
+    /**
+     * Enables strict mode type, which forces exact types when deserializing
+     * (not allowing INT16 to be deserialized in place of Int for example)
+     */
+    val strictTypes: Boolean = false
 ) {
     companion object {
         @JvmStatic

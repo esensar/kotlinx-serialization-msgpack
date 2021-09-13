@@ -7,12 +7,12 @@ import com.ensarsarajcic.kotlinx.serialization.msgpack.utils.joinToNumber
 internal interface MsgUnpacker {
     fun unpackNull()
     fun unpackBoolean(): Boolean
-    fun unpackByte(): Byte
-    fun unpackShort(): Short
-    fun unpackInt(): Int
-    fun unpackLong(): Long
-    fun unpackFloat(): Float
-    fun unpackDouble(): Double
+    fun unpackByte(strict: Boolean = false): Byte
+    fun unpackShort(strict: Boolean = false): Short
+    fun unpackInt(strict: Boolean = false): Int
+    fun unpackLong(strict: Boolean = false): Long
+    fun unpackFloat(strict: Boolean = false): Float
+    fun unpackDouble(strict: Boolean = false): Double
     fun unpackString(): String
     fun unpackByteArray(): ByteArray
 }
@@ -31,7 +31,7 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
         }
     }
 
-    override fun unpackByte(): Byte {
+    override fun unpackByte(strict: Boolean): Byte {
         // Check is it a single byte value
         val next = dataBuffer.requireNextByte()
         return when {
@@ -42,7 +42,7 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
         }
     }
 
-    override fun unpackShort(): Short {
+    override fun unpackShort(strict: Boolean): Short {
         val next = dataBuffer.peek()
         return when {
             MsgPackType.Int.isShort(next) -> {
@@ -53,11 +53,11 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
                 dataBuffer.skip(1)
                 (dataBuffer.requireNextByte().toInt() and 0xff).toShort()
             }
-            else -> unpackByte().toShort()
+            else -> if (strict) TODO("Strict type error") else unpackByte(strict).toShort()
         }
     }
 
-    override fun unpackInt(): Int {
+    override fun unpackInt(strict: Boolean): Int {
         val next = dataBuffer.peek()
         return when {
             MsgPackType.Int.isInt(next) -> {
@@ -68,11 +68,11 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
                 dataBuffer.skip(1)
                 dataBuffer.takeNext(2).joinToNumber()
             }
-            else -> unpackShort().toInt()
+            else -> if (strict) TODO("Strict type error") else unpackShort(strict).toInt()
         }
     }
 
-    override fun unpackLong(): Long {
+    override fun unpackLong(strict: Boolean): Long {
         val next = dataBuffer.peek()
         return when {
             MsgPackType.Int.isLong(next) -> {
@@ -83,11 +83,11 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
                 dataBuffer.skip(1)
                 dataBuffer.takeNext(4).joinToNumber()
             }
-            else -> unpackInt().toLong()
+            else -> if (strict) TODO("Strict type error") else unpackInt(strict).toLong()
         }
     }
 
-    override fun unpackFloat(): Float {
+    override fun unpackFloat(strict: Boolean): Float {
         return when (dataBuffer.peek()) {
             MsgPackType.Float.FLOAT -> {
                 dataBuffer.skip(1)
@@ -97,13 +97,13 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
         }
     }
 
-    override fun unpackDouble(): Double {
+    override fun unpackDouble(strict: Boolean): Double {
         return when (dataBuffer.peek()) {
             MsgPackType.Float.DOUBLE -> {
                 dataBuffer.skip(1)
                 Double.fromBits(dataBuffer.takeNext(8).joinToNumber())
             }
-            MsgPackType.Float.FLOAT -> unpackFloat().toDouble()
+            MsgPackType.Float.FLOAT -> if (strict) TODO("Strict type error") else unpackFloat(strict).toDouble()
             else -> TODO("Add a more descriptive error when wrong type is found!")
         }
     }

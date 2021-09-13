@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file. This change
 - Upgraded kotlinx-serialization version to 1.2.2
 - Added support for timestamp extension ([#10][i10])
 - Added configuration for raw (old str) type compatibility ([#12][i12])
+- Added configuration for strict type mode ([#18][i18])
 
 ### Fixed
 - Bug with failing to decode extension types with variable data size
@@ -47,4 +48,5 @@ All notable changes to this project will be documented in this file. This change
 [i12]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/12
 [i13]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/13
 [i14]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/14
+[i18]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/18
 [p40]: https://github.com/esensar/kotlinx-serialization-msgpack/pull/40
