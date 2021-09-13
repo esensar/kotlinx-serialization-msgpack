@@ -31,12 +31,12 @@ internal class MsgPackTest {
 
     @Test
     fun testNullDecode() {
-        assertEquals(null, MsgPack.default.decodeFromByteArray(Boolean.serializer().nullable, byteArrayOf(0xc0.toByte())))
+        assertEquals(null, MsgPack.decodeFromByteArray(Boolean.serializer().nullable, byteArrayOf(0xc0.toByte())))
     }
 
     @Test
     fun testNullEncode() {
-        assertEquals("c0", MsgPack.default.encodeToByteArray(Boolean.serializer().nullable, null).toHex())
+        assertEquals("c0", MsgPack.encodeToByteArray(Boolean.serializer().nullable, null).toHex())
     }
 
     @Test
@@ -140,7 +140,7 @@ internal class MsgPackTest {
         TestData.floatTestPairs.forEach { (value, expectedResult) ->
             // Tests in JS were failing when == comparison was used, so threshold is now used
             val threshold = 0.00001f
-            val right = MsgPack.default.decodeFromByteArray(Float.serializer(), value.hexStringToByteArray())
+            val right = MsgPack.decodeFromByteArray(Float.serializer(), value.hexStringToByteArray())
             assertTrue("Floats should be close enough! (Threshold is $threshold) - Expected: $expectedResult - Received: $right") { expectedResult - right < threshold }
         }
     }
@@ -158,7 +158,7 @@ internal class MsgPackTest {
         TestData.doubleTestPairs.forEach { (value, expectedResult) ->
             // Tests in JS were failing when == comparison was used, so threshold is now used
             val threshold = 0.000000000000000000000000000000000000000000001
-            val right = MsgPack.default.decodeFromByteArray(Double.serializer(), value.hexStringToByteArray())
+            val right = MsgPack.decodeFromByteArray(Double.serializer(), value.hexStringToByteArray())
             assertTrue("Doubles should be close enough! (Threshold is $threshold) - Expected: $expectedResult - Received: $right") { expectedResult - right < threshold }
         }
     }
@@ -194,7 +194,7 @@ internal class MsgPackTest {
     @Test
     fun testBinaryDecode() {
         TestData.bin8TestPairs.forEach { (value, expectedResult) ->
-            assertTrue { expectedResult.contentEquals(MsgPack.default.decodeFromByteArray(ByteArraySerializer(), value.hexStringToByteArray())) }
+            assertTrue { expectedResult.contentEquals(MsgPack.decodeFromByteArray(ByteArraySerializer(), value.hexStringToByteArray())) }
         }
     }
 
@@ -213,11 +213,11 @@ internal class MsgPackTest {
     @Test
     fun testArrayDecode() {
         TestData.stringArrayTestPairs.forEach { (value, expectedResult) ->
-            val right = MsgPack.default.decodeFromByteArray(ArraySerializer(String.serializer()), value.hexStringToByteArray())
+            val right = MsgPack.decodeFromByteArray(ArraySerializer(String.serializer()), value.hexStringToByteArray())
             assertEquals(expectedResult.toList(), right.toList())
         }
         TestData.intArrayTestPairs.forEach { (value, expectedResult) ->
-            val right = MsgPack.default.decodeFromByteArray(ArraySerializer(Int.serializer()), value.hexStringToByteArray())
+            val right = MsgPack.decodeFromByteArray(ArraySerializer(Int.serializer()), value.hexStringToByteArray())
             assertEquals(expectedResult.toList(), right.toList())
         }
     }
@@ -272,12 +272,12 @@ internal class MsgPackTest {
 
     private fun <T> testEncodePairs(serializer: KSerializer<T>, vararg pairs: Pair<String, T>) {
         pairs.forEach { (expectedResult, value) ->
-            assertEquals(expectedResult, MsgPack.default.encodeToByteArray(serializer, value).toHex())
+            assertEquals(expectedResult, MsgPack.encodeToByteArray(serializer, value).toHex())
         }
     }
     private fun <T> testDecodePairs(serializer: KSerializer<T>, vararg pairs: Pair<String, T>) {
         pairs.forEach { (value, expectedResult) ->
-            assertEquals(expectedResult, MsgPack.default.decodeFromByteArray(serializer, value.hexStringToByteArray()))
+            assertEquals(expectedResult, MsgPack.decodeFromByteArray(serializer, value.hexStringToByteArray()))
         }
     }
 }

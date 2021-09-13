@@ -1,6 +1,8 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
 import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackTimestamp
+import com.ensarsarajcic.kotlinx.serialization.msgpack.internal.BasicMsgPackEncoder
+import com.ensarsarajcic.kotlinx.serialization.msgpack.internal.MsgPackEncoder
 import kotlinx.serialization.builtins.ArraySerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
@@ -20,7 +22,7 @@ internal class MsgPackEncoderTest {
 
     @Test
     fun testNullEncode() {
-        val encoder = MsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})
+        val encoder = BasicMsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})
         encoder.encodeNull()
         assertEquals("c0", encoder.result.toByteArray().toHex())
     }
@@ -106,7 +108,7 @@ internal class MsgPackEncoderTest {
     @Test
     fun testArrayEncodeStringArrays() {
         TestData.stringArrayTestPairs.forEach { (result, input) ->
-            val encoder = MsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})
+            val encoder = BasicMsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})
             val serializer = ArraySerializer(String.serializer())
             serializer.serialize(encoder, input)
             assertEquals(result, encoder.result.toByteArray().toHex())
@@ -116,7 +118,7 @@ internal class MsgPackEncoderTest {
     @Test
     fun testArrayEncodeIntArrays() {
         TestData.intArrayTestPairs.forEach { (result, input) ->
-            val encoder = MsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})
+            val encoder = BasicMsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})
             val serializer = ArraySerializer(Int.serializer())
             serializer.serialize(encoder, input)
             assertEquals(result, encoder.result.toByteArray().toHex())
@@ -126,7 +128,7 @@ internal class MsgPackEncoderTest {
     @Test
     fun testMapEncode() {
         TestData.mapTestPairs.forEach { (result, input) ->
-            val encoder = MsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})
+            val encoder = BasicMsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})
             val serializer = MapSerializer(String.serializer(), String.serializer())
             serializer.serialize(encoder, input)
             assertEquals(result, encoder.result.toByteArray().toHex())
@@ -136,7 +138,7 @@ internal class MsgPackEncoderTest {
     @Test
     fun testSampleClassEncode() {
         TestData.sampleClassTestPairs.forEach { (result, input) ->
-            val encoder = MsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})
+            val encoder = BasicMsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})
             val serializer = TestData.SampleClass.serializer()
             serializer.serialize(encoder, input)
             assertEquals(result, encoder.result.toByteArray().toHex())
@@ -146,7 +148,7 @@ internal class MsgPackEncoderTest {
     @Test
     fun testTimestampEncode() {
         TestData.timestampTestPairs.forEach { (result, input) ->
-            val encoder = MsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})
+            val encoder = BasicMsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})
             val serializer = MsgPackTimestamp.serializer()
             serializer.serialize(encoder, input)
             assertEquals(result, encoder.result.toByteArray().toHex())
@@ -155,7 +157,7 @@ internal class MsgPackEncoderTest {
 
     private fun <INPUT> testPairs(encodeFunction: MsgPackEncoder.(INPUT) -> Unit, vararg pairs: Pair<String, INPUT>) {
         pairs.forEach { (result, input) ->
-            MsgPackEncoder(MsgPackConfiguration.default, SerializersModule {}).also {
+            MsgPackEncoder(BasicMsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})).also {
                 it.encodeFunction(input)
                 assertEquals(result, it.result.toByteArray().toHex())
             }
