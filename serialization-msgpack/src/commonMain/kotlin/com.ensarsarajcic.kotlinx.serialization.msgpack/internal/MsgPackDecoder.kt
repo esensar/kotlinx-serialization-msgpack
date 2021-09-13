@@ -75,7 +75,19 @@ internal class BasicMsgPackDecoder(
     }
 
     fun decodeByteArray(): ByteArray {
-        return msgUnpacker.unpackByteArray()
+        return if (configuration.rawCompatibility) {
+            val next = dataBuffer.peek()
+            if (MsgPackType.String.FIXSTR_SIZE_MASK.test(next) ||
+                next == MsgPackType.String.STR16 ||
+                next == MsgPackType.String.STR32
+            ) {
+                msgUnpacker.unpackString().encodeToByteArray()
+            } else {
+                msgUnpacker.unpackByteArray()
+            }
+        } else {
+            msgUnpacker.unpackByteArray()
+        }
     }
 
     override fun decodeCollectionSize(descriptor: SerialDescriptor): Int {

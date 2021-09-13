@@ -12,7 +12,7 @@ internal interface MsgPacker {
     fun packLong(value: Long): ByteArray
     fun packFloat(value: Float): ByteArray
     fun packDouble(value: Double): ByteArray
-    fun packString(value: String): ByteArray
+    fun packString(value: String, rawCompatibility: Boolean = false): ByteArray
     fun packByteArray(value: ByteArray): ByteArray
 }
 
@@ -98,13 +98,13 @@ internal class BasicMsgPacker : MsgPacker {
         return byteArrayOf(MsgPackType.Float.DOUBLE) + value.toRawBits().splitToByteArray()
     }
 
-    override fun packString(value: String): ByteArray {
+    override fun packString(value: String, rawCompatibility: Boolean): ByteArray {
         val bytes = value.encodeToByteArray()
         val prefix = when {
             bytes.size <= MsgPackType.String.MAX_FIXSTR_LENGTH -> {
                 byteArrayOf(MsgPackType.String.FIXSTR_SIZE_MASK.maskValue(bytes.size.toByte()))
             }
-            bytes.size <= MsgPackType.String.MAX_STR8_LENGTH -> {
+            bytes.size <= MsgPackType.String.MAX_STR8_LENGTH && !rawCompatibility -> {
                 byteArrayOf(MsgPackType.String.STR8) + bytes.size.toByte().splitToByteArray()
             }
             bytes.size <= MsgPackType.String.MAX_STR16_LENGTH -> {

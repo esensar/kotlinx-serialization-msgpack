@@ -54,11 +54,15 @@ internal class BasicMsgPackEncoder(
     }
 
     override fun encodeString(value: String) {
-        result.addAll(packer.packString(value))
+        result.addAll(packer.packString(value, configuration.rawCompatibility))
     }
 
     fun encodeByteArray(value: ByteArray) {
-        result.addAll(packer.packByteArray(value))
+        if (configuration.rawCompatibility) {
+            result.addAll(packer.packString(value.decodeToString(), true))
+        } else {
+            result.addAll(packer.packByteArray(value))
+        }
     }
 
     override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder {
