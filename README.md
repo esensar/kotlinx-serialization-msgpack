@@ -44,7 +44,7 @@ data class SampleClass(
 
 fun encode() {
     println(
-        MsgPack.default.encodeToByteArray(
+        MsgPack.encodeToByteArray(
             SampleClass.serializer(),
             SampleClass("def", 123, true)
         ).joinToString(separator = "") { it.toInt().and(0xff).toString(16).padStart(2, '0') }
@@ -53,7 +53,7 @@ fun encode() {
 
 fun decode() {
     println(
-        MsgPack.default.decodeFromByteArray(
+        MsgPack.decodeFromByteArray(
             SampleClass.serializer(),
             "83aa74657374537472696e67a3646566a774657374496e747bab74657374426f6f6c65616ec3".let { bytesString ->
                 ByteArray(bytesString.length / 2) { bytesString.substring(it * 2, it * 2 + 2).toInt(16).toByte() }
