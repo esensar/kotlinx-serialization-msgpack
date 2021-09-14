@@ -54,15 +54,23 @@ internal object MsgPackType {
     }
 
     internal object String {
+        fun isString(value: Byte): kotlin.Boolean {
+            return FIXSTR_SIZE_MASK.test(value) ||
+                value == STR8 ||
+                value == STR16 ||
+                value == STR32
+        }
+
         const val STR8 = 0xd9.toByte()
         const val STR16 = 0xda.toByte()
         const val STR32 = 0xdb.toByte()
 
         val FIXSTR_SIZE_MASK = object : Mask<Byte> {
-            private val mask = 0b10100000
-            override fun maskValue(value: Byte): Byte = (mask or value.toInt()).toByte()
-            override fun test(value: Byte): kotlin.Boolean = (mask and value.toInt()) == mask
-            override fun unMaskValue(value: Byte): Byte = (mask xor value.toInt()).toByte()
+            private val maskResult = 0b10100000
+            private val mask = 0b11100000
+            override fun maskValue(value: Byte): Byte = (maskResult or value.toInt()).toByte()
+            override fun test(value: Byte): kotlin.Boolean = (mask and value.toInt()) == maskResult
+            override fun unMaskValue(value: Byte): Byte = (maskResult xor value.toInt()).toByte()
         }
         const val MAX_FIXSTR_LENGTH = 31
         const val MAX_STR8_LENGTH = Int.MAX_UBYTE
@@ -71,6 +79,12 @@ internal object MsgPackType {
     }
 
     internal object Bin {
+        fun isBinary(value: Byte): kotlin.Boolean {
+            return value == BIN8 ||
+                value == BIN16 ||
+                value == BIN32
+        }
+
         const val BIN8 = 0xc4.toByte()
         const val BIN16 = 0xc5.toByte()
         const val BIN32 = 0xc6.toByte()
@@ -81,14 +95,21 @@ internal object MsgPackType {
     }
 
     internal object Array {
+        fun isArray(value: Byte): kotlin.Boolean {
+            return FIXARRAY_SIZE_MASK.test(value) ||
+                value == ARRAY16 ||
+                value == ARRAY32
+        }
+
         const val ARRAY16 = 0xdc.toByte()
         const val ARRAY32 = 0xdd.toByte()
 
         val FIXARRAY_SIZE_MASK = object : Mask<Byte> {
-            private val mask = 0b10010000
-            override fun maskValue(value: Byte): Byte = (mask or value.toInt()).toByte()
-            override fun test(value: Byte): kotlin.Boolean = (mask and value.toInt()) == mask
-            override fun unMaskValue(value: Byte): Byte = (mask xor value.toInt()).toByte()
+            private val maskResult = 0b10010000
+            private val mask = 0b11110000
+            override fun maskValue(value: Byte): Byte = (maskResult or value.toInt()).toByte()
+            override fun test(value: Byte): kotlin.Boolean = (mask and value.toInt()) == maskResult
+            override fun unMaskValue(value: Byte): Byte = (maskResult xor value.toInt()).toByte()
         }
         const val MAX_FIXARRAY_SIZE = 15
         const val MAX_ARRAY16_LENGTH = Int.MAX_USHORT
@@ -96,14 +117,21 @@ internal object MsgPackType {
     }
 
     internal object Map {
+        fun isMap(value: Byte): kotlin.Boolean {
+            return FIXMAP_SIZE_MASK.test(value) ||
+                value == MAP16 ||
+                value == MAP32
+        }
+
         const val MAP16 = 0xde.toByte()
         const val MAP32 = 0xdf.toByte()
 
         val FIXMAP_SIZE_MASK = object : Mask<Byte> {
-            private val mask = 0b10000000
-            override fun maskValue(value: Byte): Byte = (mask or value.toInt()).toByte()
-            override fun test(value: Byte): kotlin.Boolean = (mask and value.toInt()) == mask
-            override fun unMaskValue(value: Byte): Byte = (mask xor value.toInt()).toByte()
+            private val maskResult = 0b10000000
+            private val mask = 0b11110000
+            override fun maskValue(value: Byte): Byte = (maskResult or value.toInt()).toByte()
+            override fun test(value: Byte): kotlin.Boolean = (mask and value.toInt()) == maskResult
+            override fun unMaskValue(value: Byte): Byte = (maskResult xor value.toInt()).toByte()
         }
         const val MAX_FIXMAP_SIZE = 15
         const val MAX_MAP16_LENGTH = Int.MAX_USHORT
@@ -111,6 +139,10 @@ internal object MsgPackType {
     }
 
     internal object Ext {
+        fun isExt(value: Byte): kotlin.Boolean {
+            return TYPES.contains(value)
+        }
+
         const val FIXEXT1 = 0xd4.toByte()
         const val FIXEXT2 = 0xd5.toByte()
         const val FIXEXT4 = 0xd6.toByte()

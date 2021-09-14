@@ -10,7 +10,7 @@ abstract class BaseMsgPackExtensionSerializer<T> : KSerializer<T> {
 
     override fun deserialize(decoder: Decoder): T {
         val extension = decoder.decodeSerializableValue(serializer)
-        if (extension.extTypeId != extTypeId) {
+        if (checkTypeId && extension.extTypeId != extTypeId) {
             throw TODO("Add more info")
         }
         return deserialize(extension)
@@ -20,7 +20,7 @@ abstract class BaseMsgPackExtensionSerializer<T> : KSerializer<T> {
 
     override fun serialize(encoder: Encoder, value: T) {
         val extension = serialize(value)
-        if (extension.extTypeId != extTypeId) {
+        if (checkTypeId && extension.extTypeId != extTypeId) {
             throw TODO("Add more info")
         }
         encoder.encodeSerializableValue(serializer, serialize(value))
@@ -29,4 +29,5 @@ abstract class BaseMsgPackExtensionSerializer<T> : KSerializer<T> {
     abstract fun deserialize(extension: MsgPackExtension): T
     abstract fun serialize(extension: T): MsgPackExtension
     abstract val extTypeId: Byte
+    internal open val checkTypeId: Boolean = true
 }

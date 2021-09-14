@@ -26,10 +26,10 @@ sealed class MsgPackTimestamp {
     }
 }
 
-class MsgPackTimestampExtensionSerializer :
+sealed class MsgPackTimestampExtensionSerializer :
     BaseMsgPackExtensionSerializer<MsgPackTimestamp>() {
-    private companion object {
-        const val TIMESTAMP_96_DATA_SIZE = 12
+    companion object Default : MsgPackTimestampExtensionSerializer() {
+        private const val TIMESTAMP_96_DATA_SIZE = 12
     }
 
     override val extTypeId: Byte = -1

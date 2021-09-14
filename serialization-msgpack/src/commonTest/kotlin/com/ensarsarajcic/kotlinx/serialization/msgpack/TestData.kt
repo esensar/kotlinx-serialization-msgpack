@@ -104,7 +104,7 @@ object TestData {
         "92d921616266647366736466736466647366736466736673646673647364666466646663a3616473" to arrayOf("abfdsfsdfsdfdsfsdfsfsdfsdsdfdfdfc", "ads")
     )
     val mixedListTestPairs = arrayOf(
-        "92a3616263a3646566" to listOf("abc", 1, 325, 0.12f)
+        "94a361626301cd0145cb3fbeb851eb851eb8" to listOf("abc", 1, 325, 0.12)
     )
     val mapTestPairs = arrayOf(
         "81a3616263a3646566" to mapOf("abc" to "def")

@@ -13,12 +13,16 @@ import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.modules.SerializersModule
 
+interface MsgPackTypeDecoder {
+    fun peekNextType(): Byte
+}
+
 internal class BasicMsgPackDecoder(
     private val configuration: MsgPackConfiguration,
     override val serializersModule: SerializersModule,
     val dataBuffer: MsgPackDataInputBuffer,
     private val msgUnpacker: MsgUnpacker = BasicMsgUnpacker(dataBuffer)
-) : AbstractDecoder() {
+) : AbstractDecoder(), MsgPackTypeDecoder {
 
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
         if (descriptor.kind in arrayOf(StructureKind.CLASS, StructureKind.OBJECT)) {
@@ -141,17 +145,21 @@ internal class BasicMsgPackDecoder(
         }
         return this
     }
+
+    override fun peekNextType(): Byte {
+        return dataBuffer.peek()
+    }
 }
 
 internal class MsgPackDecoder(
     private val basicMsgPackDecoder: BasicMsgPackDecoder
-) : Decoder by basicMsgPackDecoder, CompositeDecoder by basicMsgPackDecoder {
+) : Decoder by basicMsgPackDecoder, CompositeDecoder by basicMsgPackDecoder, MsgPackTypeDecoder by basicMsgPackDecoder {
     override val serializersModule: SerializersModule = basicMsgPackDecoder.serializersModule
 }
 
 internal class ClassMsgPackDecoder(
     private val basicMsgPackDecoder: BasicMsgPackDecoder
-) : Decoder by basicMsgPackDecoder, CompositeDecoder by basicMsgPackDecoder {
+) : Decoder by basicMsgPackDecoder, CompositeDecoder by basicMsgPackDecoder, MsgPackTypeDecoder by basicMsgPackDecoder {
     override val serializersModule: SerializersModule = basicMsgPackDecoder.serializersModule
 
     override fun decodeSequentially(): Boolean = false
@@ -159,7 +167,7 @@ internal class ClassMsgPackDecoder(
 
 internal class ExtensionTypeDecoder(
     private val basicMsgPackDecoder: BasicMsgPackDecoder
-) : CompositeDecoder, AbstractDecoder() {
+) : CompositeDecoder, AbstractDecoder(), MsgPackTypeDecoder by basicMsgPackDecoder {
     private val dataBuffer = basicMsgPackDecoder.dataBuffer
     var type: Byte? = null
     var typeId: Byte? = null
@@ -174,7 +182,7 @@ internal class ExtensionTypeDecoder(
         return if (bytesRead == 0) {
             val byte = dataBuffer.requireNextByte()
             bytesRead++
-            if (!MsgPackType.Ext.TYPES.contains(byte)) {
+            if (!MsgPackType.Ext.isExt(byte)) {
                 throw TODO("Unexpected byte")
             }
             type = byte

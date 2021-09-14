@@ -2,6 +2,7 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+- Added dynamic serialization support ([#20][i20])
 
 ## [0.3.0] - 2021-09-14
 **BREAKING CHANGES**:
@@ -64,4 +65,5 @@ MsgPack.default.encodeToByteArray(...)
 [i13]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/13
 [i14]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/14
 [i18]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/18
+[i20]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/20
 [p40]: https://github.com/esensar/kotlinx-serialization-msgpack/pull/40
