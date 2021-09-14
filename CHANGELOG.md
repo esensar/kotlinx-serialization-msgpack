@@ -28,7 +28,7 @@ MsgPack.default.encodeToByteArray(...)
 
 ## [0.2.1] - 2020-09-07
 ### Added
-- iOS target support ([#40][[p40])
+- iOS target support ([#40][p40])
 
 ## [0.2.0] - 2020-03-20
 ### Added
