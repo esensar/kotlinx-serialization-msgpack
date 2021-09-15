@@ -17,28 +17,28 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.serializer
 
-sealed class MsgPackDynamicSerializer(
+open class MsgPackDynamicSerializer(
     private val nullableSerializer: MsgPackNullableDynamicSerializer = MsgPackNullableDynamicSerializer
 ) : KSerializer<Any> {
     companion object Default : MsgPackDynamicSerializer(MsgPackNullableDynamicSerializer)
 
-    override fun deserialize(decoder: Decoder): Any {
+    final override fun deserialize(decoder: Decoder): Any {
         return nullableSerializer.deserialize(decoder)!!
     }
 
     @OptIn(InternalSerializationApi::class)
-    override val descriptor: SerialDescriptor = buildSerialDescriptor("MsgPackDynamic", SerialKind.CONTEXTUAL)
+    final override val descriptor: SerialDescriptor = buildSerialDescriptor("MsgPackDynamic", SerialKind.CONTEXTUAL)
 
-    override fun serialize(encoder: Encoder, value: Any) {
+    final override fun serialize(encoder: Encoder, value: Any) {
         nullableSerializer.serialize(encoder, value)
     }
 }
 
-sealed class MsgPackNullableDynamicSerializer(
+open class MsgPackNullableDynamicSerializer(
     private val dynamicMsgPackExtensionSerializer: DynamicMsgPackExtensionSerializer = DynamicMsgPackExtensionSerializer
 ) : KSerializer<Any?> {
     companion object Default : MsgPackNullableDynamicSerializer(DynamicMsgPackExtensionSerializer)
-    override fun deserialize(decoder: Decoder): Any? {
+    final override fun deserialize(decoder: Decoder): Any? {
         if (decoder !is MsgPackTypeDecoder) TODO("Unsupported decoder!")
         val type = decoder.peekNextType()
         println(type)
@@ -84,10 +84,10 @@ sealed class MsgPackNullableDynamicSerializer(
     }
 
     @OptIn(InternalSerializationApi::class)
-    override val descriptor: SerialDescriptor = buildSerialDescriptor("MsgPackNullableDynamic", SerialKind.CONTEXTUAL)
+    final override val descriptor: SerialDescriptor = buildSerialDescriptor("MsgPackNullableDynamic", SerialKind.CONTEXTUAL)
 
     @OptIn(InternalSerializationApi::class)
-    override fun serialize(encoder: Encoder, value: Any?) {
+    final override fun serialize(encoder: Encoder, value: Any?) {
         when (value) {
             null -> encoder.encodeNull()
             is Boolean -> encoder.encodeBoolean(value)

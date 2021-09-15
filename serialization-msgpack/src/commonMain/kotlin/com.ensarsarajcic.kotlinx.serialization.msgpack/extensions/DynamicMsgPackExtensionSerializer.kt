@@ -2,7 +2,7 @@ package com.ensarsarajcic.kotlinx.serialization.msgpack.extensions
 
 import kotlin.reflect.KClass
 
-sealed class DynamicMsgPackExtensionSerializer : BaseMsgPackExtensionSerializer<Any?>() {
+open class DynamicMsgPackExtensionSerializer : BaseMsgPackExtensionSerializer<Any?>() {
     companion object Default : DynamicMsgPackExtensionSerializer()
     private data class SerializerPair<T : Any>(val klass: KClass<T>, val serializer: BaseMsgPackExtensionSerializer<T>) {
         fun deserialize(extension: MsgPackExtension): T {
@@ -14,21 +14,21 @@ sealed class DynamicMsgPackExtensionSerializer : BaseMsgPackExtensionSerializer<
         }
     }
 
-    private val serializers = HashMap<Byte, SerializerPair<*>>()
+    private val serializers: MutableMap<Byte, SerializerPair<*>> = mutableMapOf()
 
     inline fun <reified T : Any> register(serializer: BaseMsgPackExtensionSerializer<T>) {
         register(serializer, T::class)
     }
 
-    fun <T : Any> register(serializer: BaseMsgPackExtensionSerializer<T>, klass: KClass<T>) {
+    final fun <T : Any> register(serializer: BaseMsgPackExtensionSerializer<T>, klass: KClass<T>) {
         serializers[serializer.extTypeId] = SerializerPair(klass, serializer)
     }
 
-    fun unregister(serializer: BaseMsgPackExtensionSerializer<*>) {
+    final fun unregister(serializer: BaseMsgPackExtensionSerializer<*>) {
         serializers.remove(serializer.extTypeId)
     }
 
-    fun canSerialize(value: Any?): Boolean {
+    final fun canSerialize(value: Any?): Boolean {
         if (value is MsgPackExtension) return true
         for (serializer in serializers.values) {
             if (serializer.klass.isInstance(value)) {
@@ -38,12 +38,12 @@ sealed class DynamicMsgPackExtensionSerializer : BaseMsgPackExtensionSerializer<
         return false
     }
 
-    override fun deserialize(extension: MsgPackExtension): Any? {
+    final override fun deserialize(extension: MsgPackExtension): Any? {
         val pair = serializers[extension.extTypeId] ?: return extension
         return pair.deserialize(extension)
     }
 
-    override fun serialize(extension: Any?): MsgPackExtension {
+    final override fun serialize(extension: Any?): MsgPackExtension {
         if (extension is MsgPackExtension) {
             return extension
         }
@@ -55,6 +55,6 @@ sealed class DynamicMsgPackExtensionSerializer : BaseMsgPackExtensionSerializer<
         throw TODO("missing serializer")
     }
 
-    override val extTypeId: Byte = 0x00
-    override val checkTypeId: Boolean = false
+    final override val extTypeId: Byte = 0x00
+    final override val checkTypeId: Boolean = false
 }

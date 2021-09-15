@@ -65,9 +65,10 @@ internal class MsgPackDynamicSerializerTest {
 
     @Test
     fun testDynamicDeserializeExtension() {
-        DynamicMsgPackExtensionSerializer.register(MsgPackTimestampExtensionSerializer)
+        val extensionSerializer = DynamicMsgPackExtensionSerializer()
+        extensionSerializer.register(MsgPackTimestampExtensionSerializer)
         testDecodePairs(
-            MsgPackDynamicSerializer,
+            MsgPackDynamicSerializer(MsgPackNullableDynamicSerializer(extensionSerializer)),
             *(
                 TestData.timestampTestPairs.toList()
                 ).toTypedArray()
@@ -76,9 +77,10 @@ internal class MsgPackDynamicSerializerTest {
 
     @Test
     fun testDynamicSerializeExtension() {
-        DynamicMsgPackExtensionSerializer.register(MsgPackTimestampExtensionSerializer)
+        val extensionSerializer = DynamicMsgPackExtensionSerializer()
+        extensionSerializer.register(MsgPackTimestampExtensionSerializer)
         testEncodePairs(
-            MsgPackDynamicSerializer,
+            MsgPackDynamicSerializer(MsgPackNullableDynamicSerializer(extensionSerializer)),
             *(
                 TestData.timestampTestPairs.toList()
                 ).toTypedArray()
