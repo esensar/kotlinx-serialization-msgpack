@@ -16,6 +16,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Run tests with Gradle
         run: ./gradlew allTests
+      - name: Generate dokka HTML
+        run: ./gradlew dokkaHtml
       - name: Decode signing key
         run: |
           mkdir -p ~/.gradle
