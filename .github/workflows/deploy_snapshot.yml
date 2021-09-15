@@ -13,7 +13,7 @@ jobs:
       - name: Run tests with Gradle
         run: ./gradlew allTests
       - name: Generate dokka HTML
-        run: ./gradlew dokkaHtml
+        run: ./gradlew -Porg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=1g" dokkaHtml
       - name: Deploy snapshot to Sonatype Snapshots
         run: ./gradlew -Porg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=1g" -Psnapshot=true publishAllPublicationsToSnapshotRepository
         env:
