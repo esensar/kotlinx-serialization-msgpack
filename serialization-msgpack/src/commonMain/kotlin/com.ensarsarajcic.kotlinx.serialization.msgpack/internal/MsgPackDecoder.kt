@@ -130,8 +130,7 @@ internal class BasicMsgPackDecoder(
                 when {
                     MsgPackType.Map.FIXMAP_SIZE_MASK.test(next) -> MsgPackType.Map.FIXMAP_SIZE_MASK.unMaskValue(next).toInt()
                     next == MsgPackType.Map.MAP16 -> dataBuffer.takeNext(2).joinToNumber()
-                    // TODO: Change to MAP32
-                    next == MsgPackType.Map.MAP16 -> {
+                    next == MsgPackType.Map.MAP32 -> {
                         if (configuration.preventOverflows) {
                             val number = dataBuffer.takeNext(4).joinToNumber<Long>()
                             if (number !in Int.MIN_VALUE..Int.MAX_VALUE) {

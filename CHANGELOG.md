@@ -2,9 +2,13 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+### Added
 - Added dynamic serialization support ([#20][i20])
 - Added additional module for experimental unsigned support ([#19][i19]) - `serialization-msgpack-unsigned-support`
 - Added configuration to prevent number overflows ([#17][i17])
+
+### Fixed
+- Bug with never decoding `map 32` type
 
 ## [0.3.0] - 2021-09-14
 **BREAKING CHANGES**:
