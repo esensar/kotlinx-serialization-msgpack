@@ -7,14 +7,14 @@ import com.ensarsarajcic.kotlinx.serialization.msgpack.utils.joinToNumber
 internal interface MsgUnpacker {
     fun unpackNull()
     fun unpackBoolean(): Boolean
-    fun unpackByte(strict: Boolean = false): Byte
-    fun unpackShort(strict: Boolean = false): Short
-    fun unpackInt(strict: Boolean = false): Int
-    fun unpackLong(strict: Boolean = false): Long
+    fun unpackByte(strict: Boolean = false, preventOverflow: Boolean = false): Byte
+    fun unpackShort(strict: Boolean = false, preventOverflow: Boolean = false): Short
+    fun unpackInt(strict: Boolean = false, preventOverflow: Boolean = false): Int
+    fun unpackLong(strict: Boolean = false, preventOverflow: Boolean = false): Long
     fun unpackFloat(strict: Boolean = false): Float
     fun unpackDouble(strict: Boolean = false): Double
-    fun unpackString(): String
-    fun unpackByteArray(): ByteArray
+    fun unpackString(preventOverflow: Boolean = false): String
+    fun unpackByteArray(preventOverflow: Boolean = false): ByteArray
 }
 
 internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) : MsgUnpacker {
@@ -31,23 +31,42 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
         }
     }
 
-    override fun unpackByte(strict: Boolean): Byte {
+    override fun unpackByte(strict: Boolean, preventOverflow: Boolean): Byte {
         // Check is it a single byte value
         val next = dataBuffer.requireNextByte()
         return when {
             MsgPackType.Int.POSITIVE_FIXNUM_MASK.test(next) or MsgPackType.Int.NEGATIVE_FIXNUM_MASK.test(next) -> next
-            // TODO reader is not handling overflows (when using unsigned types)
-            MsgPackType.Int.isByte(next) -> dataBuffer.requireNextByte()
+            MsgPackType.Int.isByte(next) -> {
+                if (next == MsgPackType.Int.UINT8 && preventOverflow) {
+                    val number = (dataBuffer.requireNextByte().toInt() and 0xff).toShort()
+                    if (number !in Byte.MIN_VALUE..Byte.MAX_VALUE) {
+                        throw TODO("Overflow error")
+                    } else {
+                        number.toByte()
+                    }
+                } else {
+                    dataBuffer.requireNextByte()
+                }
+            }
             else -> throw TODO("Add a more descriptive error when wrong type is found!")
         }
     }
 
-    override fun unpackShort(strict: Boolean): Short {
+    override fun unpackShort(strict: Boolean, preventOverflow: Boolean): Short {
         val next = dataBuffer.peek()
         return when {
             MsgPackType.Int.isShort(next) -> {
                 dataBuffer.skip(1)
-                dataBuffer.takeNext(2).joinToNumber()
+                if (next == MsgPackType.Int.UINT16 && preventOverflow) {
+                    val number = dataBuffer.takeNext(2).joinToNumber<Int>()
+                    if (number !in Short.MIN_VALUE..Short.MAX_VALUE) {
+                        throw TODO("Overflow error")
+                    } else {
+                        number.toShort()
+                    }
+                } else {
+                    dataBuffer.takeNext(2).joinToNumber()
+                }
             }
             next == MsgPackType.Int.UINT8 -> {
                 dataBuffer.skip(1)
@@ -57,12 +76,21 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
         }
     }
 
-    override fun unpackInt(strict: Boolean): Int {
+    override fun unpackInt(strict: Boolean, preventOverflow: Boolean): Int {
         val next = dataBuffer.peek()
         return when {
             MsgPackType.Int.isInt(next) -> {
                 dataBuffer.skip(1)
-                dataBuffer.takeNext(4).joinToNumber()
+                if (next == MsgPackType.Int.UINT32 && preventOverflow) {
+                    val number = dataBuffer.takeNext(4).joinToNumber<Long>()
+                    if (number !in Int.MIN_VALUE..Int.MAX_VALUE) {
+                        throw TODO("Overflow error")
+                    } else {
+                        number.toInt()
+                    }
+                } else {
+                    dataBuffer.takeNext(4).joinToNumber()
+                }
             }
             next == MsgPackType.Int.UINT16 -> {
                 dataBuffer.skip(1)
@@ -72,12 +100,21 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
         }
     }
 
-    override fun unpackLong(strict: Boolean): Long {
+    override fun unpackLong(strict: Boolean, preventOverflow: Boolean): Long {
         val next = dataBuffer.peek()
         return when {
             MsgPackType.Int.isLong(next) -> {
                 dataBuffer.skip(1)
-                dataBuffer.takeNext(8).joinToNumber()
+                if (next == MsgPackType.Int.UINT64 && preventOverflow) {
+                    val number = dataBuffer.takeNext(8).joinToNumber<Long>()
+                    if (number < 0) {
+                        throw TODO("Overflow error")
+                    } else {
+                        number
+                    }
+                } else {
+                    dataBuffer.takeNext(8).joinToNumber()
+                }
             }
             next == MsgPackType.Int.UINT32 -> {
                 dataBuffer.skip(1)
@@ -108,14 +145,24 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
         }
     }
 
-    override fun unpackString(): String {
+    override fun unpackString(preventOverflow: Boolean): String {
         val next = dataBuffer.requireNextByte()
         val length = when {
             MsgPackType.String.FIXSTR_SIZE_MASK.test(next) -> MsgPackType.String.FIXSTR_SIZE_MASK.unMaskValue(next).toInt()
             next == MsgPackType.String.STR8 -> dataBuffer.requireNextByte().toInt() and 0xff
             next == MsgPackType.String.STR16 -> dataBuffer.takeNext(2).joinToNumber()
-            // TODO: this may have issues with long strings, since size will overflow
-            next == MsgPackType.String.STR32 -> dataBuffer.takeNext(4).joinToNumber()
+            next == MsgPackType.String.STR32 -> {
+                if (preventOverflow) {
+                    val number = dataBuffer.takeNext(4).joinToNumber<Long>()
+                    if (number !in Int.MIN_VALUE..Int.MAX_VALUE) {
+                        throw TODO("Overflow error")
+                    } else {
+                        number.toInt()
+                    }
+                } else {
+                    dataBuffer.takeNext(4).joinToNumber()
+                }
+            }
             else -> {
                 throw TODO("Add a more descriptive error when wrong type is found!")
             }
@@ -124,13 +171,23 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
         return dataBuffer.takeNext(length).decodeToString()
     }
 
-    override fun unpackByteArray(): ByteArray {
+    override fun unpackByteArray(preventOverflow: Boolean): ByteArray {
         val next = dataBuffer.requireNextByte()
         val length = when (next) {
             MsgPackType.Bin.BIN8 -> dataBuffer.requireNextByte().toInt() and 0xff
             MsgPackType.Bin.BIN16 -> dataBuffer.takeNext(2).joinToNumber()
-            // TODO: this may have issues with long byte arrays, since size will overflow
-            MsgPackType.Bin.BIN32 -> dataBuffer.takeNext(4).joinToNumber()
+            MsgPackType.Bin.BIN32 -> {
+                if (preventOverflow) {
+                    val number = dataBuffer.takeNext(4).joinToNumber<Long>()
+                    if (number !in Int.MIN_VALUE..Int.MAX_VALUE) {
+                        throw TODO("Overflow error")
+                    } else {
+                        number.toInt()
+                    }
+                } else {
+                    dataBuffer.takeNext(4).joinToNumber()
+                }
+            }
             else -> {
                 throw TODO("Add a more descriptive error when wrong type is found!")
             }

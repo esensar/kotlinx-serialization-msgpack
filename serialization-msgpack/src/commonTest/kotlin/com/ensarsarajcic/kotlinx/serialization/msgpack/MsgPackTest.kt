@@ -11,6 +11,7 @@ import kotlinx.serialization.serializer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.test.fail
 
 internal class MsgPackTest {
     @Test
@@ -268,6 +269,24 @@ internal class MsgPackTest {
             MsgPackTimestamp.serializer(),
             *TestData.timestampTestPairs
         )
+    }
+
+    @Test
+    fun testOverflows() {
+        fun <T> testPairs(dataList: List<String>, serializer: KSerializer<T>) {
+            dataList.forEach {
+                try {
+                    MsgPack(
+                        configuration = MsgPackConfiguration(preventOverflows = true)
+                    ).decodeFromByteArray(serializer, it.hexStringToByteArray())
+                    fail("Overflow should have occurred")
+                    // TODO change to proper exception once it is made
+                } catch (ex: Throwable) {}
+            }
+        }
+        testPairs(TestData.uByteTestPairs.map { it.first }, Byte.serializer())
+        testPairs(TestData.uShortTestPairs.map { it.first }, Short.serializer())
+        testPairs(TestData.uIntTestPairs.map { it.first }, Int.serializer())
     }
 
     private fun <T> testEncodePairs(serializer: KSerializer<T>, vararg pairs: Pair<String, T>) {

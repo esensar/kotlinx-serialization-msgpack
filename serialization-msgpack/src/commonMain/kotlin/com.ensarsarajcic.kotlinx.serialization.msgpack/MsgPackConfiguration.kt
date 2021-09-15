@@ -19,7 +19,13 @@ data class MsgPackConfiguration(
      * Enables strict mode type, which forces exact types when deserializing
      * (not allowing INT16 to be deserialized in place of Int for example)
      */
-    val strictTypes: Boolean = false
+    val strictTypes: Boolean = false,
+    /**
+     * Prevent overflows by throwing when overflow would occur
+     * Useful when combined with strict mode type
+     * true by default
+     */
+    val preventOverflows: Boolean = true
 ) {
     companion object {
         @JvmStatic
