@@ -2,6 +2,8 @@ package com.ensarsarajcic.kotlinx.serialization.msgpack
 
 import com.ensarsarajcic.kotlinx.serialization.msgpack.internal.BasicMsgPackDecoder
 import com.ensarsarajcic.kotlinx.serialization.msgpack.internal.BasicMsgPackEncoder
+import com.ensarsarajcic.kotlinx.serialization.msgpack.internal.InlineDecoderHelper
+import com.ensarsarajcic.kotlinx.serialization.msgpack.internal.InlineEncoderHelper
 import com.ensarsarajcic.kotlinx.serialization.msgpack.internal.MsgPackDecoder
 import com.ensarsarajcic.kotlinx.serialization.msgpack.internal.MsgPackEncoder
 import com.ensarsarajcic.kotlinx.serialization.msgpack.stream.toMsgPackBuffer
@@ -33,22 +35,22 @@ import kotlin.jvm.JvmOverloads
  * @see MsgPack.Default The instance using default configurations.
  */
 @OptIn(ExperimentalSerializationApi::class)
-sealed class MsgPack @JvmOverloads constructor(
-    val configuration: MsgPackConfiguration = MsgPackConfiguration.default,
-    override val serializersModule: SerializersModule = SerializersModule {
+open class MsgPack @JvmOverloads constructor(
+    private val configuration: MsgPackConfiguration = MsgPackConfiguration.default,
+    final override val serializersModule: SerializersModule = SerializersModule {
         contextual(Any::class, MsgPackDynamicSerializer)
     },
-    private val inlineEncoders: Map<SerialDescriptor, (BasicMsgPackEncoder) -> Encoder> = mapOf(),
-    private val inlineDecoders: Map<SerialDescriptor, (BasicMsgPackDecoder) -> Decoder> = mapOf()
+    private val inlineEncoders: Map<SerialDescriptor, (InlineEncoderHelper) -> Encoder> = mapOf(),
+    private val inlineDecoders: Map<SerialDescriptor, (InlineDecoderHelper) -> Decoder> = mapOf()
 ) : BinaryFormat {
     companion object Default : MsgPack()
 
-    override fun <T> decodeFromByteArray(deserializer: DeserializationStrategy<T>, bytes: ByteArray): T {
+    final override fun <T> decodeFromByteArray(deserializer: DeserializationStrategy<T>, bytes: ByteArray): T {
         val decoder = MsgPackDecoder(BasicMsgPackDecoder(configuration, serializersModule, bytes.toMsgPackBuffer(), inlineDecoders = inlineDecoders))
         return decoder.decodeSerializableValue(deserializer)
     }
 
-    override fun <T> encodeToByteArray(serializer: SerializationStrategy<T>, value: T): ByteArray {
+    final override fun <T> encodeToByteArray(serializer: SerializationStrategy<T>, value: T): ByteArray {
         val encoder = MsgPackEncoder(BasicMsgPackEncoder(configuration, serializersModule, inlineEncoders = inlineEncoders))
         kotlin.runCatching {
             encoder.encodeSerializableValue(serializer, value)

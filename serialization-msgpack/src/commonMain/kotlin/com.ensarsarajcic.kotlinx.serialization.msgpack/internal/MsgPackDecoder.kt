@@ -22,7 +22,7 @@ internal class BasicMsgPackDecoder(
     override val serializersModule: SerializersModule,
     val dataBuffer: MsgPackDataInputBuffer,
     private val msgUnpacker: MsgUnpacker = BasicMsgUnpacker(dataBuffer),
-    val inlineDecoders: Map<SerialDescriptor, (BasicMsgPackDecoder) -> Decoder> = mapOf()
+    val inlineDecoders: Map<SerialDescriptor, (InlineDecoderHelper) -> Decoder> = mapOf()
 ) : AbstractDecoder(), MsgPackTypeDecoder {
 
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
@@ -97,7 +97,7 @@ internal class BasicMsgPackDecoder(
 
     override fun decodeInline(inlineDescriptor: SerialDescriptor): Decoder {
         if (inlineDecoders.containsKey(inlineDescriptor)) {
-            return inlineDecoders[inlineDescriptor]!!(this)
+            return inlineDecoders[inlineDescriptor]!!(InlineDecoderHelper(serializersModule, dataBuffer))
         }
         return super.decodeInline(inlineDescriptor)
     }
@@ -229,3 +229,8 @@ internal class ExtensionTypeDecoder(
         ) as T
     }
 }
+
+data class InlineDecoderHelper(
+    val serializersModule: SerializersModule,
+    val inputBuffer: MsgPackDataInputBuffer
+)
