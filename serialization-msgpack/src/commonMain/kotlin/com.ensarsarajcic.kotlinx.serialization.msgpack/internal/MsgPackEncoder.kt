@@ -17,7 +17,8 @@ import kotlinx.serialization.modules.SerializersModule
 internal class BasicMsgPackEncoder(
     private val configuration: MsgPackConfiguration,
     override val serializersModule: SerializersModule,
-    private val packer: MsgPacker = BasicMsgPacker()
+    private val packer: MsgPacker = BasicMsgPacker(),
+    val inlineEncoders: Map<SerialDescriptor, (BasicMsgPackEncoder) -> Encoder> = mapOf()
 ) : AbstractEncoder() {
     val result = MsgPackDataOutputBuffer()
 
@@ -63,6 +64,13 @@ internal class BasicMsgPackEncoder(
         } else {
             result.addAll(packer.packByteArray(value))
         }
+    }
+
+    override fun encodeInline(inlineDescriptor: SerialDescriptor): Encoder {
+        if (inlineEncoders.containsKey(inlineDescriptor)) {
+            return inlineEncoders[inlineDescriptor]!!(this)
+        }
+        return super.encodeInline(inlineDescriptor)
     }
 
     override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder {
@@ -227,7 +235,8 @@ internal class MsgPackClassEncoder(
 
     @ExperimentalSerializationApi
     override fun encodeInlineElement(descriptor: SerialDescriptor, index: Int): Encoder {
-        return basicMsgPackEncoder
+        encodeName(descriptor, index)
+        return basicMsgPackEncoder.encodeInline(descriptor)
     }
 
     override fun encodeIntElement(descriptor: SerialDescriptor, index: Int, value: Int) {

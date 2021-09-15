@@ -21,7 +21,8 @@ internal class BasicMsgPackDecoder(
     private val configuration: MsgPackConfiguration,
     override val serializersModule: SerializersModule,
     val dataBuffer: MsgPackDataInputBuffer,
-    private val msgUnpacker: MsgUnpacker = BasicMsgUnpacker(dataBuffer)
+    private val msgUnpacker: MsgUnpacker = BasicMsgUnpacker(dataBuffer),
+    val inlineDecoders: Map<SerialDescriptor, (BasicMsgPackDecoder) -> Decoder> = mapOf()
 ) : AbstractDecoder(), MsgPackTypeDecoder {
 
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
@@ -92,6 +93,13 @@ internal class BasicMsgPackDecoder(
         } else {
             msgUnpacker.unpackByteArray()
         }
+    }
+
+    override fun decodeInline(inlineDescriptor: SerialDescriptor): Decoder {
+        if (inlineDecoders.containsKey(inlineDescriptor)) {
+            return inlineDecoders[inlineDescriptor]!!(this)
+        }
+        return super.decodeInline(inlineDescriptor)
     }
 
     override fun decodeCollectionSize(descriptor: SerialDescriptor): Int {
