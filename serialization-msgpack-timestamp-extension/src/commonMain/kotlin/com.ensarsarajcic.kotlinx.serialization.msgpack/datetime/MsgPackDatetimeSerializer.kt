@@ -7,7 +7,7 @@ import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackTimesta
 import kotlinx.datetime.Instant
 
 sealed class BaseMsgPackDatetimeSerializer(private val outputType: Byte) : BaseMsgPackExtensionSerializer<Instant>() {
-    private val timestampSerializer = MsgPackTimestampExtensionSerializer()
+    private val timestampSerializer = MsgPackTimestampExtensionSerializer
     override fun deserialize(extension: MsgPackExtension): Instant {
         return when (val timestamp = timestampSerializer.deserialize(extension)) {
             is MsgPackTimestamp.T32 -> Instant.fromEpochSeconds(timestamp.seconds, 0)

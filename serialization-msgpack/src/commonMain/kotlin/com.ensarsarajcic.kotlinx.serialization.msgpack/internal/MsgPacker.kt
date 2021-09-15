@@ -34,6 +34,7 @@ internal class BasicMsgPacker : MsgPacker {
     }
 
     override fun packShort(value: Short): ByteArray {
+        println("Value $value is between ${MsgPackType.Int.MIN_NEGATIVE_BYTE} and ${Byte.MAX_VALUE}")
         return if (value in MsgPackType.Int.MIN_NEGATIVE_BYTE..Byte.MAX_VALUE) {
             packByte(value.toByte())
         } else {
