@@ -34,8 +34,7 @@ kotlin {
 
     sourceSets {
         all {
-            languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
-            languageSettings.useExperimentalAnnotation("kotlinx.serialization.ExperimentalSerializationApi")
+            languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
         }
 
         val commonMain by getting {
