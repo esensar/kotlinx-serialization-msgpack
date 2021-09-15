@@ -28,6 +28,11 @@ implementation("com.ensarsarajcic.kotlinx:serialization-msgpack-timestamp-extens
 **NOTE**:
 Timestamp support is available in core library as well, the additional library just adds a specific serializer that can be used with [kotlinx-datetime](https://github.com/Kotlin/kotlinx-datetime) types. These are `MsgPackTimestamp32DatetimeSerializer`, `MsgPackTimestamp64DatetimeSerializer` and `MsgPackTimestamp96DatetimeSerializer`.
 
+For experimental kotlin unsigned types support, use `serialization-msgpack-unsigned-support`:
+```kotlin
+implementation("com.ensarsarajcic.kotlinx:serialization-msgpack-unsigned-support:${kotlinxSerializationMsgPackVersion}")
+```
+
 ### Snapshot builds
 **Gradle:**
 ```kotlin
@@ -43,6 +48,11 @@ To also use timestamp support with [kotlinx-datetime](https://github.com/Kotlin/
 
 ```kotlin
 implementation("com.ensarsarajcic.kotlinx:serialization-msgpack-timestamp-extension:${kotlinxSerializationMsgPackSnapshotVersion}")
+```
+
+For experimental kotlin unsigned types support, use `serialization-msgpack-unsigned-support`:
+```kotlin
+implementation("com.ensarsarajcic.kotlinx:serialization-msgpack-unsigned-support:${kotlinxSerializationMsgPackSnapshotVersion}")
 ```
 
 ## Usage

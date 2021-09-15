@@ -18,7 +18,7 @@ internal class BasicMsgPackEncoder(
     private val configuration: MsgPackConfiguration,
     override val serializersModule: SerializersModule,
     private val packer: MsgPacker = BasicMsgPacker(),
-    val inlineEncoders: Map<SerialDescriptor, (BasicMsgPackEncoder) -> Encoder> = mapOf()
+    val inlineEncoders: Map<SerialDescriptor, (InlineEncoderHelper) -> Encoder> = mapOf()
 ) : AbstractEncoder() {
     val result = MsgPackDataOutputBuffer()
 
@@ -68,7 +68,7 @@ internal class BasicMsgPackEncoder(
 
     override fun encodeInline(inlineDescriptor: SerialDescriptor): Encoder {
         if (inlineEncoders.containsKey(inlineDescriptor)) {
-            return inlineEncoders[inlineDescriptor]!!(this)
+            return inlineEncoders[inlineDescriptor]!!(InlineEncoderHelper(serializersModule, result))
         }
         return super.encodeInline(inlineDescriptor)
     }
@@ -284,3 +284,8 @@ internal class MsgPackClassEncoder(
         encodeSerializableValue(serializer, value)
     }
 }
+
+data class InlineEncoderHelper(
+    val serializersModule: SerializersModule,
+    val outputBuffer: MsgPackDataOutputBuffer
+)
