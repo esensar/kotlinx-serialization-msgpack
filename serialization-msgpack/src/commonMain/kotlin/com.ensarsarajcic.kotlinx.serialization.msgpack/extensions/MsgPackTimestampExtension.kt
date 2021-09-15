@@ -26,15 +26,15 @@ sealed class MsgPackTimestamp {
     }
 }
 
-sealed class MsgPackTimestampExtensionSerializer :
+open class MsgPackTimestampExtensionSerializer :
     BaseMsgPackExtensionSerializer<MsgPackTimestamp>() {
     companion object Default : MsgPackTimestampExtensionSerializer() {
         private const val TIMESTAMP_96_DATA_SIZE = 12
     }
 
-    override val extTypeId: Byte = -1
+    final override val extTypeId: Byte = -1
 
-    override fun deserialize(extension: MsgPackExtension): MsgPackTimestamp {
+    final override fun deserialize(extension: MsgPackExtension): MsgPackTimestamp {
         when (extension.type) {
             MsgPackExtension.Type.FIXEXT4 -> {
                 // Working with Timestamp 32
@@ -75,7 +75,7 @@ sealed class MsgPackTimestampExtensionSerializer :
         }
     }
 
-    override fun serialize(extension: MsgPackTimestamp): MsgPackExtension {
+    final override fun serialize(extension: MsgPackTimestamp): MsgPackExtension {
         return when (extension) {
             is MsgPackTimestamp.T32 -> MsgPackExtension(
                 MsgPackExtension.Type.FIXEXT4,
