@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file. This change
 
 ## [Unreleased]
 - Added dynamic serialization support ([#20][i20])
+- Added additional module for experimental unsigned support ([#19][i19]) - `serialization-msgpack-unsigned-support`
 
 ## [0.3.0] - 2021-09-14
 **BREAKING CHANGES**:
@@ -65,5 +66,6 @@ MsgPack.default.encodeToByteArray(...)
 [i13]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/13
 [i14]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/14
 [i18]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/18
+[i19]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/19
 [i20]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/20
 [p40]: https://github.com/esensar/kotlinx-serialization-msgpack/pull/40
