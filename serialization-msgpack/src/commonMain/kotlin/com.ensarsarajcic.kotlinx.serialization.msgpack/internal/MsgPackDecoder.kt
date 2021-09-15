@@ -52,19 +52,19 @@ internal class BasicMsgPackDecoder(
     }
 
     override fun decodeByte(): Byte {
-        return msgUnpacker.unpackByte(configuration.strictTypes)
+        return msgUnpacker.unpackByte(configuration.strictTypes, configuration.preventOverflows)
     }
 
     override fun decodeShort(): Short {
-        return msgUnpacker.unpackShort(configuration.strictTypes)
+        return msgUnpacker.unpackShort(configuration.strictTypes, configuration.preventOverflows)
     }
 
     override fun decodeInt(): Int {
-        return msgUnpacker.unpackInt(configuration.strictTypes)
+        return msgUnpacker.unpackInt(configuration.strictTypes, configuration.preventOverflows)
     }
 
     override fun decodeLong(): Long {
-        return msgUnpacker.unpackLong(configuration.strictTypes)
+        return msgUnpacker.unpackLong(configuration.strictTypes, configuration.preventOverflows)
     }
 
     override fun decodeFloat(): Float {
@@ -109,8 +109,18 @@ internal class BasicMsgPackDecoder(
                 when {
                     MsgPackType.Array.FIXARRAY_SIZE_MASK.test(next) -> MsgPackType.Array.FIXARRAY_SIZE_MASK.unMaskValue(next).toInt()
                     next == MsgPackType.Array.ARRAY16 -> dataBuffer.takeNext(2).joinToNumber()
-                    // TODO: this may have issues with long arrays, since size will overflow
-                    next == MsgPackType.Array.ARRAY32 -> dataBuffer.takeNext(4).joinToNumber()
+                    next == MsgPackType.Array.ARRAY32 -> {
+                        if (configuration.preventOverflows) {
+                            val number = dataBuffer.takeNext(4).joinToNumber<Long>()
+                            if (number !in Int.MIN_VALUE..Int.MAX_VALUE) {
+                                throw TODO("Overflow error")
+                            } else {
+                                number.toInt()
+                            }
+                        } else {
+                            dataBuffer.takeNext(4).joinToNumber()
+                        }
+                    }
                     else -> {
                         throw TODO("Add a more descriptive error when wrong type is found!")
                     }
@@ -120,8 +130,19 @@ internal class BasicMsgPackDecoder(
                 when {
                     MsgPackType.Map.FIXMAP_SIZE_MASK.test(next) -> MsgPackType.Map.FIXMAP_SIZE_MASK.unMaskValue(next).toInt()
                     next == MsgPackType.Map.MAP16 -> dataBuffer.takeNext(2).joinToNumber()
-                    // TODO: this may have issues with long objects, since size will overflow
-                    next == MsgPackType.Map.MAP16 -> dataBuffer.takeNext(4).joinToNumber()
+                    // TODO: Change to MAP32
+                    next == MsgPackType.Map.MAP16 -> {
+                        if (configuration.preventOverflows) {
+                            val number = dataBuffer.takeNext(4).joinToNumber<Long>()
+                            if (number !in Int.MIN_VALUE..Int.MAX_VALUE) {
+                                throw TODO("Overflow error")
+                            } else {
+                                number.toInt()
+                            }
+                        } else {
+                            dataBuffer.takeNext(4).joinToNumber()
+                        }
+                    }
                     else -> {
                         throw TODO("Add a more descriptive error when wrong type is found!")
                     }
