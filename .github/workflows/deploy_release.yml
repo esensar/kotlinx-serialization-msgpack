@@ -17,7 +17,7 @@ jobs:
       - name: Run tests with Gradle
         run: ./gradlew allTests
       - name: Generate dokka HTML
-        run: ./gradlew -Porg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=1g" dokkaHtml
+        run: ./gradlew -Porg.gradle.jvmargs="-Xmx8g" dokkaHtml
       - name: Decode signing key
         run: |
           mkdir -p ~/.gradle
@@ -25,7 +25,7 @@ jobs:
           base64 -di ~/.gradle/secring.gpg.b64 > ~/.gradle/secring.gpg
       - name: Deploy to maven central
         run: |
-          ./gradlew -Porg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=1g" -Psigning.keyId=${{secrets.SIGNING_KEY_ID}} -Psigning.password=${{secrets.SIGNING_KEY_PASSPHRASE}} -Psigning.secretKeyRingFile=$(echo ~/.gradle/secring.gpg) publishAllPublicationsToMavenRepository
+          ./gradlew -Porg.gradle.jvmargs="-Xmx8g" -Psigning.keyId=${{secrets.SIGNING_KEY_ID}} -Psigning.password=${{secrets.SIGNING_KEY_PASSPHRASE}} -Psigning.secretKeyRingFile=$(echo ~/.gradle/secring.gpg) publishAllPublicationsToMavenRepository
         env:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
