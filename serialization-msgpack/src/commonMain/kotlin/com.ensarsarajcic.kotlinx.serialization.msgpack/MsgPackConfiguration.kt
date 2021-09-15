@@ -21,6 +21,12 @@ data class MsgPackConfiguration(
      */
     val strictTypes: Boolean = false,
     /**
+     * Enables strict mode type for serialization
+     * (which is different from [strictTypes], which deals with deserialization)
+     * This prevents Int from being written as Byte in case it is small enough
+     */
+    val strictTypeWriting: Boolean = false,
+    /**
      * Prevent overflows by throwing when overflow would occur
      * Useful when combined with strict mode type
      * true by default

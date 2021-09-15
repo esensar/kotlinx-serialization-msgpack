@@ -31,19 +31,19 @@ internal class BasicMsgPackEncoder(
     }
 
     override fun encodeByte(value: Byte) {
-        result.addAll(packer.packByte(value))
+        result.addAll(packer.packByte(value, configuration.strictTypeWriting))
     }
 
     override fun encodeShort(value: Short) {
-        result.addAll(packer.packShort(value))
+        result.addAll(packer.packShort(value, configuration.strictTypeWriting))
     }
 
     override fun encodeInt(value: Int) {
-        result.addAll(packer.packInt(value))
+        result.addAll(packer.packInt(value, configuration.strictTypeWriting))
     }
 
     override fun encodeLong(value: Long) {
-        result.addAll(packer.packLong(value))
+        result.addAll(packer.packLong(value, configuration.strictTypeWriting))
     }
 
     override fun encodeFloat(value: Float) {

@@ -120,6 +120,23 @@ object TestData {
         "c70cff000000007fffffffffffffff" to MsgPackTimestamp.T92(9_223_372_036_854_775_807),
         "c70cff000000008000000000000001" to MsgPackTimestamp.T92(-9_223_372_036_854_775_807),
     )
+    val strictWriteShortPairs = arrayOf<Pair<String, Short>>(
+        "d1ffdf" to -33,
+        "d1ffce" to -50,
+        "d1ff81" to -127,
+    )
+    val strictWriteIntPairs = arrayOf<Pair<String, Int>>(
+        "ce00007fff" to 32767,
+        "ce00000100" to 256,
+        "d2ffffff80" to -128,
+        "d2ffffff7f" to -129,
+    )
+    val strictWriteLongPairs = arrayOf<Pair<String, Long>>(
+        "cf0000000000007fff" to 32767,
+        "cf0000000000000100" to 256,
+        "d3ffffffffffffff80" to -128,
+        "d3ffffffffffffff7f" to -129,
+    )
 
     @Serializable
     data class SampleClass(

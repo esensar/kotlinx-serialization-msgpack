@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file. This change
 - Added dynamic serialization support ([#20][i20])
 - Added additional module for experimental unsigned support ([#19][i19]) - `serialization-msgpack-unsigned-support`
 - Added configuration to prevent number overflows ([#17][i17])
+- Added configuration for strict writing, to prevent reducing numbers into more compact format (disabled by default)
 
 ### Fixed
 - Bug with never decoding `map 32` type

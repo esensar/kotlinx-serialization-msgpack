@@ -7,6 +7,7 @@ import kotlinx.serialization.builtins.ByteArraySerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.serializer
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -287,6 +288,21 @@ internal class MsgPackTest {
         testPairs(TestData.uByteTestPairs.map { it.first }, Byte.serializer())
         testPairs(TestData.uShortTestPairs.map { it.first }, Short.serializer())
         testPairs(TestData.uIntTestPairs.map { it.first }, Int.serializer())
+    }
+
+    @Test
+    fun testStrictWrites() {
+        fun <T> testPairs(dataList: Array<Pair<String, T>>, serializer: KSerializer<T>) {
+            dataList.forEach { (expectedResult, value) ->
+                val result = MsgPack(
+                    configuration = MsgPackConfiguration(strictTypeWriting = true)
+                ).encodeToByteArray(serializer, value)
+                assertEquals(expectedResult, result.toHex())
+            }
+        }
+        testPairs(TestData.strictWriteShortPairs, Short.serializer())
+        testPairs(TestData.strictWriteIntPairs, Int.serializer())
+        testPairs(TestData.strictWriteLongPairs, Long.serializer())
     }
 
     private fun <T> testEncodePairs(serializer: KSerializer<T>, vararg pairs: Pair<String, T>) {

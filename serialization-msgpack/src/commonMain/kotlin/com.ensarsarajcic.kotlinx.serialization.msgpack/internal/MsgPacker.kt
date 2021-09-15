@@ -6,10 +6,10 @@ import com.ensarsarajcic.kotlinx.serialization.msgpack.utils.splitToByteArray
 internal interface MsgPacker {
     fun packNull(): ByteArray
     fun packBoolean(value: Boolean): ByteArray
-    fun packByte(value: Byte): ByteArray
-    fun packShort(value: Short): ByteArray
-    fun packInt(value: Int): ByteArray
-    fun packLong(value: Long): ByteArray
+    fun packByte(value: Byte, strict: Boolean = false): ByteArray
+    fun packShort(value: Short, strict: Boolean = false): ByteArray
+    fun packInt(value: Int, strict: Boolean = false): ByteArray
+    fun packLong(value: Long, strict: Boolean = false): ByteArray
     fun packFloat(value: Float): ByteArray
     fun packDouble(value: Double): ByteArray
     fun packString(value: String, rawCompatibility: Boolean = false): ByteArray
@@ -25,7 +25,7 @@ internal class BasicMsgPacker : MsgPacker {
         return byteArrayOf(MsgPackType.Boolean(value))
     }
 
-    override fun packByte(value: Byte): ByteArray {
+    override fun packByte(value: Byte, strict: Boolean): ByteArray {
         return if (value >= MsgPackType.Int.MIN_NEGATIVE_SINGLE_BYTE) {
             byteArrayOf(value)
         } else {
@@ -33,15 +33,15 @@ internal class BasicMsgPacker : MsgPacker {
         }
     }
 
-    override fun packShort(value: Short): ByteArray {
-        return if (value in MsgPackType.Int.MIN_NEGATIVE_BYTE..Byte.MAX_VALUE) {
+    override fun packShort(value: Short, strict: Boolean): ByteArray {
+        return if (value in MsgPackType.Int.MIN_NEGATIVE_BYTE..Byte.MAX_VALUE && !strict) {
             packByte(value.toByte())
         } else {
             var uByte = false
             val type =
                 when {
                     value < 0 -> MsgPackType.Int.INT16
-                    value <= MsgPackType.Int.MAX_UBYTE -> MsgPackType.Int.UINT8.also { uByte = true }
+                    value <= MsgPackType.Int.MAX_UBYTE && !strict -> MsgPackType.Int.UINT8.also { uByte = true }
                     else -> MsgPackType.Int.UINT16
                 }
             if (uByte) {
@@ -52,15 +52,15 @@ internal class BasicMsgPacker : MsgPacker {
         }
     }
 
-    override fun packInt(value: Int): ByteArray {
-        return if (value in Short.MIN_VALUE..Short.MAX_VALUE) {
+    override fun packInt(value: Int, strict: Boolean): ByteArray {
+        return if (value in Short.MIN_VALUE..Short.MAX_VALUE && !strict) {
             packShort(value.toShort())
         } else {
             var uShort = false
             val type =
                 when {
                     value < 0 -> MsgPackType.Int.INT32
-                    value <= MsgPackType.Int.MAX_USHORT -> MsgPackType.Int.UINT16.also { uShort = true }
+                    value <= MsgPackType.Int.MAX_USHORT && !strict -> MsgPackType.Int.UINT16.also { uShort = true }
                     else -> MsgPackType.Int.UINT32
                 }
             if (uShort) {
@@ -71,15 +71,15 @@ internal class BasicMsgPacker : MsgPacker {
         }
     }
 
-    override fun packLong(value: Long): ByteArray {
-        return if (value in Int.MIN_VALUE..Int.MAX_VALUE) {
+    override fun packLong(value: Long, strict: Boolean): ByteArray {
+        return if (value in Int.MIN_VALUE..Int.MAX_VALUE && !strict) {
             packInt(value.toInt())
         } else {
             var uInt = false
             val type =
                 when {
                     value < 0 -> MsgPackType.Int.INT64
-                    value <= MsgPackType.Int.MAX_UINT -> MsgPackType.Int.UINT32.also { uInt = true }
+                    value <= MsgPackType.Int.MAX_UINT && !strict -> MsgPackType.Int.UINT32.also { uInt = true }
                     else -> MsgPackType.Int.UINT64
                 }
             if (uInt) {
