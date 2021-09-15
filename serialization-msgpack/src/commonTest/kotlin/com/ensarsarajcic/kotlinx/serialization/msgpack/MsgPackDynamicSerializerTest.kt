@@ -91,7 +91,6 @@ internal class MsgPackDynamicSerializerTest {
 
     private fun <T> testEncodePairs(serializer: KSerializer<T>, vararg pairs: Pair<String, T>) {
         pairs.forEach { (expectedResult, value) ->
-            println("Type of $value is ${value!!::class}")
             val result = MsgPack.encodeToByteArray(serializer, value).toHex()
             assertEquals(expectedResult, result)
         }

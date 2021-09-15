@@ -9,6 +9,9 @@ import kotlinx.serialization.BinaryFormat
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.SerializersModule
 import kotlin.jvm.JvmOverloads
 
@@ -34,17 +37,19 @@ sealed class MsgPack @JvmOverloads constructor(
     val configuration: MsgPackConfiguration = MsgPackConfiguration.default,
     override val serializersModule: SerializersModule = SerializersModule {
         contextual(Any::class, MsgPackDynamicSerializer)
-    }
+    },
+    private val inlineEncoders: Map<SerialDescriptor, (BasicMsgPackEncoder) -> Encoder> = mapOf(),
+    private val inlineDecoders: Map<SerialDescriptor, (BasicMsgPackDecoder) -> Decoder> = mapOf()
 ) : BinaryFormat {
     companion object Default : MsgPack()
 
     override fun <T> decodeFromByteArray(deserializer: DeserializationStrategy<T>, bytes: ByteArray): T {
-        val decoder = MsgPackDecoder(BasicMsgPackDecoder(configuration, serializersModule, bytes.toMsgPackBuffer()))
+        val decoder = MsgPackDecoder(BasicMsgPackDecoder(configuration, serializersModule, bytes.toMsgPackBuffer(), inlineDecoders = inlineDecoders))
         return decoder.decodeSerializableValue(deserializer)
     }
 
     override fun <T> encodeToByteArray(serializer: SerializationStrategy<T>, value: T): ByteArray {
-        val encoder = MsgPackEncoder(BasicMsgPackEncoder(configuration, serializersModule))
+        val encoder = MsgPackEncoder(BasicMsgPackEncoder(configuration, serializersModule, inlineEncoders = inlineEncoders))
         kotlin.runCatching {
             encoder.encodeSerializableValue(serializer, value)
         }.fold(
