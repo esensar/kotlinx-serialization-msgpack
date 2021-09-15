@@ -13,11 +13,11 @@ jobs:
       - name: Run tests with Gradle
         run: ./gradlew allTests
       - name: Deploy snapshot to Sonatype Snapshots
-        run: ./gradlew -Psnapshot=true publishAllPublicationsToSnapshotRepository
+        run: ./gradlew -Porg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=1g" -Psnapshot=true publishAllPublicationsToSnapshotRepository
         env:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
       - name: Deploy snapshot to GitHub packages
-        run: ./gradlew -Psnapshot=true publishAllPublicationsToGitHubPackagesRepository
+        run: ./gradlew -Porg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=1g" -Psnapshot=true publishAllPublicationsToGitHubPackagesRepository
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
