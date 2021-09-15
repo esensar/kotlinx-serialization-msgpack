@@ -41,7 +41,6 @@ open class MsgPackNullableDynamicSerializer(
     final override fun deserialize(decoder: Decoder): Any? {
         if (decoder !is MsgPackTypeDecoder) TODO("Unsupported decoder!")
         val type = decoder.peekNextType()
-        println(type)
         return when {
             type == MsgPackType.NULL -> decoder.decodeNull()
             type == MsgPackType.Boolean.FALSE || type == MsgPackType.Boolean.TRUE -> decoder.decodeBoolean()
@@ -88,29 +87,33 @@ open class MsgPackNullableDynamicSerializer(
 
     @OptIn(InternalSerializationApi::class)
     final override fun serialize(encoder: Encoder, value: Any?) {
-        when (value) {
-            null -> encoder.encodeNull()
-            is Boolean -> encoder.encodeBoolean(value)
-            is Byte -> encoder.encodeByte(value)
-            is Short -> encoder.encodeShort(value)
-            is Int -> encoder.encodeInt(value)
-            is Long -> encoder.encodeLong(value)
-            is Float -> encoder.encodeFloat(value)
-            is Double -> encoder.encodeDouble(value)
-            is String -> encoder.encodeString(value)
-            is ByteArray -> encoder.encodeSerializableValue(ByteArraySerializer(), value)
-            is Map<*, *> -> MapSerializer(this, this).serialize(encoder, value as Map<Any?, Any?>)
-            is Array<*> -> ArraySerializer(this).serialize(encoder, value.map { it }.toTypedArray())
-            is List<*> -> ListSerializer(this).serialize(encoder, value.map { it })
-            is Map.Entry<*, *> -> MapEntrySerializer(this, this).serialize(encoder, value)
-            else ->
-                {
-                    if (dynamicMsgPackExtensionSerializer.canSerialize(value)) {
-                        dynamicMsgPackExtensionSerializer.serialize(encoder, value)
-                    } else {
-                        encoder.encodeSerializableValue(value::class.serializer() as KSerializer<Any>, value)
-                    }
+        if (value == null) encoder.encodeNull()
+        when (value!!::class) {
+            Boolean::class -> encoder.encodeBoolean(value as Boolean)
+            Byte::class -> encoder.encodeByte(value as Byte)
+            Short::class -> encoder.encodeShort(value as Short)
+            Int::class -> encoder.encodeInt(value as Int)
+            Long::class -> encoder.encodeLong(value as Long)
+            Float::class -> encoder.encodeFloat(value as Float)
+            Double::class -> encoder.encodeDouble(value as Double)
+            String::class -> encoder.encodeString(value as String)
+            ByteArray::class -> encoder.encodeSerializableValue(ByteArraySerializer(), value as ByteArray)
+            else -> {
+                when (value) {
+                    is Map<*, *> -> MapSerializer(this, this).serialize(encoder, value as Map<Any?, Any?>)
+                    is Array<*> -> ArraySerializer(this).serialize(encoder, value.map { it }.toTypedArray())
+                    is List<*> -> ListSerializer(this).serialize(encoder, value.map { it })
+                    is Map.Entry<*, *> -> MapEntrySerializer(this, this).serialize(encoder, value)
+                    else ->
+                        {
+                            if (dynamicMsgPackExtensionSerializer.canSerialize(value)) {
+                                dynamicMsgPackExtensionSerializer.serialize(encoder, value)
+                            } else {
+                                encoder.encodeSerializableValue(value::class.serializer() as KSerializer<Any>, value)
+                            }
+                        }
                 }
+            }
         }
     }
 }

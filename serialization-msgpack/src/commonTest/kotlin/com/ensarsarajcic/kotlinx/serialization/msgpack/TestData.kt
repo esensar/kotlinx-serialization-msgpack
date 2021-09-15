@@ -61,7 +61,7 @@ object TestData {
         "d3ffffffff7fffffff" to -2147483649,
         "d3fffffffed5fa0e00" to -5000000000
     )
-    val floatTestPairs = arrayOf(
+    val floatTestPairs = arrayOf<Pair<String, Float>>(
         "ca3dfbe76d" to 0.123f,
         "cabdfbe76d" to -0.123f,
         "ca42f6e979" to 123.456f,

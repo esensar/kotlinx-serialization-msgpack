@@ -121,7 +121,6 @@ internal class BasicMsgPackEncoder(
         if (serializer == ByteArraySerializer()) {
             encodeByteArray(value as ByteArray)
         } else {
-            println("Serializing $value with $serializer")
             super.encodeSerializableValue(serializer, value)
         }
     }
