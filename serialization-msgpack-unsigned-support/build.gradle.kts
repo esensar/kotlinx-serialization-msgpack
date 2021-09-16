@@ -20,6 +20,8 @@ kotlin {
         }
     }
     ios()
+    tvos()
+    watchos()
     val hostOs = System.getProperty("os.name")
     val isMingwX64 = hostOs.startsWith("Windows")
     val nativeTarget = when {

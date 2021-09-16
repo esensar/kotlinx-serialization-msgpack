@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file. This change
 - Added additional module for experimental unsigned support ([#19][i19]) - `serialization-msgpack-unsigned-support`
 - Added configuration to prevent number overflows ([#17][i17])
 - Added configuration for strict writing, to prevent reducing numbers into more compact format (disabled by default)
+- More targets (watchos, tvos)
 
 ### Fixed
 - Bug with never decoding `map 32` type
