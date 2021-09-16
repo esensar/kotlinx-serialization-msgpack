@@ -18,7 +18,6 @@ jobs:
           timeout_minutes: 10
           max_attempts: 3
           command: ./gradlew -Porg.gradle.jvmargs="-Xmx8g" dokkaHtml
-      - name: Generate dokka HTML
       - name: Deploy snapshot to Sonatype Snapshots
         uses: nick-invision/retry@v2
         with:
