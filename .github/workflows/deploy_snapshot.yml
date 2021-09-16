@@ -13,7 +13,11 @@ jobs:
       - name: Run tests with Gradle
         run: ./gradlew allTests
       - name: Generate dokka HTML
-        run: ./gradlew -Porg.gradle.jvmargs="-Xmx8g" dokkaHtml
+        uses: nick-invision/retry@v2
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          command: ./gradlew -Porg.gradle.jvmargs="-Xmx8g" dokkaHtml
       - name: Deploy snapshot to Sonatype Snapshots
         run: ./gradlew -Porg.gradle.jvmargs="-Xmx8g" -Psnapshot=true publishAllPublicationsToSnapshotRepository
         env:
