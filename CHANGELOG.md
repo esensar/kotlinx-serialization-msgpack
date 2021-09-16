@@ -3,10 +3,10 @@ All notable changes to this project will be documented in this file. This change
 
 ## [Unreleased]
 ### Added
-- Added dynamic serialization support ([#20][i20])
-- Added additional module for experimental unsigned support ([#19][i19]) - `serialization-msgpack-unsigned-support`
-- Added configuration to prevent number overflows ([#17][i17])
-- Added configuration for strict writing, to prevent reducing numbers into more compact format (disabled by default)
+- Dynamic serialization support ([#20][i20])
+- Additional module for experimental unsigned support ([#19][i19]) - `serialization-msgpack-unsigned-support`
+- Configuration to prevent number overflows ([#17][i17])
+- Configuration for strict writing, to prevent reducing numbers into more compact format (disabled by default)
 - More targets (watchos, tvos)
 
 ### Fixed
@@ -26,11 +26,13 @@ MsgPack.default.encodeToByteArray(...)
 ```
 
 ### Added
+- Support for timestamp extension ([#10][i10])
+- Configuration for raw (old str) type compatibility ([#12][i12])
+- Configuration for strict type mode ([#18][i18])
+
+### Changed
 - Upgraded kotlin version to 1.5.0
 - Upgraded kotlinx-serialization version to 1.2.2
-- Added support for timestamp extension ([#10][i10])
-- Added configuration for raw (old str) type compatibility ([#12][i12])
-- Added configuration for strict type mode ([#18][i18])
 
 ### Fixed
 - Bug with failing to decode extension types with variable data size
