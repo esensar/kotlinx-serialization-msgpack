@@ -18,12 +18,21 @@ jobs:
           timeout_minutes: 10
           max_attempts: 3
           command: ./gradlew -Porg.gradle.jvmargs="-Xmx8g" dokkaHtml
+      - name: Generate dokka HTML
       - name: Deploy snapshot to Sonatype Snapshots
-        run: ./gradlew -Porg.gradle.jvmargs="-Xmx8g" -Psnapshot=true publishAllPublicationsToSnapshotRepository
+        uses: nick-invision/retry@v2
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          command: ./gradlew -Porg.gradle.jvmargs="-Xmx8g" -Psnapshot=true publishAllPublicationsToSnapshotRepository
         env:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
       - name: Deploy snapshot to GitHub packages
-        run: ./gradlew -Porg.gradle.jvmargs="-Xmx8g" -Psnapshot=true publishAllPublicationsToGitHubPackagesRepository
+        uses: nick-invision/retry@v2
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          command: ./gradlew -Porg.gradle.jvmargs="-Xmx8g" -Psnapshot=true publishAllPublicationsToGitHubPackagesRepository
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
