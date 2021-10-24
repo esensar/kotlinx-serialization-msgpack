@@ -1,6 +1,9 @@
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
+    id("maven-publish")
+    id("signing")
+    id("org.jetbrains.dokka")
 }
 
 kotlin {

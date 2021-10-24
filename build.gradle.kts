@@ -37,10 +37,6 @@ allprojects {
 
 subprojects {
     afterEvaluate {
-        apply(plugin = "maven-publish")
-        apply(plugin = "signing")
-        apply(plugin = "org.jetbrains.dokka")
-
         val dokkaHtml = tasks["dokkaHtml"]
         tasks {
             create<Jar>("javadocJar") {
