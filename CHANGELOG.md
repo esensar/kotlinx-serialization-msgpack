@@ -2,6 +2,7 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+- Fixed issues with platform specific release artifacts ([#55][i55])
 
 ## [0.4.0] - 2021-09-17
 ### Added
@@ -81,4 +82,5 @@ MsgPack.default.encodeToByteArray(...)
 [i18]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/18
 [i19]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/19
 [i20]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/20
+[i55]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/55
 [p40]: https://github.com/esensar/kotlinx-serialization-msgpack/pull/40
