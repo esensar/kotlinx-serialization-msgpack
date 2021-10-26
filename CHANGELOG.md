@@ -71,7 +71,7 @@ MsgPack.default.encodeToByteArray(...)
 - `MsgPackDynamicSerializer` as placeholder for future [contextual serializer](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/serializers.md#contextual-serialization)
 - Full implementation of msgpack spec excluding extension types and bin format family
 
-[Unreleased]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.4.2...main
+[Unreleased]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.4.2...develop
 [0.2.0]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.1.0...0.2.0
 [0.2.1]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.2.0...0.2.1
 [0.3.0]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.2.1...0.3.0
