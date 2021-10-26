@@ -27,10 +27,13 @@ internal class BasicMsgPackDecoder(
 
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
         if (descriptor.kind in arrayOf(StructureKind.CLASS, StructureKind.OBJECT)) {
-            // TODO Improve structure end logic
-            //      This will probably fail in nested structures
-            val fieldName = kotlin.runCatching { decodeString() }.getOrNull() ?: return CompositeDecoder.DECODE_DONE
-            return descriptor.getElementIndex(fieldName)
+            val next = dataBuffer.peekSafely()
+            if (next != null && MsgPackType.String.isString(next)) {
+                val fieldName = kotlin.runCatching { decodeString() }.getOrNull() ?: return CompositeDecoder.DECODE_DONE
+                return descriptor.getElementIndex(fieldName)
+            } else {
+                return CompositeDecoder.DECODE_DONE
+            }
         }
         return 0
     }
@@ -189,6 +192,15 @@ internal class ClassMsgPackDecoder(
     private val basicMsgPackDecoder: BasicMsgPackDecoder
 ) : Decoder by basicMsgPackDecoder, CompositeDecoder by basicMsgPackDecoder, MsgPackTypeDecoder by basicMsgPackDecoder {
     override val serializersModule: SerializersModule = basicMsgPackDecoder.serializersModule
+
+    private var decodedElements = 0
+
+    override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
+        if (decodedElements >= descriptor.elementsCount) return CompositeDecoder.DECODE_DONE
+        val result = basicMsgPackDecoder.decodeElementIndex(descriptor)
+        if (result != CompositeDecoder.DECODE_DONE) decodedElements++
+        return result
+    }
 
     override fun decodeSequentially(): Boolean = false
 }

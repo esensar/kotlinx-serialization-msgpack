@@ -22,6 +22,7 @@ class MsgPackDataInputBuffer(private val byteArray: ByteArray) : MsgPackDataBuff
     }
 
     fun peek(): Byte = byteArray.getOrNull(index) ?: throw Exception("End of stream")
+    fun peekSafely(): Byte? = byteArray.getOrNull(index)
 
     // Increases index only if next byte is not null
     fun nextByteOrNull(): Byte? = byteArray.getOrNull(index)?.also { index++ }
