@@ -7,6 +7,11 @@ import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackTimesta
 import kotlinx.datetime.Instant
 
 sealed class BaseMsgPackDatetimeSerializer(private val outputType: Byte) : BaseMsgPackExtensionSerializer<Instant>() {
+
+    init {
+        require(outputType in 0..2) { "Output type can only take values from 0 to 2 inclusive" }
+    }
+
     private val timestampSerializer = MsgPackTimestampExtensionSerializer
     override fun deserialize(extension: MsgPackExtension): Instant {
         return when (val timestamp = timestampSerializer.deserialize(extension)) {
@@ -27,7 +32,7 @@ sealed class BaseMsgPackDatetimeSerializer(private val outputType: Byte) : BaseM
             2.toByte() -> {
                 MsgPackTimestamp.T92(extension.epochSeconds, extension.nanosecondsOfSecond.toLong())
             }
-            else -> TODO("Needs more info")
+            else -> throw AssertionError()
         }
         return timestampSerializer.serialize(timestamp)
     }
