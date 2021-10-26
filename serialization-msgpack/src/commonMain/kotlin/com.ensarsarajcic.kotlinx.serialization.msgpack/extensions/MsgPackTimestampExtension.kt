@@ -1,5 +1,6 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack.extensions
 
+import com.ensarsarajcic.kotlinx.serialization.msgpack.exceptions.MsgPackSerializationException
 import com.ensarsarajcic.kotlinx.serialization.msgpack.utils.joinToNumber
 import com.ensarsarajcic.kotlinx.serialization.msgpack.utils.splitToByteArray
 import kotlinx.serialization.Serializable
@@ -59,7 +60,7 @@ open class MsgPackTimestampExtensionSerializer :
             MsgPackExtension.Type.EXT8 -> {
                 // Working with Timestamp 96
                 if (extension.data.size != TIMESTAMP_96_DATA_SIZE) {
-                    throw TODO("Needs more info")
+                    throw MsgPackSerializationException.genericExtensionError(extension, "Error when parsing datetime. Expected data size of $TIMESTAMP_96_DATA_SIZE, but found ${extension.data.size}")
                 }
                 val nanoseconds = extension.data
                     .take(4)
@@ -71,7 +72,7 @@ open class MsgPackTimestampExtensionSerializer :
                     .joinToNumber<Long>()
                 return MsgPackTimestamp.T92(seconds, nanoseconds)
             }
-            else -> TODO("Needs more info")
+            else -> throw MsgPackSerializationException.genericExtensionError(extension, "Unsupported extension type for timestamp: ${extension.type}")
         }
     }
 

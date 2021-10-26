@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+### Added
+- More descriptive errors ([#21][i21])
 
 ## [0.4.4] - 2021-12-20
 - Added support for ignoring unknown keys ([#69][i69])
@@ -102,6 +104,7 @@ MsgPack.default.encodeToByteArray(...)
 [i18]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/18
 [i19]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/19
 [i20]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/20
+[i21]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/21
 [i55]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/55
 [i57]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/57
 [i60]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/60
