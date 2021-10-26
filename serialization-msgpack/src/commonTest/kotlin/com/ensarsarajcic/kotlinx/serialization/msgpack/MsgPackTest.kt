@@ -1,5 +1,6 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
+import com.ensarsarajcic.kotlinx.serialization.msgpack.exceptions.MsgPackSerializationException
 import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackTimestamp
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ArraySerializer
@@ -285,8 +286,7 @@ internal class MsgPackTest {
                         configuration = MsgPackConfiguration(preventOverflows = true)
                     ).decodeFromByteArray(serializer, it.hexStringToByteArray())
                     fail("Overflow should have occurred")
-                    // TODO change to proper exception once it is made
-                } catch (ex: Throwable) {}
+                } catch (ex: MsgPackSerializationException) {}
             }
         }
         testPairs(TestData.uByteTestPairs.map { it.first }, Byte.serializer())
@@ -321,10 +321,6 @@ internal class MsgPackTest {
     fun testNestedStructures() {
         val sm1: NestedMessage = listOf("Alice" to "Bob", "Charley" to "Delta") to "Random message Body here"
         val result = MsgPack.encodeToByteArray(sm1)
-        println(result.toHex())
-        println(result.toList())
-        println(result.size)
-        println(MsgPack.decodeFromByteArray<Pair<Int, Int>>(MsgPack.encodeToByteArray(1 to 2)))
         val result2 = MsgPack.decodeFromByteArray<NestedMessage>(result)
         assertEquals(sm1, result2)
     }

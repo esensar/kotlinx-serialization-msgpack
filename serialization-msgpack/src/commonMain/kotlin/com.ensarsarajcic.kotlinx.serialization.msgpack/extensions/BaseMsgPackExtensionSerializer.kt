@@ -1,5 +1,6 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack.extensions
 
+import com.ensarsarajcic.kotlinx.serialization.msgpack.exceptions.MsgPackSerializationException
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
@@ -11,7 +12,7 @@ abstract class BaseMsgPackExtensionSerializer<T> : KSerializer<T> {
     override fun deserialize(decoder: Decoder): T {
         val extension = decoder.decodeSerializableValue(serializer)
         if (checkTypeId && extension.extTypeId != extTypeId) {
-            throw TODO("Add more info")
+            throw MsgPackSerializationException.extensionDeserializationWrongType(extension, extTypeId, extension.extTypeId)
         }
         return deserialize(extension)
     }
@@ -21,7 +22,7 @@ abstract class BaseMsgPackExtensionSerializer<T> : KSerializer<T> {
     override fun serialize(encoder: Encoder, value: T) {
         val extension = serialize(value)
         if (checkTypeId && extension.extTypeId != extTypeId) {
-            throw TODO("Add more info")
+            throw MsgPackSerializationException.extensionSerializationWrongType(extension, extTypeId, extension.extTypeId)
         }
         encoder.encodeSerializableValue(serializer, serialize(value))
     }
