@@ -27,10 +27,13 @@ kotlin {
     watchos()
     val hostOs = System.getProperty("os.name")
     val isMingwX64 = hostOs.startsWith("Windows")
-    val nativeTarget = when {
-        hostOs == "Mac OS X" -> macosX64("native")
-        hostOs == "Linux" -> linuxX64("native")
-        isMingwX64 -> mingwX64("native")
+    when {
+        hostOs == "Mac OS X" -> macosX64()
+        hostOs == "Linux" -> {
+            mingwX64() // cross-compile windows
+            linuxX64()
+        }
+        isMingwX64 -> mingwX64()
         else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
     }
 
