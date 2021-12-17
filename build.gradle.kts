@@ -14,8 +14,8 @@ buildscript {
 }
 
 val snapshot: String? by project
-val sonatypeStaging = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-val sonatypeSnapshots = "https://oss.sonatype.org/content/repositories/snapshots"
+val sonatypeStaging = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2"
+val sonatypeSnapshots = "https://s01.oss.sonatype.org/content/repositories/snapshots"
 
 val sonatypePassword: String? by project
 val sonatypeUsername: String? by project
