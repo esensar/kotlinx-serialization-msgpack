@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file. This change
 
 ## [Unreleased]
 
+## [0.4.3] - 2021-12-17
+- Added windows target using cross-compilation ([#60][i60])
+- Added support for enum serialization ([#63][i63])
+
 ## [0.4.2] - 2021-10-26
 - Fixed issues with nested structure deserialization ([#57][i57])
 
@@ -91,4 +95,6 @@ MsgPack.default.encodeToByteArray(...)
 [i20]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/20
 [i55]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/55
 [i57]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/57
+[i60]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/60
+[i63]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/63
 [p40]: https://github.com/esensar/kotlinx-serialization-msgpack/pull/40

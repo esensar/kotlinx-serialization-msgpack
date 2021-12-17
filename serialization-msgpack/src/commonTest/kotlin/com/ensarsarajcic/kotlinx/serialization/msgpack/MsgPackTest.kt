@@ -277,6 +277,22 @@ internal class MsgPackTest {
     }
 
     @Test
+    fun testEnumEncode() {
+        testEncodePairs(
+            Vocation.serializer(),
+            *TestData.enumTestPairs
+        )
+    }
+
+    @Test
+    fun testEnumDecode() {
+        testDecodePairs(
+            Vocation.serializer(),
+            *TestData.enumTestPairs
+        )
+    }
+
+    @Test
     fun testOverflows() {
         fun <T> testPairs(dataList: List<String>, serializer: KSerializer<T>) {
             dataList.forEach {

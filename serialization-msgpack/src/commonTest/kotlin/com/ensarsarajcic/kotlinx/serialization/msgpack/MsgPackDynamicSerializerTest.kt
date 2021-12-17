@@ -60,7 +60,8 @@ internal class MsgPackDynamicSerializerTest {
                     TestData.intArrayTestPairs.toList() +
                     TestData.stringArrayTestPairs.toList() +
                     TestData.mixedListTestPairs.toList() +
-                    TestData.mapTestPairs.toList()
+                    TestData.mapTestPairs.toList() +
+                    TestData.enumTestPairs.toList()
                 ).toTypedArray()
         )
     }
