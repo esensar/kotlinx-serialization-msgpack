@@ -58,6 +58,10 @@ internal class BasicMsgPackEncoder(
         result.addAll(packer.packString(value, configuration.rawCompatibility))
     }
 
+    override fun encodeEnum(enumDescriptor: SerialDescriptor, index: Int) {
+        result.addAll(packer.packString(enumDescriptor.getElementName(index), configuration.rawCompatibility))
+    }
+
     fun encodeByteArray(value: ByteArray) {
         if (configuration.rawCompatibility) {
             result.addAll(packer.packString(value.decodeToString(), true))

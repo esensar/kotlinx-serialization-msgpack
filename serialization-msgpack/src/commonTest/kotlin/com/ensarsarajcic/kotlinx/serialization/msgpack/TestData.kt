@@ -138,6 +138,12 @@ object TestData {
         "d3ffffffffffffff7f" to -129,
     )
 
+    val enumTestPairs = arrayOf(
+        "a44e4f4e45" to Vocation.NONE,
+        "a54452554944" to Vocation.DRUID,
+        "ab454c4445525f4452554944" to Vocation.ELDER_DRUID,
+    )
+
     @Serializable
     data class SampleClass(
         @SerialName("testString")
@@ -155,6 +161,26 @@ object TestData {
     val triplesTestPairs: Array<Pair<String, Triple<String, String, String>>> = arrayOf(
         "83a56669727374a5416c696365a67365636f6e64a3426f62a57468697264a454657374" to Triple("Alice", "Bob", "Test")
     )
+}
+
+@Serializable
+// Taken from issue #63: https://github.com/esensar/kotlinx-serialization-msgpack/issues/63
+enum class Vocation(val properName: String) {
+    NONE("None"),
+    DRUID("Druid"),
+    SORCERER("Sorcerer"),
+    PALADIN("Paladin"),
+    KNIGHT("Knight"),
+    ELDER_DRUID("Elder Druid"),
+    MASTER_SORCERER("Master Sorcerer"),
+    ROYAL_PALADIN("Royal Paladin"),
+    ELITE_KNIGHT("Elite Knight");
+
+    companion object {
+        fun fromProperName(properName: String): Vocation? {
+            return values().firstOrNull { it.properName.equals(properName, true) }
+        }
+    }
 }
 
 @Serializable(with = CustomExtensionSerializer::class)

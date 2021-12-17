@@ -82,6 +82,10 @@ internal class BasicMsgPackDecoder(
         return msgUnpacker.unpackString()
     }
 
+    override fun decodeEnum(enumDescriptor: SerialDescriptor): Int {
+        return enumDescriptor.getElementIndex(decodeString())
+    }
+
     fun decodeByteArray(): ByteArray {
         return if (configuration.rawCompatibility) {
             val next = dataBuffer.peek()
