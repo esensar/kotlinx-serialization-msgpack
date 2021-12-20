@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+- Added support for ignoring unknown keys ([#69][i69])
+
+```
+val msgPack = MsgPack(MsgPackConfiguration.default.copy(ignoreUnknownKeys = true))
+```
 
 ## [0.4.3] - 2021-12-17
 - Added windows target using cross-compilation ([#60][i60])
@@ -75,13 +80,14 @@ MsgPack.default.encodeToByteArray(...)
 - `MsgPackDynamicSerializer` as placeholder for future [contextual serializer](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/serializers.md#contextual-serialization)
 - Full implementation of msgpack spec excluding extension types and bin format family
 
-[Unreleased]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.4.2...main
+[Unreleased]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.4.3...main
 [0.2.0]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.1.0...0.2.0
 [0.2.1]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.2.0...0.2.1
 [0.3.0]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.2.1...0.3.0
 [0.4.0]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.3.0...0.4.0
 [0.4.1]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.4.0...0.4.1
 [0.4.2]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.4.1...0.4.2
+[0.4.3]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.4.2...0.4.3
 [i6]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/6
 [i9]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/9
 [i10]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/10
@@ -97,4 +103,5 @@ MsgPack.default.encodeToByteArray(...)
 [i57]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/57
 [i60]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/60
 [i63]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/63
+[i69]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/69
 [p40]: https://github.com/esensar/kotlinx-serialization-msgpack/pull/40
