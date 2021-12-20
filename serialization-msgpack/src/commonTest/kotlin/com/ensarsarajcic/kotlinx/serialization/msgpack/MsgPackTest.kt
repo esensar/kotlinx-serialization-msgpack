@@ -1,6 +1,8 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
 import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackTimestamp
+import com.ensarsarajcic.kotlinx.serialization.msgpack.internal.BasicMsgPackDecoder
+import com.ensarsarajcic.kotlinx.serialization.msgpack.stream.toMsgPackBuffer
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ArraySerializer
 import kotlinx.serialization.builtins.ByteArraySerializer
@@ -11,6 +13,7 @@ import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
+import kotlinx.serialization.modules.SerializersModule
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -293,6 +296,22 @@ internal class MsgPackTest {
     }
 
     @Test
+    fun testDecodeIgnoreUnknownKeys() {
+        fun <T> testPairs(dataList: Array<Pair<String, T>>, serializer: KSerializer<T>) {
+            dataList.forEach { (value, expectedResult) ->
+                val result = MsgPack(
+                    configuration = MsgPackConfiguration(ignoreUnknownKeys = true)
+                ).decodeFromByteArray(serializer, value.hexStringToByteArray())
+                assertEquals(expectedResult, result)
+            }
+        }
+        testPairs(
+            TestData.unknownKeysTestPairs,
+            TestData.SampleClass.serializer()
+        )
+    }
+
+    @Test
     fun testOverflows() {
         fun <T> testPairs(dataList: List<String>, serializer: KSerializer<T>) {
             dataList.forEach {
@@ -337,10 +356,6 @@ internal class MsgPackTest {
     fun testNestedStructures() {
         val sm1: NestedMessage = listOf("Alice" to "Bob", "Charley" to "Delta") to "Random message Body here"
         val result = MsgPack.encodeToByteArray(sm1)
-        println(result.toHex())
-        println(result.toList())
-        println(result.size)
-        println(MsgPack.decodeFromByteArray<Pair<Int, Int>>(MsgPack.encodeToByteArray(1 to 2)))
         val result2 = MsgPack.decodeFromByteArray<NestedMessage>(result)
         assertEquals(sm1, result2)
     }
