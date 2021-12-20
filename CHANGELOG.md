@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+
+## [0.4.4] - 2021-12-20
 - Added support for ignoring unknown keys ([#69][i69])
 
 ```
@@ -80,7 +82,7 @@ MsgPack.default.encodeToByteArray(...)
 - `MsgPackDynamicSerializer` as placeholder for future [contextual serializer](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/serializers.md#contextual-serialization)
 - Full implementation of msgpack spec excluding extension types and bin format family
 
-[Unreleased]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.4.3...main
+[Unreleased]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.4.4...main
 [0.2.0]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.1.0...0.2.0
 [0.2.1]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.2.0...0.2.1
 [0.3.0]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.2.1...0.3.0
@@ -88,6 +90,7 @@ MsgPack.default.encodeToByteArray(...)
 [0.4.1]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.4.0...0.4.1
 [0.4.2]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.4.1...0.4.2
 [0.4.3]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.4.2...0.4.3
+[0.4.4]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.4.3...0.4.4
 [i6]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/6
 [i9]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/9
 [i10]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/10
