@@ -1,8 +1,6 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
 import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackTimestamp
-import com.ensarsarajcic.kotlinx.serialization.msgpack.internal.BasicMsgPackDecoder
-import com.ensarsarajcic.kotlinx.serialization.msgpack.stream.toMsgPackBuffer
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ArraySerializer
 import kotlinx.serialization.builtins.ByteArraySerializer
@@ -13,7 +11,6 @@ import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
-import kotlinx.serialization.modules.SerializersModule
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
