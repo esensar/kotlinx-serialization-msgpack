@@ -31,7 +31,13 @@ data class MsgPackConfiguration(
      * Useful when combined with strict mode type
      * true by default
      */
-    val preventOverflows: Boolean = true
+    val preventOverflows: Boolean = true,
+    /**
+     * Prevent exceptions when unknown keys are found when deserializing
+     * Useful when only parts of data are of interest
+     * false by default
+     */
+    val ignoreUnknownKeys: Boolean = false
 ) {
     companion object {
         @JvmStatic

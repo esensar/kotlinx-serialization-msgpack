@@ -1,6 +1,7 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack.internal
 
 import com.ensarsarajcic.kotlinx.serialization.msgpack.MsgPackConfiguration
+import com.ensarsarajcic.kotlinx.serialization.msgpack.MsgPackNullableDynamicSerializer
 import com.ensarsarajcic.kotlinx.serialization.msgpack.stream.MsgPackDataInputBuffer
 import com.ensarsarajcic.kotlinx.serialization.msgpack.types.MsgPackType
 import com.ensarsarajcic.kotlinx.serialization.msgpack.utils.joinToNumber
@@ -29,8 +30,14 @@ internal class BasicMsgPackDecoder(
         if (descriptor.kind in arrayOf(StructureKind.CLASS, StructureKind.OBJECT)) {
             val next = dataBuffer.peekSafely()
             if (next != null && MsgPackType.String.isString(next)) {
-                val fieldName = kotlin.runCatching { decodeString() }.getOrNull() ?: return CompositeDecoder.DECODE_DONE
-                return descriptor.getElementIndex(fieldName)
+                val fieldName = kotlin.runCatching { decodeString() }.getOrNull() ?: return CompositeDecoder.UNKNOWN_NAME
+                val index = descriptor.getElementIndex(fieldName)
+                return if (index == CompositeDecoder.UNKNOWN_NAME && configuration.ignoreUnknownKeys) {
+                    MsgPackNullableDynamicSerializer.deserialize(this)
+                    decodeElementIndex(descriptor)
+                } else {
+                    index
+                }
             } else {
                 return CompositeDecoder.DECODE_DONE
             }

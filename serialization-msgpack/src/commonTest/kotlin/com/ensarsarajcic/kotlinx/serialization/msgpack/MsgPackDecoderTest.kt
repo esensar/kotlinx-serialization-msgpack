@@ -169,6 +169,15 @@ internal class MsgPackDecoderTest {
         }
     }
 
+    @Test
+    fun testDecodeIgnoreUnknownKeys() {
+        TestData.unknownKeysTestPairs.forEach { (input, result) ->
+            val decoder = BasicMsgPackDecoder(MsgPackConfiguration.default.copy(ignoreUnknownKeys = true), SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
+            val serializer = TestData.SampleClass.serializer()
+            assertEquals(result, serializer.deserialize(decoder))
+        }
+    }
+
     private fun <RESULT> testPairs(decodeFunction: MsgPackDecoder.() -> RESULT, vararg pairs: Pair<String, RESULT>) {
         pairs.forEach { (input, result) ->
             MsgPackDecoder(BasicMsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())).also {

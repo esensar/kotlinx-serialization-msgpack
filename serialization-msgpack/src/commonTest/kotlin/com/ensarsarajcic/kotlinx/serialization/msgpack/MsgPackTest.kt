@@ -293,6 +293,22 @@ internal class MsgPackTest {
     }
 
     @Test
+    fun testDecodeIgnoreUnknownKeys() {
+        fun <T> testPairs(dataList: Array<Pair<String, T>>, serializer: KSerializer<T>) {
+            dataList.forEach { (value, expectedResult) ->
+                val result = MsgPack(
+                    configuration = MsgPackConfiguration(ignoreUnknownKeys = true)
+                ).decodeFromByteArray(serializer, value.hexStringToByteArray())
+                assertEquals(expectedResult, result)
+            }
+        }
+        testPairs(
+            TestData.unknownKeysTestPairs,
+            TestData.SampleClass.serializer()
+        )
+    }
+
+    @Test
     fun testOverflows() {
         fun <T> testPairs(dataList: List<String>, serializer: KSerializer<T>) {
             dataList.forEach {
@@ -337,10 +353,6 @@ internal class MsgPackTest {
     fun testNestedStructures() {
         val sm1: NestedMessage = listOf("Alice" to "Bob", "Charley" to "Delta") to "Random message Body here"
         val result = MsgPack.encodeToByteArray(sm1)
-        println(result.toHex())
-        println(result.toList())
-        println(result.size)
-        println(MsgPack.decodeFromByteArray<Pair<Int, Int>>(MsgPack.encodeToByteArray(1 to 2)))
         val result2 = MsgPack.decodeFromByteArray<NestedMessage>(result)
         assertEquals(sm1, result2)
     }
