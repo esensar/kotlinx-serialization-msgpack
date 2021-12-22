@@ -15,7 +15,8 @@ class MsgPackDataOutputBuffer() : MsgPackDataBuffer {
 }
 
 class MsgPackDataInputBuffer(private val byteArray: ByteArray) : MsgPackDataBuffer {
-    private var index = 0
+    var index = 0
+        private set
 
     fun skip(bytes: Int) {
         index += bytes

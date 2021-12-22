@@ -1,6 +1,7 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack.internal
 
 import com.ensarsarajcic.kotlinx.serialization.msgpack.MsgPackConfiguration
+import com.ensarsarajcic.kotlinx.serialization.msgpack.exceptions.MsgPackSerializationException
 import com.ensarsarajcic.kotlinx.serialization.msgpack.stream.MsgPackDataOutputBuffer
 import com.ensarsarajcic.kotlinx.serialization.msgpack.types.MsgPackType
 import com.ensarsarajcic.kotlinx.serialization.msgpack.utils.splitToByteArray
@@ -105,7 +106,7 @@ internal class BasicMsgPackEncoder(
                         result.add(MsgPackType.Array.ARRAY32)
                         result.addAll(collectionSize.toInt().splitToByteArray().toList())
                     }
-                    else -> TODO("TOO LONG COLLECTION")
+                    else -> throw MsgPackSerializationException.serialization(result, "Collection too long (max size = ${MsgPackType.Array.MAX_ARRAY32_LENGTH}, size = $collectionSize)!")
                 }
 
             StructureKind.CLASS, StructureKind.OBJECT, StructureKind.MAP ->
@@ -121,10 +122,10 @@ internal class BasicMsgPackEncoder(
                         result.add(MsgPackType.Map.MAP32)
                         result.addAll(collectionSize.toInt().splitToByteArray().toList())
                     }
-                    else -> TODO("TOO LONG COLLECTION")
+                    else -> throw MsgPackSerializationException.serialization(result, "Object too long (max size = ${MsgPackType.Map.MAX_MAP32_LENGTH}, size = $collectionSize)!")
                 }
 
-            else -> TODO("UNSUPPORTED COLLECTION!")
+            else -> throw MsgPackSerializationException.serialization(result, "Unsupported collection type: ${descriptor.kind}")
         }
         return this
     }
@@ -183,20 +184,20 @@ internal class ExtensionTypeEncoder(
                 MsgPackType.Ext.EXT8 -> MsgPackType.Ext.MAX_EXT8_LENGTH
                 MsgPackType.Ext.EXT16 -> MsgPackType.Ext.MAX_EXT16_LENGTH
                 MsgPackType.Ext.EXT32 -> MsgPackType.Ext.MAX_EXT32_LENGTH
-                else -> TODO("HANDLE")
+                else -> throw MsgPackSerializationException.serialization(result, "Unexpected extension type: $type")
             }.toLong()
-            if (size!!.toLong() > maxSize) throw TODO("Size exceeded")
+            if (size!!.toLong() > maxSize) throw MsgPackSerializationException.serialization(result, "Size ($size) too long for extension type ($maxSize)!")
             result.addAll(
                 when (type) {
                     MsgPackType.Ext.EXT8 -> size!!.toByte().splitToByteArray()
                     MsgPackType.Ext.EXT16 -> size!!.toShort().splitToByteArray()
                     MsgPackType.Ext.EXT32 -> size!!.toInt().splitToByteArray()
-                    else -> TODO("HANDLE")
+                    else -> throw MsgPackSerializationException.serialization(result, "Unexpected extension type: $type")
                 }
             )
             result.add(typeId!!)
         } else {
-            if (value.size != size) throw TODO("Invalid size")
+            if (value.size != size) throw MsgPackSerializationException.serialization(result, "Invalid size for fixed size extension type! Expected $size but found ${value.size}")
         }
         result.addAll(value)
     }

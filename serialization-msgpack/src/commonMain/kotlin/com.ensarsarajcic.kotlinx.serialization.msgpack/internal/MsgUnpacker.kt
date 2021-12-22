@@ -1,5 +1,6 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack.internal
 
+import com.ensarsarajcic.kotlinx.serialization.msgpack.exceptions.MsgPackSerializationException
 import com.ensarsarajcic.kotlinx.serialization.msgpack.stream.MsgPackDataInputBuffer
 import com.ensarsarajcic.kotlinx.serialization.msgpack.types.MsgPackType
 import com.ensarsarajcic.kotlinx.serialization.msgpack.utils.joinToNumber
@@ -40,7 +41,7 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
                 if (next == MsgPackType.Int.UINT8 && preventOverflow) {
                     val number = (dataBuffer.requireNextByte().toInt() and 0xff).toShort()
                     if (number !in Byte.MIN_VALUE..Byte.MAX_VALUE) {
-                        throw TODO("Overflow error")
+                        throw MsgPackSerializationException.overflowError(dataBuffer)
                     } else {
                         number.toByte()
                     }
@@ -48,7 +49,7 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
                     dataBuffer.requireNextByte()
                 }
             }
-            else -> throw TODO("Add a more descriptive error when wrong type is found!")
+            else -> throw MsgPackSerializationException.deserialization(dataBuffer, "Expected byte type, but found $next")
         }
     }
 
@@ -60,7 +61,7 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
                 if (next == MsgPackType.Int.UINT16 && preventOverflow) {
                     val number = dataBuffer.takeNext(2).joinToNumber<Int>()
                     if (number !in Short.MIN_VALUE..Short.MAX_VALUE) {
-                        throw TODO("Overflow error")
+                        throw MsgPackSerializationException.overflowError(dataBuffer)
                     } else {
                         number.toShort()
                     }
@@ -72,7 +73,7 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
                 dataBuffer.skip(1)
                 (dataBuffer.requireNextByte().toInt() and 0xff).toShort()
             }
-            else -> if (strict) TODO("Strict type error") else unpackByte(strict).toShort()
+            else -> if (strict) throw MsgPackSerializationException.strictTypeError(dataBuffer, "short", "byte") else unpackByte(strict).toShort()
         }
     }
 
@@ -84,7 +85,7 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
                 if (next == MsgPackType.Int.UINT32 && preventOverflow) {
                     val number = dataBuffer.takeNext(4).joinToNumber<Long>()
                     if (number !in Int.MIN_VALUE..Int.MAX_VALUE) {
-                        throw TODO("Overflow error")
+                        throw MsgPackSerializationException.overflowError(dataBuffer)
                     } else {
                         number.toInt()
                     }
@@ -96,7 +97,7 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
                 dataBuffer.skip(1)
                 dataBuffer.takeNext(2).joinToNumber()
             }
-            else -> if (strict) TODO("Strict type error") else unpackShort(strict).toInt()
+            else -> if (strict) throw MsgPackSerializationException.strictTypeError(dataBuffer, "int", "short") else unpackShort(strict).toInt()
         }
     }
 
@@ -108,7 +109,7 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
                 if (next == MsgPackType.Int.UINT64 && preventOverflow) {
                     val number = dataBuffer.takeNext(8).joinToNumber<Long>()
                     if (number < 0) {
-                        throw TODO("Overflow error")
+                        throw MsgPackSerializationException.overflowError(dataBuffer)
                     } else {
                         number
                     }
@@ -120,28 +121,28 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
                 dataBuffer.skip(1)
                 dataBuffer.takeNext(4).joinToNumber()
             }
-            else -> if (strict) TODO("Strict type error") else unpackInt(strict).toLong()
+            else -> if (strict) throw MsgPackSerializationException.strictTypeError(dataBuffer, "long", "int") else unpackInt(strict).toLong()
         }
     }
 
     override fun unpackFloat(strict: Boolean): Float {
-        return when (dataBuffer.peek()) {
+        return when (val type = dataBuffer.peek()) {
             MsgPackType.Float.FLOAT -> {
                 dataBuffer.skip(1)
                 Float.fromBits(dataBuffer.takeNext(4).joinToNumber())
             }
-            else -> TODO("Add a more descriptive error when wrong type is found!")
+            else -> throw MsgPackSerializationException.deserialization(dataBuffer, "Expected float type, but found $type")
         }
     }
 
     override fun unpackDouble(strict: Boolean): Double {
-        return when (dataBuffer.peek()) {
+        return when (val type = dataBuffer.peek()) {
             MsgPackType.Float.DOUBLE -> {
                 dataBuffer.skip(1)
                 Double.fromBits(dataBuffer.takeNext(8).joinToNumber())
             }
-            MsgPackType.Float.FLOAT -> if (strict) TODO("Strict type error") else unpackFloat(strict).toDouble()
-            else -> TODO("Add a more descriptive error when wrong type is found!")
+            MsgPackType.Float.FLOAT -> if (strict) throw MsgPackSerializationException.strictTypeError(dataBuffer, "double", "float") else unpackFloat(strict).toDouble()
+            else -> throw MsgPackSerializationException.deserialization(dataBuffer, "Expected double type, but found $type")
         }
     }
 
@@ -155,7 +156,7 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
                 if (preventOverflow) {
                     val number = dataBuffer.takeNext(4).joinToNumber<Long>()
                     if (number !in Int.MIN_VALUE..Int.MAX_VALUE) {
-                        throw TODO("Overflow error")
+                        throw MsgPackSerializationException.overflowError(dataBuffer)
                     } else {
                         number.toInt()
                     }
@@ -164,7 +165,7 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
                 }
             }
             else -> {
-                throw TODO("Add a more descriptive error when wrong type is found!")
+                throw MsgPackSerializationException.deserialization(dataBuffer, "Expected string type, but found $next")
             }
         }
         if (length == 0) return ""
@@ -180,7 +181,7 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
                 if (preventOverflow) {
                     val number = dataBuffer.takeNext(4).joinToNumber<Long>()
                     if (number !in Int.MIN_VALUE..Int.MAX_VALUE) {
-                        throw TODO("Overflow error")
+                        throw MsgPackSerializationException.overflowError(dataBuffer)
                     } else {
                         number.toInt()
                     }
@@ -189,7 +190,7 @@ internal class BasicMsgUnpacker(private val dataBuffer: MsgPackDataInputBuffer) 
                 }
             }
             else -> {
-                throw TODO("Add a more descriptive error when wrong type is found!")
+                throw MsgPackSerializationException.deserialization(dataBuffer, "Expected binary type, but found $next")
             }
         }
         if (length == 0) return byteArrayOf()

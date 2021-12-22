@@ -1,5 +1,6 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack.extensions
 
+import kotlinx.serialization.SerializationException
 import kotlin.reflect.KClass
 
 open class DynamicMsgPackExtensionSerializer : BaseMsgPackExtensionSerializer<Any?>() {
@@ -52,7 +53,7 @@ open class DynamicMsgPackExtensionSerializer : BaseMsgPackExtensionSerializer<An
                 return serializer.serialize(extension)
             }
         }
-        throw TODO("missing serializer")
+        throw SerializationException("Missing serializer for extension: $extension")
     }
 
     final override val extTypeId: Byte = 0x00

@@ -2,6 +2,7 @@ package com.ensarsarajcic.kotlinx.serialization.msgpack.internal
 
 import com.ensarsarajcic.kotlinx.serialization.msgpack.MsgPackConfiguration
 import com.ensarsarajcic.kotlinx.serialization.msgpack.MsgPackNullableDynamicSerializer
+import com.ensarsarajcic.kotlinx.serialization.msgpack.exceptions.MsgPackSerializationException
 import com.ensarsarajcic.kotlinx.serialization.msgpack.stream.MsgPackDataInputBuffer
 import com.ensarsarajcic.kotlinx.serialization.msgpack.types.MsgPackType
 import com.ensarsarajcic.kotlinx.serialization.msgpack.utils.joinToNumber
@@ -127,7 +128,7 @@ internal class BasicMsgPackDecoder(
                         if (configuration.preventOverflows) {
                             val number = dataBuffer.takeNext(4).joinToNumber<Long>()
                             if (number !in Int.MIN_VALUE..Int.MAX_VALUE) {
-                                throw TODO("Overflow error")
+                                throw MsgPackSerializationException.overflowError(dataBuffer)
                             } else {
                                 number.toInt()
                             }
@@ -136,7 +137,7 @@ internal class BasicMsgPackDecoder(
                         }
                     }
                     else -> {
-                        throw TODO("Add a more descriptive error when wrong type is found!")
+                        throw MsgPackSerializationException.deserialization(dataBuffer, "Unknown array type: $next")
                     }
                 }
 
@@ -148,7 +149,7 @@ internal class BasicMsgPackDecoder(
                         if (configuration.preventOverflows) {
                             val number = dataBuffer.takeNext(4).joinToNumber<Long>()
                             if (number !in Int.MIN_VALUE..Int.MAX_VALUE) {
-                                throw TODO("Overflow error")
+                                throw MsgPackSerializationException.overflowError(dataBuffer)
                             } else {
                                 number.toInt()
                             }
@@ -157,12 +158,12 @@ internal class BasicMsgPackDecoder(
                         }
                     }
                     else -> {
-                        throw TODO("Add a more descriptive error when wrong type is found!")
+                        throw MsgPackSerializationException.deserialization(dataBuffer, "Unknown map type: $next")
                     }
                 }
 
             else -> {
-                TODO("Unsupported collection")
+                throw MsgPackSerializationException.deserialization(dataBuffer, "Unsupported collection: ${descriptor.kind}")
             }
         }
     }
@@ -181,9 +182,8 @@ internal class BasicMsgPackDecoder(
                 return ExtensionTypeDecoder(this)
             }
             // Handle extension types as arrays
-            decodeCollectionSize(descriptor)
-            return ClassMsgPackDecoder(this)
-            // TODO compare with descriptor.elementsCount
+            val size = decodeCollectionSize(descriptor)
+            return ClassMsgPackDecoder(this, size)
         }
         return this
     }
@@ -200,14 +200,15 @@ internal class MsgPackDecoder(
 }
 
 internal class ClassMsgPackDecoder(
-    private val basicMsgPackDecoder: BasicMsgPackDecoder
+    private val basicMsgPackDecoder: BasicMsgPackDecoder,
+    private val size: Int
 ) : Decoder by basicMsgPackDecoder, CompositeDecoder by basicMsgPackDecoder, MsgPackTypeDecoder by basicMsgPackDecoder {
     override val serializersModule: SerializersModule = basicMsgPackDecoder.serializersModule
 
     private var decodedElements = 0
 
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
-        if (decodedElements >= descriptor.elementsCount) return CompositeDecoder.DECODE_DONE
+        if (decodedElements >= size) return CompositeDecoder.DECODE_DONE
         val result = basicMsgPackDecoder.decodeElementIndex(descriptor)
         if (result != CompositeDecoder.DECODE_DONE) decodedElements++
         return result
@@ -234,7 +235,7 @@ internal class ExtensionTypeDecoder(
             val byte = dataBuffer.requireNextByte()
             bytesRead++
             if (!MsgPackType.Ext.isExt(byte)) {
-                throw TODO("Unexpected byte")
+                throw MsgPackSerializationException.deserialization(dataBuffer, "Unexpected byte: $byte. Expected extension type byte!")
             }
             type = byte
             if (MsgPackType.Ext.SIZES.containsKey(type)) {
@@ -254,7 +255,7 @@ internal class ExtensionTypeDecoder(
             typeId = byte
             typeId!!
         } else {
-            throw TODO("Handle?")
+            throw AssertionError()
         }
     }
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {

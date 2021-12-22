@@ -1,5 +1,6 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
+import com.ensarsarajcic.kotlinx.serialization.msgpack.exceptions.MsgPackSerializationException
 import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.DynamicMsgPackExtensionSerializer
 import com.ensarsarajcic.kotlinx.serialization.msgpack.internal.MsgPackTypeDecoder
 import com.ensarsarajcic.kotlinx.serialization.msgpack.types.MsgPackType
@@ -39,7 +40,7 @@ open class MsgPackNullableDynamicSerializer(
 ) : KSerializer<Any?> {
     companion object Default : MsgPackNullableDynamicSerializer(DynamicMsgPackExtensionSerializer)
     final override fun deserialize(decoder: Decoder): Any? {
-        if (decoder !is MsgPackTypeDecoder) TODO("Unsupported decoder!")
+        if (decoder !is MsgPackTypeDecoder) throw MsgPackSerializationException.dynamicSerializationError("Unsupported decoder: $decoder")
         val type = decoder.peekNextType()
         return when {
             type == MsgPackType.NULL -> decoder.decodeNull()
@@ -78,7 +79,7 @@ open class MsgPackNullableDynamicSerializer(
             MsgPackType.Array.isArray(type) -> ListSerializer(this).deserialize(decoder)
             MsgPackType.Map.isMap(type) -> MapSerializer(this, this).deserialize(decoder)
             MsgPackType.Ext.isExt(type) -> dynamicMsgPackExtensionSerializer.deserialize(decoder)
-            else -> TODO("Missing decoder for type")
+            else -> throw MsgPackSerializationException.dynamicSerializationError("Missing decoder for type: $type")
         }
     }
 
