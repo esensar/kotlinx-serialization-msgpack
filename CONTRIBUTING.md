@@ -8,12 +8,12 @@ Following is a basic set of guidelines for contributing to this repository and i
 
 #### Table of contents
 
-[Code of Conduct](#code-of-conduct)
-[Asking questions](#asking-questions)
-[Styleguides](#styleguides)
- - [Commit message](#commit-messages)
- - [Lint](#lint)
-[Additional info](#additional-info)
+- [Code of Conduct](#code-of-conduct)
+- [Asking questions](#asking-questions)
+- [Styleguides](#styleguides)
+  - [Commit message](#commit-messages)
+  - [Lint](#lint)
+- [Additional info](#additional-info)
 
 ## Code of Conduct
 
