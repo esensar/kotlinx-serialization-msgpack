@@ -23,6 +23,7 @@ kotlin {
         }
     }
     ios()
+    iosSimulatorArm64()
     tvos()
     watchos()
     macosX64()

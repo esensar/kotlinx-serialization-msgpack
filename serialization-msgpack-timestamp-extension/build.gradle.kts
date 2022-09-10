@@ -23,6 +23,7 @@ kotlin {
         }
     }
     ios()
+    iosSimulatorArm64()
     tvos()
     watchos()
     val hostOs = System.getProperty("os.name")
