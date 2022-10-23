@@ -158,6 +158,11 @@ object TestData {
     val unknownKeysTestPairs = arrayOf(
         "85aa74657374537472696e67a3646566ab7465737449676e6f72656491a969676e6f7265206d65a774657374496e747bab74657374556e6b6e6f776ea7756e6b6e6f776eab74657374426f6f6c65616ec3" to SampleClass("def", 123, true)
     )
+
+    val floatEncodedDataTestPairs = arrayOf(
+        "83aa74657374537472696e67a3646566a774657374496e74cb405ec7df3b645a1dab74657374426f6f6c65616ec3" to SampleClass("def", 123, true)
+    )
+
     val pairsTestPairs: Array<Pair<String, Pair<String, String>>> = arrayOf(
         "82a56669727374a5416c696365a67365636f6e64a3426f62" to Pair("Alice", "Bob")
     )
