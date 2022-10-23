@@ -152,6 +152,15 @@ internal class MsgPackDecoderTest {
     }
 
     @Test
+    fun testSampleClassWithNestedValueAndMissingKeys() {
+        TestData.nestedSampleClassWithMissingValue.forEach { (input, result) ->
+            val decoder = BasicMsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
+            val serializer = TestData.SampleClassWithNestedClass.serializer()
+            assertEquals(result, serializer.deserialize(decoder))
+        }
+    }
+
+    @Test
     fun testTimestampDecode() {
         TestData.timestampTestPairs.forEach { (input, result) ->
             val decoder = BasicMsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())

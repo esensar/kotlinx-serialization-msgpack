@@ -152,6 +152,19 @@ object TestData {
         val testBoolean: Boolean
     )
 
+    @Serializable
+    data class SampleClassWithNestedClass(
+        val testString: String,
+        val testInt: Int,
+        val testBoolean: Boolean,
+        val testNested: NestedClass
+    ) {
+        @Serializable
+        data class NestedClass(
+            val testInt: Int? = null
+        )
+    }
+
     val sampleClassTestPairs = arrayOf(
         "83aa74657374537472696e67a3646566a774657374496e747bab74657374426f6f6c65616ec3" to SampleClass("def", 123, true)
     )
@@ -163,6 +176,9 @@ object TestData {
     )
     val triplesTestPairs: Array<Pair<String, Triple<String, String, String>>> = arrayOf(
         "83a56669727374a5416c696365a67365636f6e64a3426f62a57468697264a454657374" to Triple("Alice", "Bob", "Test")
+    )
+    val nestedSampleClassWithMissingValue = arrayOf(
+        "84aa74657374537472696e67a3646566a774657374496e747bab74657374426f6f6c65616ec3aa746573744e657374656482aa74657374537472696e67a3646566ab74657374426f6f6c65616ec3" to SampleClassWithNestedClass("def", 123, true, SampleClassWithNestedClass.NestedClass(null))
     )
 }
 
