@@ -213,12 +213,34 @@ internal class ClassMsgPackDecoder(
     private val size: Int
 ) : Decoder by basicMsgPackDecoder, CompositeDecoder by basicMsgPackDecoder, MsgPackTypeDecoder by basicMsgPackDecoder {
     override val serializersModule: SerializersModule = basicMsgPackDecoder.serializersModule
-
+    private fun decodeElemIndex(descriptor: SerialDescriptor, size: Int): Int {
+        if (descriptor.kind in arrayOf(StructureKind.CLASS, StructureKind.OBJECT)) {
+            val next = basicMsgPackDecoder.dataBuffer.peekSafely()
+            if (next != null && MsgPackType.String.isString(next)) {
+                val fieldName = kotlin.runCatching { decodeString() }.getOrNull()
+                    ?: return CompositeDecoder.UNKNOWN_NAME
+                val index = descriptor.getElementIndex(fieldName)
+                return if (index == CompositeDecoder.UNKNOWN_NAME && basicMsgPackDecoder.configuration.ignoreUnknownKeys) {
+                    MsgPackNullableDynamicSerializer.deserialize(this)
+                    decodedElements++
+                    if (decodedElements >= size) CompositeDecoder.DECODE_DONE else decodeElemIndex(
+                        descriptor,
+                        size
+                    )
+                } else {
+                    index
+                }
+            } else {
+                return CompositeDecoder.DECODE_DONE
+            }
+        }
+        return 0
+    }
     private var decodedElements = 0
 
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
         if (decodedElements >= size) return CompositeDecoder.DECODE_DONE
-        val result = basicMsgPackDecoder.decodeElementIndex(descriptor)
+        val result = decodeElemIndex(descriptor, size)
         if (result != CompositeDecoder.DECODE_DONE) decodedElements++
         return if (result == CompositeDecoder.UNKNOWN_NAME) {
             MsgPackNullableDynamicSerializer.deserialize(this)
