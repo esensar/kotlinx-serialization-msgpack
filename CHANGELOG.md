@@ -2,6 +2,7 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+- Fixed `ignoreUnknownKeys` behavior in nested structures ([#82][i82] and [#87][p87])
 
 ## [0.5.3] - 2022-10-23
 - Fixed `strictTypes` flag to allow all number conversions and not just different precisions ([#81][i81])
@@ -107,7 +108,7 @@ MsgPack.default.encodeToByteArray(...)
 [0.5.0]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.4.4...0.5.0
 [0.5.1]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.5.0...0.5.1
 [0.5.2]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.5.1...0.5.2
-[0.5.2]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.5.2...0.5.3
+[0.5.3]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.5.2...0.5.3
 [i6]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/6
 [i9]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/9
 [i10]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/10
@@ -129,3 +130,4 @@ MsgPack.default.encodeToByteArray(...)
 [i81]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/81
 [i82]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/82
 [p40]: https://github.com/esensar/kotlinx-serialization-msgpack/pull/40
+[p87]: https://github.com/esensar/kotlinx-serialization-msgpack/pull/87

@@ -157,7 +157,8 @@ object TestData {
         val testString: String,
         val testInt: Int,
         val testBoolean: Boolean,
-        val testNested: NestedClass
+        val testNested: NestedClass,
+        val secondNested: NestedClass? = null
     ) {
         @Serializable
         data class NestedClass(
@@ -183,7 +184,8 @@ object TestData {
         "83a56669727374a5416c696365a67365636f6e64a3426f62a57468697264a454657374" to Triple("Alice", "Bob", "Test")
     )
     val nestedSampleClassWithMissingValue = arrayOf(
-        "84aa74657374537472696e67a3646566a774657374496e747bab74657374426f6f6c65616ec3aa746573744e657374656482aa74657374537472696e67a3646566ab74657374426f6f6c65616ec3" to SampleClassWithNestedClass("def", 123, true, SampleClassWithNestedClass.NestedClass(null))
+        "84aa74657374537472696e67a3646566a774657374496e747bab74657374426f6f6c65616ec3aa746573744e657374656482aa74657374537472696e67a3646566ab74657374426f6f6c65616ec3" to SampleClassWithNestedClass("def", 123, true, SampleClassWithNestedClass.NestedClass(null)),
+        "85aa74657374537472696e67a3646566a774657374496e747bab74657374426f6f6c65616ec3aa746573744e657374656483aa74657374537472696e67a3646566ab74657374426f6f6c65616ec3ae616e6f74686572556e6b6e6f776ea474657374ac7365636f6e644e657374656481ab74657374426f6f6c65616ec2" to SampleClassWithNestedClass("def", 123, true, SampleClassWithNestedClass.NestedClass(null), SampleClassWithNestedClass.NestedClass(null)),
     )
 }
 
