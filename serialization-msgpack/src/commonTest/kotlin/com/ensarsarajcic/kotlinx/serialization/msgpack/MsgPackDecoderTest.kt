@@ -199,8 +199,8 @@ internal class MsgPackDecoderTest {
     private fun <RESULT> testPairs(decodeFunction: MsgPackDecoder.() -> RESULT, vararg pairs: Pair<String, RESULT>) {
         pairs.forEach { (input, result) ->
             MsgPackDecoder(BasicMsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())).also {
-                assertEquals(result, it.decodeFunction())
-            }
+            assertEquals(result, it.decodeFunction())
+        }
         }
     }
 }
