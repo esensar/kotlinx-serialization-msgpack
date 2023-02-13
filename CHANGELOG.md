@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file. This change
 
 ## [0.5.4] - 2023-02-13
 - Fixed `ignoreUnknownKeys` behavior in nested structures ([#82][i82] and [#87][p87])
+- Updated kotlin version to `1.8.10`
 
 ## [0.5.3] - 2022-10-23
 - Fixed `strictTypes` flag to allow all number conversions and not just different precisions ([#81][i81])
