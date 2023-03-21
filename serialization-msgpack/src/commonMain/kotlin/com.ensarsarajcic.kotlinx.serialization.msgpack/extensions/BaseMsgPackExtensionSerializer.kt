@@ -24,7 +24,7 @@ abstract class BaseMsgPackExtensionSerializer<T> : KSerializer<T> {
         if (checkTypeId && extension.extTypeId != extTypeId) {
             throw MsgPackSerializationException.extensionSerializationWrongType(extension, extTypeId, extension.extTypeId)
         }
-        encoder.encodeSerializableValue(serializer, serialize(value))
+        encoder.encodeSerializableValue(serializer, extension)
     }
 
     abstract fun deserialize(extension: MsgPackExtension): T
