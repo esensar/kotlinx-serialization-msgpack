@@ -26,6 +26,7 @@ kotlin {
     tvos()
     watchos()
     macosX64()
+    macosArm64()
     mingwX64()
     linuxX64()
 

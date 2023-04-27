@@ -25,17 +25,10 @@ kotlin {
     iosSimulatorArm64()
     tvos()
     watchos()
-    val hostOs = System.getProperty("os.name")
-    val isMingwX64 = hostOs.startsWith("Windows")
-    when {
-        hostOs == "Mac OS X" -> macosX64()
-        hostOs == "Linux" -> {
-            mingwX64() // cross-compile windows
-            linuxX64()
-        }
-        isMingwX64 -> mingwX64()
-        else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
-    }
+    macosX64()
+    macosArm64()
+    mingwX64()
+    linuxX64()
 
     fun kotlinx(name: String, version: String): String = "org.jetbrains.kotlinx:kotlinx-$name:$version"
     fun kotlinxSerialization(name: String) = kotlinx("serialization-$name", Dependencies.Versions.serialization)
