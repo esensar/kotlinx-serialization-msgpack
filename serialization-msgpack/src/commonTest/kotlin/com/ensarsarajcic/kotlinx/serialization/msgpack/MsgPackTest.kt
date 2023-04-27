@@ -298,7 +298,7 @@ internal class MsgPackTest {
         testEncodePairs(
             Vocation.serializer(),
             *TestData.enumOrdinalTestPairs,
-            msgPack = MsgPack(MsgPackConfiguration(ordinalEnums = true))
+            msgPack = MsgPack(MsgPackConfiguration(ordinalEnums = true, strictTypeWriting = true))
         )
     }
 
@@ -307,7 +307,7 @@ internal class MsgPackTest {
         testDecodePairs(
             Vocation.serializer(),
             *TestData.enumOrdinalTestPairs,
-            msgPack = MsgPack(MsgPackConfiguration(ordinalEnums = true))
+            msgPack = MsgPack(MsgPackConfiguration(ordinalEnums = true, strictTypes = true))
         )
     }
 

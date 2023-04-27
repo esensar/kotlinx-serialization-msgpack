@@ -145,9 +145,9 @@ object TestData {
     )
 
     val enumOrdinalTestPairs = arrayOf(
-        "0000000000" to Vocation.NONE,
-        "0000000001" to Vocation.DRUID,
-        "0000000100" to Vocation.ELDER_DRUID,
+        "ce00000000" to Vocation.NONE,
+        "ce00000001" to Vocation.DRUID,
+        "ce00000005" to Vocation.ELDER_DRUID,
     )
 
     @Serializable

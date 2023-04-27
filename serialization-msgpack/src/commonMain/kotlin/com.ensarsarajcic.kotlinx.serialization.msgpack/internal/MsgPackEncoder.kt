@@ -61,7 +61,7 @@ internal class BasicMsgPackEncoder(
 
     override fun encodeEnum(enumDescriptor: SerialDescriptor, index: Int) {
         if (configuration.ordinalEnums) {
-            result.addAll(packer.packInt(index))
+            result.addAll(packer.packInt(index, configuration.strictTypeWriting))
         } else {
             result.addAll(packer.packString(enumDescriptor.getElementName(index), configuration.rawCompatibility))
         }

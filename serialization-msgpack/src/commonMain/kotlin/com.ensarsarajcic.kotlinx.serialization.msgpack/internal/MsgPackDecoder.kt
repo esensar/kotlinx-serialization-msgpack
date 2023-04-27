@@ -99,7 +99,7 @@ internal class BasicMsgPackDecoder(
 
     override fun decodeEnum(enumDescriptor: SerialDescriptor): Int {
         if (configuration.ordinalEnums) {
-            return msgUnpacker.unpackInt()
+            return msgUnpacker.unpackInt(configuration.strictTypes, configuration.preventOverflows)
         }
         return enumDescriptor.getElementIndex(decodeString())
     }

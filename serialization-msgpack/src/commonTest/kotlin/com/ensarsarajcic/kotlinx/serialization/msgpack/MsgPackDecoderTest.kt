@@ -181,7 +181,7 @@ internal class MsgPackDecoderTest {
     @Test
     fun testEnumOrdinalDecode() {
         TestData.enumOrdinalTestPairs.forEach { (input, result) ->
-            val decoder = BasicMsgPackDecoder(MsgPackConfiguration(ordinalEnums = true), SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
+            val decoder = BasicMsgPackDecoder(MsgPackConfiguration(ordinalEnums = true, strictTypes = true), SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
             val serializer = Vocation.serializer()
             assertEquals(result, serializer.deserialize(decoder))
         }
