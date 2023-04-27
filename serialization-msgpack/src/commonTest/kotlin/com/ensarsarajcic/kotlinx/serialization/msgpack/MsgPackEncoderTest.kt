@@ -165,6 +165,16 @@ internal class MsgPackEncoderTest {
         }
     }
 
+    @Test
+    fun testEnumOrdinalEncode() {
+        TestData.enumOrdinalTestPairs.forEach { (result, input) ->
+            val encoder = BasicMsgPackEncoder(MsgPackConfiguration(ordinalEnums = true), SerializersModule {})
+            val serializer = Vocation.serializer()
+            serializer.serialize(encoder, input)
+            assertEquals(result, encoder.result.toByteArray().toHex())
+        }
+    }
+
     private fun <INPUT> testPairs(encodeFunction: MsgPackEncoder.(INPUT) -> Unit, vararg pairs: Pair<String, INPUT>) {
         pairs.forEach { (result, input) ->
             MsgPackEncoder(BasicMsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})).also {
