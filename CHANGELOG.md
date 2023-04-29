@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file. This change
 
 ## [Unreleased]
 
+## [0.5.5] - 2023-04-29
+- Removed redundant call to serialize in BaseMsgPackExtensionSerializer ([#92][i92] and [#95][p95])
+- Added mac os arm64 target ([#93][i93] and [#94][p94])
+- Added configuration support for ordinal enums ([#97][i97] and [#99][p98])
+
 ## [0.5.4] - 2023-02-13
 - Fixed `ignoreUnknownKeys` behavior in nested structures ([#82][i82] and [#87][p87])
 - Updated kotlin version to `1.8.10`
@@ -133,5 +138,11 @@ MsgPack.default.encodeToByteArray(...)
 [i77]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/77
 [i81]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/81
 [i82]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/82
+[i92]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/92
+[i93]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/93
+[i97]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/97
 [p40]: https://github.com/esensar/kotlinx-serialization-msgpack/pull/40
 [p87]: https://github.com/esensar/kotlinx-serialization-msgpack/pull/87
+[p94]: https://github.com/esensar/kotlinx-serialization-msgpack/pull/94
+[p95]: https://github.com/esensar/kotlinx-serialization-msgpack/pull/95
+[p99]: https://github.com/esensar/kotlinx-serialization-msgpack/pull/99
