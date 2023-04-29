@@ -294,6 +294,24 @@ internal class MsgPackTest {
     }
 
     @Test
+    fun testEnumOrdinalEncode() {
+        testEncodePairs(
+            Vocation.serializer(),
+            *TestData.enumOrdinalTestPairs,
+            msgPack = MsgPack(MsgPackConfiguration(ordinalEnums = true, strictTypeWriting = true))
+        )
+    }
+
+    @Test
+    fun testEnumOrdinalDecode() {
+        testDecodePairs(
+            Vocation.serializer(),
+            *TestData.enumOrdinalTestPairs,
+            msgPack = MsgPack(MsgPackConfiguration(ordinalEnums = true, strictTypes = true))
+        )
+    }
+
+    @Test
     fun testDecodeIgnoreUnknownKeys() {
         fun <T> testPairs(dataList: Array<Pair<String, T>>, serializer: KSerializer<T>) {
             dataList.forEach { (value, expectedResult) ->
@@ -372,14 +390,14 @@ internal class MsgPackTest {
         testPairs(TestData.strictWriteLongPairs, Long.serializer())
     }
 
-    private fun <T> testEncodePairs(serializer: KSerializer<T>, vararg pairs: Pair<String, T>) {
+    private fun <T> testEncodePairs(serializer: KSerializer<T>, vararg pairs: Pair<String, T>, msgPack: MsgPack = MsgPack()) {
         pairs.forEach { (expectedResult, value) ->
-            assertEquals(expectedResult, MsgPack.encodeToByteArray(serializer, value).toHex())
+            assertEquals(expectedResult, msgPack.encodeToByteArray(serializer, value).toHex())
         }
     }
-    private fun <T> testDecodePairs(serializer: KSerializer<T>, vararg pairs: Pair<String, T>) {
+    private fun <T> testDecodePairs(serializer: KSerializer<T>, vararg pairs: Pair<String, T>, msgPack: MsgPack = MsgPack()) {
         pairs.forEach { (value, expectedResult) ->
-            assertEquals(expectedResult, MsgPack.decodeFromByteArray(serializer, value.hexStringToByteArray()))
+            assertEquals(expectedResult, msgPack.decodeFromByteArray(serializer, value.hexStringToByteArray()))
         }
     }
 }
