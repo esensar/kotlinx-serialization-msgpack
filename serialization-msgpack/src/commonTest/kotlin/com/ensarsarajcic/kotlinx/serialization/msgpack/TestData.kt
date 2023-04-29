@@ -144,6 +144,12 @@ object TestData {
         "ab454c4445525f4452554944" to Vocation.ELDER_DRUID,
     )
 
+    val enumOrdinalTestPairs = arrayOf(
+        "ce00000000" to Vocation.NONE,
+        "ce00000001" to Vocation.DRUID,
+        "ce00000005" to Vocation.ELDER_DRUID,
+    )
+
     @Serializable
     data class SampleClass(
         @SerialName("testString")

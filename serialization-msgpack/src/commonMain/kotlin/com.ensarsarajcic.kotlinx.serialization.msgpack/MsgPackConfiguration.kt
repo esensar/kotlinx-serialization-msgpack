@@ -37,7 +37,12 @@ data class MsgPackConfiguration(
      * Useful when only parts of data are of interest
      * false by default
      */
-    val ignoreUnknownKeys: Boolean = false
+    val ignoreUnknownKeys: Boolean = false,
+    /**
+     * Encode enum values as Ints corresponding to their ordinal values
+     * false by default
+     */
+    val ordinalEnums: Boolean = false
 ) {
     companion object {
         @JvmStatic
