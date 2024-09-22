@@ -59,7 +59,12 @@ class UByteDecoder(private val decoderHelper: InlineDecoderHelper) : AbstractDec
 
     override fun decodeByte(): Byte {
         val type = decoderHelper.inputBuffer.requireNextByte()
-        if (type != UnsignedTypes.UINT8) throw MsgPackSerializationException.deserialization(decoderHelper.inputBuffer, "Expected UINT8 type, but found $type")
+        if (type != UnsignedTypes.UINT8) {
+            throw MsgPackSerializationException.deserialization(
+                decoderHelper.inputBuffer,
+                "Expected UINT8 type, but found $type",
+            )
+        }
         return decoderHelper.inputBuffer.requireNextByte()
     }
 }
@@ -71,7 +76,12 @@ class UShortDecoder(private val decoderHelper: InlineDecoderHelper) : AbstractDe
 
     override fun decodeShort(): Short {
         val type = decoderHelper.inputBuffer.requireNextByte()
-        if (type != UnsignedTypes.UINT16) throw MsgPackSerializationException.deserialization(decoderHelper.inputBuffer, "Expected UINT16 type, but found $type")
+        if (type != UnsignedTypes.UINT16) {
+            throw MsgPackSerializationException.deserialization(
+                decoderHelper.inputBuffer,
+                "Expected UINT16 type, but found $type",
+            )
+        }
         return decoderHelper.inputBuffer.takeNext(2).joinToNumber()
     }
 }
@@ -83,7 +93,12 @@ class UIntDecoder(private val decoderHelper: InlineDecoderHelper) : AbstractDeco
 
     override fun decodeInt(): Int {
         val type = decoderHelper.inputBuffer.requireNextByte()
-        if (type != UnsignedTypes.UINT32) throw MsgPackSerializationException.deserialization(decoderHelper.inputBuffer, "Expected UINT32 type, but found $type")
+        if (type != UnsignedTypes.UINT32) {
+            throw MsgPackSerializationException.deserialization(
+                decoderHelper.inputBuffer,
+                "Expected UINT32 type, but found $type",
+            )
+        }
         return decoderHelper.inputBuffer.takeNext(4).joinToNumber()
     }
 }
@@ -95,7 +110,12 @@ class ULongDecoder(private val decoderHelper: InlineDecoderHelper) : AbstractDec
 
     override fun decodeLong(): Long {
         val type = decoderHelper.inputBuffer.requireNextByte()
-        if (type != UnsignedTypes.UINT64) throw MsgPackSerializationException.deserialization(decoderHelper.inputBuffer, "Expected UINT64 type, but found $type")
+        if (type != UnsignedTypes.UINT64) {
+            throw MsgPackSerializationException.deserialization(
+                decoderHelper.inputBuffer,
+                "Expected UINT64 type, but found $type",
+            )
+        }
         return decoderHelper.inputBuffer.takeNext(8).joinToNumber()
     }
 }

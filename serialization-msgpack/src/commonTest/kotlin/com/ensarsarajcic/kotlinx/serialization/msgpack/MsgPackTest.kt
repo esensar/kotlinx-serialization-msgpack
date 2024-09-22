@@ -24,7 +24,7 @@ internal class MsgPackTest {
     fun testBooleanEncode() {
         testEncodePairs(
             Boolean.serializer(),
-            *TestData.booleanTestPairs
+            *TestData.booleanTestPairs,
         )
     }
 
@@ -32,7 +32,7 @@ internal class MsgPackTest {
     fun testBooleanDecode() {
         testDecodePairs(
             Boolean.serializer(),
-            *TestData.booleanTestPairs
+            *TestData.booleanTestPairs,
         )
     }
 
@@ -50,7 +50,7 @@ internal class MsgPackTest {
     fun testByteEncode() {
         testEncodePairs(
             Byte.serializer(),
-            *TestData.byteTestPairs
+            *TestData.byteTestPairs,
         )
     }
 
@@ -58,7 +58,7 @@ internal class MsgPackTest {
     fun testByteDecode() {
         testDecodePairs(
             Byte.serializer(),
-            *TestData.byteTestPairs
+            *TestData.byteTestPairs,
         )
     }
 
@@ -68,7 +68,7 @@ internal class MsgPackTest {
             Short.serializer(),
             *TestData.byteTestPairs.map { it.first to it.second.toShort() }.toTypedArray(),
             *TestData.shortTestPairs,
-            *TestData.uByteTestPairs
+            *TestData.uByteTestPairs,
         )
     }
 
@@ -78,7 +78,7 @@ internal class MsgPackTest {
             Short.serializer(),
             *TestData.byteTestPairs.map { it.first to it.second.toShort() }.toTypedArray(),
             *TestData.shortTestPairs,
-            *TestData.uByteTestPairs
+            *TestData.uByteTestPairs,
         )
     }
 
@@ -90,7 +90,7 @@ internal class MsgPackTest {
             *TestData.shortTestPairs.map { it.first to it.second.toInt() }.toTypedArray(),
             *TestData.uByteTestPairs.map { it.first to it.second.toInt() }.toTypedArray(),
             *TestData.intTestPairs,
-            *TestData.uShortTestPairs
+            *TestData.uShortTestPairs,
         )
     }
 
@@ -102,7 +102,7 @@ internal class MsgPackTest {
             *TestData.shortTestPairs.map { it.first to it.second.toInt() }.toTypedArray(),
             *TestData.uByteTestPairs.map { it.first to it.second.toInt() }.toTypedArray(),
             *TestData.intTestPairs,
-            *TestData.uShortTestPairs
+            *TestData.uShortTestPairs,
         )
     }
 
@@ -116,7 +116,7 @@ internal class MsgPackTest {
             *TestData.intTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
             *TestData.uShortTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
             *TestData.longTestPairs,
-            *TestData.uIntTestPairs
+            *TestData.uIntTestPairs,
         )
     }
 
@@ -130,7 +130,7 @@ internal class MsgPackTest {
             *TestData.intTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
             *TestData.uShortTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
             *TestData.longTestPairs,
-            *TestData.uIntTestPairs
+            *TestData.uIntTestPairs,
         )
     }
 
@@ -138,7 +138,7 @@ internal class MsgPackTest {
     fun testFloatEncode() {
         testEncodePairs(
             Float.serializer(),
-            *TestData.floatTestPairs
+            *TestData.floatTestPairs,
         )
     }
 
@@ -148,7 +148,9 @@ internal class MsgPackTest {
             // Tests in JS were failing when == comparison was used, so threshold is now used
             val threshold = 0.00001f
             val right = MsgPack.decodeFromByteArray(Float.serializer(), value.hexStringToByteArray())
-            assertTrue("Floats should be close enough! (Threshold is $threshold) - Expected: $expectedResult - Received: $right") { expectedResult - right < threshold }
+            assertTrue("Floats should be close enough! (Threshold is $threshold) - Expected: $expectedResult - Received: $right") {
+                expectedResult - right < threshold
+            }
         }
     }
 
@@ -156,7 +158,7 @@ internal class MsgPackTest {
     fun testDoubleEncode() {
         testEncodePairs(
             Double.serializer(),
-            *TestData.doubleTestPairs
+            *TestData.doubleTestPairs,
         )
     }
 
@@ -166,7 +168,9 @@ internal class MsgPackTest {
             // Tests in JS were failing when == comparison was used, so threshold is now used
             val threshold = 0.000000000000000000000000000000000000000000001
             val right = MsgPack.decodeFromByteArray(Double.serializer(), value.hexStringToByteArray())
-            assertTrue("Doubles should be close enough! (Threshold is $threshold) - Expected: $expectedResult - Received: $right") { expectedResult - right < threshold }
+            assertTrue("Doubles should be close enough! (Threshold is $threshold) - Expected: $expectedResult - Received: $right") {
+                expectedResult - right < threshold
+            }
         }
     }
 
@@ -176,7 +180,7 @@ internal class MsgPackTest {
             String.serializer(),
             *TestData.fixStrTestPairs,
             *TestData.str8TestPairs,
-            *TestData.str16TestPairs
+            *TestData.str16TestPairs,
         )
     }
 
@@ -186,7 +190,7 @@ internal class MsgPackTest {
             String.serializer(),
             *TestData.fixStrTestPairs,
             *TestData.str8TestPairs,
-            *TestData.str16TestPairs
+            *TestData.str16TestPairs,
         )
     }
 
@@ -194,7 +198,7 @@ internal class MsgPackTest {
     fun testBinaryEncode() {
         testEncodePairs(
             ByteArraySerializer(),
-            *TestData.bin8TestPairs
+            *TestData.bin8TestPairs,
         )
     }
 
@@ -209,11 +213,11 @@ internal class MsgPackTest {
     fun testArrayEncode() {
         testEncodePairs(
             ArraySerializer(String.serializer()),
-            *TestData.stringArrayTestPairs
+            *TestData.stringArrayTestPairs,
         )
         testEncodePairs(
             ArraySerializer(Int.serializer()),
-            *TestData.intArrayTestPairs
+            *TestData.intArrayTestPairs,
         )
     }
 
@@ -233,7 +237,7 @@ internal class MsgPackTest {
     fun testMapEncode() {
         testEncodePairs(
             MapSerializer(String.serializer(), String.serializer()),
-            *TestData.mapTestPairs
+            *TestData.mapTestPairs,
         )
     }
 
@@ -241,7 +245,7 @@ internal class MsgPackTest {
     fun testMapDecode() {
         testDecodePairs(
             MapSerializer(String.serializer(), String.serializer()),
-            *TestData.mapTestPairs
+            *TestData.mapTestPairs,
         )
     }
 
@@ -249,7 +253,7 @@ internal class MsgPackTest {
     fun testSampleClassEncode() {
         testEncodePairs(
             TestData.SampleClass.serializer(),
-            *TestData.sampleClassTestPairs
+            *TestData.sampleClassTestPairs,
         )
     }
 
@@ -257,7 +261,7 @@ internal class MsgPackTest {
     fun testSampleClassDecode() {
         testDecodePairs(
             TestData.SampleClass.serializer(),
-            *TestData.sampleClassTestPairs
+            *TestData.sampleClassTestPairs,
         )
     }
 
@@ -265,7 +269,7 @@ internal class MsgPackTest {
     fun testTimestampEncode() {
         testEncodePairs(
             MsgPackTimestamp.serializer(),
-            *TestData.timestampTestPairs
+            *TestData.timestampTestPairs,
         )
     }
 
@@ -273,7 +277,7 @@ internal class MsgPackTest {
     fun testTimestampDecode() {
         testDecodePairs(
             MsgPackTimestamp.serializer(),
-            *TestData.timestampTestPairs
+            *TestData.timestampTestPairs,
         )
     }
 
@@ -281,7 +285,7 @@ internal class MsgPackTest {
     fun testEnumEncode() {
         testEncodePairs(
             Vocation.serializer(),
-            *TestData.enumTestPairs
+            *TestData.enumTestPairs,
         )
     }
 
@@ -289,7 +293,7 @@ internal class MsgPackTest {
     fun testEnumDecode() {
         testDecodePairs(
             Vocation.serializer(),
-            *TestData.enumTestPairs
+            *TestData.enumTestPairs,
         )
     }
 
@@ -298,7 +302,7 @@ internal class MsgPackTest {
         testEncodePairs(
             Vocation.serializer(),
             *TestData.enumOrdinalTestPairs,
-            msgPack = MsgPack(MsgPackConfiguration(ordinalEnums = true, strictTypeWriting = true))
+            msgPack = MsgPack(MsgPackConfiguration(ordinalEnums = true, strictTypeWriting = true)),
         )
     }
 
@@ -307,36 +311,44 @@ internal class MsgPackTest {
         testDecodePairs(
             Vocation.serializer(),
             *TestData.enumOrdinalTestPairs,
-            msgPack = MsgPack(MsgPackConfiguration(ordinalEnums = true, strictTypes = true))
+            msgPack = MsgPack(MsgPackConfiguration(ordinalEnums = true, strictTypes = true)),
         )
     }
 
     @Test
     fun testDecodeIgnoreUnknownKeys() {
-        fun <T> testPairs(dataList: Array<Pair<String, T>>, serializer: KSerializer<T>) {
+        fun <T> testPairs(
+            dataList: Array<Pair<String, T>>,
+            serializer: KSerializer<T>,
+        ) {
             dataList.forEach { (value, expectedResult) ->
-                val result = MsgPack(
-                    configuration = MsgPackConfiguration(ignoreUnknownKeys = true)
-                ).decodeFromByteArray(serializer, value.hexStringToByteArray())
+                val result =
+                    MsgPack(
+                        configuration = MsgPackConfiguration(ignoreUnknownKeys = true),
+                    ).decodeFromByteArray(serializer, value.hexStringToByteArray())
                 assertEquals(expectedResult, result)
             }
         }
         testPairs(
             TestData.unknownKeysTestPairs,
-            TestData.SampleClass.serializer()
+            TestData.SampleClass.serializer(),
         )
     }
 
     @Test
     fun testOverflows() {
-        fun <T> testPairs(dataList: List<String>, serializer: KSerializer<T>) {
+        fun <T> testPairs(
+            dataList: List<String>,
+            serializer: KSerializer<T>,
+        ) {
             dataList.forEach {
                 try {
                     MsgPack(
-                        configuration = MsgPackConfiguration(preventOverflows = true)
+                        configuration = MsgPackConfiguration(preventOverflows = true),
                     ).decodeFromByteArray(serializer, it.hexStringToByteArray())
                     fail("Overflow should have occurred")
-                } catch (ex: MsgPackSerializationException) {}
+                } catch (ex: MsgPackSerializationException) {
+                }
             }
         }
         testPairs(TestData.uByteTestPairs.map { it.first }, Byte.serializer())
@@ -358,7 +370,7 @@ internal class MsgPackTest {
     fun testTriplesEncode() {
         testEncodePairs(
             TripleSerializer(String.serializer(), String.serializer(), String.serializer()),
-            *TestData.triplesTestPairs
+            *TestData.triplesTestPairs,
         )
     }
 
@@ -377,11 +389,15 @@ internal class MsgPackTest {
 
     @Test
     fun testStrictWrites() {
-        fun <T> testPairs(dataList: Array<Pair<String, T>>, serializer: KSerializer<T>) {
+        fun <T> testPairs(
+            dataList: Array<Pair<String, T>>,
+            serializer: KSerializer<T>,
+        ) {
             dataList.forEach { (expectedResult, value) ->
-                val result = MsgPack(
-                    configuration = MsgPackConfiguration(strictTypeWriting = true)
-                ).encodeToByteArray(serializer, value)
+                val result =
+                    MsgPack(
+                        configuration = MsgPackConfiguration(strictTypeWriting = true),
+                    ).encodeToByteArray(serializer, value)
                 assertEquals(expectedResult, result.toHex())
             }
         }
@@ -390,12 +406,21 @@ internal class MsgPackTest {
         testPairs(TestData.strictWriteLongPairs, Long.serializer())
     }
 
-    private fun <T> testEncodePairs(serializer: KSerializer<T>, vararg pairs: Pair<String, T>, msgPack: MsgPack = MsgPack()) {
+    private fun <T> testEncodePairs(
+        serializer: KSerializer<T>,
+        vararg pairs: Pair<String, T>,
+        msgPack: MsgPack = MsgPack(),
+    ) {
         pairs.forEach { (expectedResult, value) ->
             assertEquals(expectedResult, msgPack.encodeToByteArray(serializer, value).toHex())
         }
     }
-    private fun <T> testDecodePairs(serializer: KSerializer<T>, vararg pairs: Pair<String, T>, msgPack: MsgPack = MsgPack()) {
+
+    private fun <T> testDecodePairs(
+        serializer: KSerializer<T>,
+        vararg pairs: Pair<String, T>,
+        msgPack: MsgPack = MsgPack(),
+    ) {
         pairs.forEach { (value, expectedResult) ->
             assertEquals(expectedResult, msgPack.decodeFromByteArray(serializer, value.hexStringToByteArray()))
         }

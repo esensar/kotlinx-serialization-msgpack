@@ -8,7 +8,9 @@ class MsgPackDataOutputBuffer() : MsgPackDataBuffer {
     private val bytes = mutableListOf<Byte>()
 
     fun add(byte: Byte) = bytes.add(byte)
+
     fun addAll(bytes: List<Byte>) = this.bytes.addAll(bytes)
+
     fun addAll(bytes: ByteArray) = this.bytes.addAll(bytes.toList())
 
     override fun toByteArray() = bytes.toByteArray()
@@ -23,6 +25,7 @@ class MsgPackDataInputBuffer(private val byteArray: ByteArray) : MsgPackDataBuff
     }
 
     fun peek(): Byte = byteArray.getOrNull(index) ?: throw Exception("End of stream")
+
     fun peekSafely(): Byte? = byteArray.getOrNull(index)
 
     // Increases index only if next byte is not null

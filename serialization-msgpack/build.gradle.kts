@@ -30,7 +30,11 @@ kotlin {
     mingwX64()
     linuxX64()
 
-    fun kotlinx(name: String, version: String): String = "org.jetbrains.kotlinx:kotlinx-$name:$version"
+    fun kotlinx(
+        name: String,
+        version: String,
+    ): String = "org.jetbrains.kotlinx:kotlinx-$name:$version"
+
     fun kotlinxSerialization(name: String) = kotlinx("serialization-$name", Dependencies.Versions.serialization)
 
     sourceSets {

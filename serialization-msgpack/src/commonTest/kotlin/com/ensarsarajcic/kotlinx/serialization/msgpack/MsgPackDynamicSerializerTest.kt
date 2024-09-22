@@ -8,7 +8,6 @@ import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
 internal class MsgPackDynamicSerializerTest {
-
     @Test
     fun testDynamicDeserialize() {
         testDecodePairs(
@@ -33,7 +32,7 @@ internal class MsgPackDynamicSerializerTest {
                     TestData.stringArrayTestPairs.toList() +
                     TestData.mixedListTestPairs.toList() +
                     TestData.mapTestPairs.toList()
-                ).toTypedArray()
+            ).toTypedArray(),
         )
     }
 
@@ -62,7 +61,7 @@ internal class MsgPackDynamicSerializerTest {
                     TestData.mixedListTestPairs.toList() +
                     TestData.mapTestPairs.toList() +
                     TestData.enumTestPairs.toList()
-                ).toTypedArray()
+            ).toTypedArray(),
         )
     }
 
@@ -74,7 +73,7 @@ internal class MsgPackDynamicSerializerTest {
             MsgPackDynamicSerializer(MsgPackNullableDynamicSerializer(extensionSerializer)),
             *(
                 TestData.timestampTestPairs.toList()
-                ).toTypedArray()
+            ).toTypedArray(),
         )
     }
 
@@ -86,17 +85,24 @@ internal class MsgPackDynamicSerializerTest {
             MsgPackDynamicSerializer(MsgPackNullableDynamicSerializer(extensionSerializer)),
             *(
                 TestData.timestampTestPairs.toList()
-                ).toTypedArray()
+            ).toTypedArray(),
         )
     }
 
-    private fun <T> testEncodePairs(serializer: KSerializer<T>, vararg pairs: Pair<String, T>) {
+    private fun <T> testEncodePairs(
+        serializer: KSerializer<T>,
+        vararg pairs: Pair<String, T>,
+    ) {
         pairs.forEach { (expectedResult, value) ->
             val result = MsgPack.encodeToByteArray(serializer, value).toHex()
             assertEquals(expectedResult, result)
         }
     }
-    private fun <T> testDecodePairs(serializer: KSerializer<T>, vararg pairs: Pair<String, T>) {
+
+    private fun <T> testDecodePairs(
+        serializer: KSerializer<T>,
+        vararg pairs: Pair<String, T>,
+    ) {
         pairs.forEach { (value, expectedResult) ->
             val result = MsgPack.decodeFromByteArray(serializer, value.hexStringToByteArray())
             when (expectedResult) {
@@ -110,7 +116,7 @@ internal class MsgPackDynamicSerializerTest {
                         }.toList(),
                         (result as List<*>).map {
                             if (it is Number) it.toLong() else it
-                        }
+                        },
                     )
                 }
                 is List<*> -> {
@@ -120,7 +126,7 @@ internal class MsgPackDynamicSerializerTest {
                         },
                         (result as List<*>).map {
                             if (it is Number) it.toLong() else it
-                        }
+                        },
                     )
                 }
                 else -> {

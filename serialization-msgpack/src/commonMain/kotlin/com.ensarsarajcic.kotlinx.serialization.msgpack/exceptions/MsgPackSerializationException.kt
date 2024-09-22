@@ -7,53 +7,92 @@ import com.ensarsarajcic.kotlinx.serialization.msgpack.stream.MsgPackDataOutputB
 import kotlinx.serialization.SerializationException
 
 private fun ByteArray.toHex() = this.joinToString(separator = "") { it.toHex() }
+
 private fun Byte.toHex() = toInt().and(0xff).toString(16).padStart(2, '0')
+
 private fun MsgPackExtension.toInfoString() = "{type = $type, extTypeId = $extTypeId, data = ${data.toHex()}}"
 
 class MsgPackSerializationException private constructor(
-    override val message: String
+    override val message: String,
 ) : SerializationException() {
     companion object {
         private fun MsgPackDataInputBuffer.locationInfo() =
             toByteArray().toList().let {
                 """
                 ${it.subList(0, index).toByteArray().toHex()}[${peekSafely()}]${it.subList((index + 1).coerceAtMost(it.size), it.size)}
-                ${(0 until index).joinToString(separator = "") { "  " }}} ^^ ${((index + 1) until it.size).joinToString(separator = "") { "  " }}
+                ${(0 until index).joinToString(
+                    separator = "",
+                ) { "  " }}} ^^ ${((index + 1) until it.size).joinToString(separator = "") { "  " }}
                 """.trimIndent()
             }
 
-        private fun MsgPackDataOutputBuffer.locationInfo() =
-            "Written so far: ${toByteArray().toHex()}\nSize: ${toByteArray().size} bytes"
+        private fun MsgPackDataOutputBuffer.locationInfo() = "Written so far: ${toByteArray().toHex()}\nSize: ${toByteArray().size} bytes"
 
-        private fun coreSerialization(buffer: MsgPackDataBuffer, locationInfo: String, reason: String? = null): MsgPackSerializationException {
+        private fun coreSerialization(
+            buffer: MsgPackDataBuffer,
+            locationInfo: String,
+            reason: String? = null,
+        ): MsgPackSerializationException {
             return MsgPackSerializationException(
-                "MsgPack Serialization failure while serializing: ${buffer.toByteArray().toHex()}\nReason: $reason\nCurrent position:\n\n$locationInfo"
+                """
+                MsgPack Serialization failure while serializing: ${buffer.toByteArray().toHex()}
+                Reason: $reason
+                Current position:
+                
+                $locationInfo
+                """.trimIndent(),
             )
         }
 
-        private fun extensionSerialization(extension: MsgPackExtension, reason: String? = null): MsgPackSerializationException {
+        private fun extensionSerialization(
+            extension: MsgPackExtension,
+            reason: String? = null,
+        ): MsgPackSerializationException {
             return MsgPackSerializationException(
-                "MsgPack Serialization failure while serializing: ${extension.toInfoString()}\nReason: $reason"
+                "MsgPack Serialization failure while serializing: ${extension.toInfoString()}\nReason: $reason",
             )
         }
 
-        fun deserialization(buffer: MsgPackDataInputBuffer, reason: String? = null): MsgPackSerializationException {
+        fun deserialization(
+            buffer: MsgPackDataInputBuffer,
+            reason: String? = null,
+        ): MsgPackSerializationException {
             return coreSerialization(buffer, buffer.locationInfo(), reason)
         }
 
-        fun serialization(buffer: MsgPackDataOutputBuffer, reason: String? = null): MsgPackSerializationException {
+        fun serialization(
+            buffer: MsgPackDataOutputBuffer,
+            reason: String? = null,
+        ): MsgPackSerializationException {
             return coreSerialization(buffer, buffer.locationInfo(), reason)
         }
 
-        fun extensionSerializationWrongType(extension: MsgPackExtension, expectedType: Byte, foundType: Byte): MsgPackSerializationException {
-            return extensionSerialization(extension, "Expected extension type ${expectedType.toHex()} but found ${foundType.toHex()}. Deserialized extension: $extension")
+        fun extensionSerializationWrongType(
+            extension: MsgPackExtension,
+            expectedType: Byte,
+            foundType: Byte,
+        ): MsgPackSerializationException {
+            return extensionSerialization(
+                extension,
+                "Expected extension type ${expectedType.toHex()} but found ${foundType.toHex()}. Deserialized extension: $extension",
+            )
         }
 
-        fun extensionDeserializationWrongType(extension: MsgPackExtension, expectedType: Byte, foundType: Byte): MsgPackSerializationException {
-            return extensionSerialization(extension, "Expected extension type ${expectedType.toHex()} but found ${foundType.toHex()}. Serialized extension: $extension")
+        fun extensionDeserializationWrongType(
+            extension: MsgPackExtension,
+            expectedType: Byte,
+            foundType: Byte,
+        ): MsgPackSerializationException {
+            return extensionSerialization(
+                extension,
+                "Expected extension type ${expectedType.toHex()} but found ${foundType.toHex()}. Serialized extension: $extension",
+            )
         }
 
-        fun genericExtensionError(extension: MsgPackExtension, reason: String? = null): MsgPackSerializationException {
+        fun genericExtensionError(
+            extension: MsgPackExtension,
+            reason: String? = null,
+        ): MsgPackSerializationException {
             return extensionSerialization(extension, reason)
         }
 
@@ -69,7 +108,11 @@ class MsgPackSerializationException private constructor(
             return MsgPackSerializationException("MsgPack Dynamic Serialization failure! Reason: $reason")
         }
 
-        fun strictTypeError(buffer: MsgPackDataInputBuffer, expectedType: String, foundType: String): MsgPackSerializationException {
+        fun strictTypeError(
+            buffer: MsgPackDataInputBuffer,
+            expectedType: String,
+            foundType: String,
+        ): MsgPackSerializationException {
             return deserialization(buffer, "Strict type error! Expected type $expectedType, but found $foundType")
         }
 

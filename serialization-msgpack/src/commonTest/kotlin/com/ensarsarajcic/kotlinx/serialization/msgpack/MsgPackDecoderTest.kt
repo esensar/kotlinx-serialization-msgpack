@@ -18,7 +18,7 @@ internal class MsgPackDecoderTest {
     fun testBooleanDecode() {
         testPairs(
             MsgPackDecoder::decodeBoolean,
-            *TestData.booleanTestPairs
+            *TestData.booleanTestPairs,
         )
     }
 
@@ -32,7 +32,7 @@ internal class MsgPackDecoderTest {
     fun testByteDecode() {
         testPairs(
             MsgPackDecoder::decodeByte,
-            *TestData.byteTestPairs
+            *TestData.byteTestPairs,
         )
     }
 
@@ -42,7 +42,7 @@ internal class MsgPackDecoderTest {
             MsgPackDecoder::decodeShort,
             *TestData.byteTestPairs.map { it.first to it.second.toShort() }.toTypedArray(),
             *TestData.shortTestPairs,
-            *TestData.uByteTestPairs
+            *TestData.uByteTestPairs,
         )
     }
 
@@ -68,7 +68,7 @@ internal class MsgPackDecoderTest {
             *TestData.intTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
             *TestData.uShortTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
             *TestData.longTestPairs,
-            *TestData.uIntTestPairs
+            *TestData.uIntTestPairs,
         )
     }
 
@@ -76,11 +76,13 @@ internal class MsgPackDecoderTest {
     fun testFloatDecode() {
         TestData.floatTestPairs.forEach { (input, result) ->
             BasicMsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer()).also {
-            // Tests in JS were failing when == comparison was used, so threshold is now used
-            val threshold = 0.00001f
-            val right = it.decodeFloat()
-            assertTrue("Floats should be close enough! (Threshold is $threshold) - Expected: $result - Received: $right") { result - right < threshold }
-        }
+                // Tests in JS were failing when == comparison was used, so threshold is now used
+                val threshold = 0.00001f
+                val right = it.decodeFloat()
+                assertTrue(
+                    "Floats should be close enough! (Threshold is $threshold) - Expected: $result - Received: $right",
+                ) { result - right < threshold }
+            }
         }
     }
 
@@ -88,11 +90,13 @@ internal class MsgPackDecoderTest {
     fun testDoubleDecode() {
         TestData.doubleTestPairs.forEach { (input, result) ->
             BasicMsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer()).also {
-            // Tests in JS were failing when == comparison was used, so threshold is now used
-            val threshold = 0.000000000000000000000000000000000000000000001
-            val right = it.decodeDouble()
-            assertTrue("Doubles should be close enough! (Threshold is $threshold) - Expected: $result - Received: $right") { result - right < threshold }
-        }
+                // Tests in JS were failing when == comparison was used, so threshold is now used
+                val threshold = 0.000000000000000000000000000000000000000000001
+                val right = it.decodeDouble()
+                assertTrue("Doubles should be close enough! (Threshold is $threshold) - Expected: $result - Received: $right") {
+                    result - right < threshold
+                }
+            }
         }
     }
 
@@ -102,7 +106,7 @@ internal class MsgPackDecoderTest {
             MsgPackDecoder::decodeString,
             *TestData.fixStrTestPairs,
             *TestData.str8TestPairs,
-            *TestData.str16TestPairs
+            *TestData.str16TestPairs,
         )
     }
 
@@ -110,15 +114,16 @@ internal class MsgPackDecoderTest {
     fun testByteArrayDecode() {
         TestData.bin8TestPairs.forEach { (input, result) ->
             BasicMsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer()).also {
-            assertTrue { result.contentEquals(it.decodeSerializableValue(serializer())) }
-        }
+                assertTrue { result.contentEquals(it.decodeSerializableValue(serializer())) }
+            }
         }
     }
 
     @Test
     fun testArrayDecodeStringArrays() {
         TestData.stringArrayTestPairs.forEach { (input, result) ->
-            val decoder = BasicMsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
+            val decoder =
+                BasicMsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
             val serializer = ArraySerializer(String.serializer())
             assertEquals(result.toList(), serializer.deserialize(decoder).toList())
         }
@@ -127,7 +132,8 @@ internal class MsgPackDecoderTest {
     @Test
     fun testArrayDecodeIntArrays() {
         TestData.intArrayTestPairs.forEach { (input, result) ->
-            val decoder = BasicMsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
+            val decoder =
+                BasicMsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
             val serializer = ArraySerializer(Int.serializer())
             assertEquals(result.toList(), serializer.deserialize(decoder).toList())
         }
@@ -136,7 +142,8 @@ internal class MsgPackDecoderTest {
     @Test
     fun testMapDecode() {
         TestData.mapTestPairs.forEach { (input, result) ->
-            val decoder = BasicMsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
+            val decoder =
+                BasicMsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
             val serializer = MapSerializer(String.serializer(), String.serializer())
             assertEquals(result, serializer.deserialize(decoder))
         }
@@ -145,7 +152,8 @@ internal class MsgPackDecoderTest {
     @Test
     fun testSampleClassDecode() {
         TestData.sampleClassTestPairs.forEach { (input, result) ->
-            val decoder = BasicMsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
+            val decoder =
+                BasicMsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
             val serializer = TestData.SampleClass.serializer()
             assertEquals(result, serializer.deserialize(decoder))
         }
@@ -154,7 +162,13 @@ internal class MsgPackDecoderTest {
     @Test
     fun testSampleClassWithNestedValueAndMissingKeys() {
         TestData.nestedSampleClassWithMissingValue.forEach { (input, result) ->
-            val decoder = BasicMsgPackDecoder(MsgPackConfiguration.default.copy(ignoreUnknownKeys = true), SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
+            val decoder =
+                BasicMsgPackDecoder(
+                    MsgPackConfiguration.default.copy(ignoreUnknownKeys = true),
+                    SerializersModule {
+                    },
+                    input.hexStringToByteArray().toMsgPackBuffer(),
+                )
             val serializer = TestData.SampleClassWithNestedClass.serializer()
             assertEquals(result, serializer.deserialize(decoder))
         }
@@ -163,7 +177,8 @@ internal class MsgPackDecoderTest {
     @Test
     fun testTimestampDecode() {
         TestData.timestampTestPairs.forEach { (input, result) ->
-            val decoder = BasicMsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
+            val decoder =
+                BasicMsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
             val serializer = MsgPackTimestamp.serializer()
             assertEquals(result, serializer.deserialize(decoder))
         }
@@ -172,7 +187,8 @@ internal class MsgPackDecoderTest {
     @Test
     fun testEnumDecode() {
         TestData.enumTestPairs.forEach { (input, result) ->
-            val decoder = BasicMsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
+            val decoder =
+                BasicMsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
             val serializer = Vocation.serializer()
             assertEquals(result, serializer.deserialize(decoder))
         }
@@ -181,7 +197,13 @@ internal class MsgPackDecoderTest {
     @Test
     fun testEnumOrdinalDecode() {
         TestData.enumOrdinalTestPairs.forEach { (input, result) ->
-            val decoder = BasicMsgPackDecoder(MsgPackConfiguration(ordinalEnums = true, strictTypes = true), SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
+            val decoder =
+                BasicMsgPackDecoder(
+                    MsgPackConfiguration(ordinalEnums = true, strictTypes = true),
+                    SerializersModule {
+                    },
+                    input.hexStringToByteArray().toMsgPackBuffer(),
+                )
             val serializer = Vocation.serializer()
             assertEquals(result, serializer.deserialize(decoder))
         }
@@ -190,7 +212,13 @@ internal class MsgPackDecoderTest {
     @Test
     fun testDecodeIgnoreUnknownKeys() {
         TestData.unknownKeysTestPairs.forEach { (input, result) ->
-            val decoder = BasicMsgPackDecoder(MsgPackConfiguration.default.copy(ignoreUnknownKeys = true), SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
+            val decoder =
+                BasicMsgPackDecoder(
+                    MsgPackConfiguration.default.copy(ignoreUnknownKeys = true),
+                    SerializersModule {
+                    },
+                    input.hexStringToByteArray().toMsgPackBuffer(),
+                )
             val serializer = TestData.SampleClass.serializer()
             assertEquals(result, serializer.deserialize(decoder))
         }
@@ -199,17 +227,33 @@ internal class MsgPackDecoderTest {
     @Test
     fun testDecodeNonStrictNumbers() {
         TestData.floatEncodedDataTestPairs.forEach { (input, result) ->
-            val decoder = BasicMsgPackDecoder(MsgPackConfiguration.default.copy(strictTypes = false), SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())
+            val decoder =
+                BasicMsgPackDecoder(
+                    MsgPackConfiguration.default.copy(strictTypes = false),
+                    SerializersModule {
+                    },
+                    input.hexStringToByteArray().toMsgPackBuffer(),
+                )
             val serializer = TestData.SampleClass.serializer()
             assertEquals(result, serializer.deserialize(decoder))
         }
     }
 
-    private fun <RESULT> testPairs(decodeFunction: MsgPackDecoder.() -> RESULT, vararg pairs: Pair<String, RESULT>) {
+    private fun <RESULT> testPairs(
+        decodeFunction: MsgPackDecoder.() -> RESULT,
+        vararg pairs: Pair<String, RESULT>,
+    ) {
         pairs.forEach { (input, result) ->
-            MsgPackDecoder(BasicMsgPackDecoder(MsgPackConfiguration.default, SerializersModule {}, input.hexStringToByteArray().toMsgPackBuffer())).also {
-            assertEquals(result, it.decodeFunction())
-        }
+            MsgPackDecoder(
+                BasicMsgPackDecoder(
+                    MsgPackConfiguration.default,
+                    SerializersModule {
+                    },
+                    input.hexStringToByteArray().toMsgPackBuffer(),
+                ),
+            ).also {
+                assertEquals(result, it.decodeFunction())
+            }
         }
     }
 }

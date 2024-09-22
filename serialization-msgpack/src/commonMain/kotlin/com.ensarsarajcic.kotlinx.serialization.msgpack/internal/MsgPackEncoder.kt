@@ -19,7 +19,7 @@ internal class BasicMsgPackEncoder(
     private val configuration: MsgPackConfiguration,
     override val serializersModule: SerializersModule,
     private val packer: MsgPacker = BasicMsgPacker(),
-    val inlineEncoders: Map<SerialDescriptor, (InlineEncoderHelper) -> Encoder> = mapOf()
+    val inlineEncoders: Map<SerialDescriptor, (InlineEncoderHelper) -> Encoder> = mapOf(),
 ) : AbstractEncoder() {
     val result = MsgPackDataOutputBuffer()
 
@@ -59,7 +59,10 @@ internal class BasicMsgPackEncoder(
         result.addAll(packer.packString(value, configuration.rawCompatibility))
     }
 
-    override fun encodeEnum(enumDescriptor: SerialDescriptor, index: Int) {
+    override fun encodeEnum(
+        enumDescriptor: SerialDescriptor,
+        index: Int,
+    ) {
         if (configuration.ordinalEnums) {
             result.addAll(packer.packInt(index, configuration.strictTypeWriting))
         } else {
@@ -95,7 +98,10 @@ internal class BasicMsgPackEncoder(
         }
     }
 
-    override fun beginCollection(descriptor: SerialDescriptor, collectionSize: Int): CompositeEncoder {
+    override fun beginCollection(
+        descriptor: SerialDescriptor,
+        collectionSize: Int,
+    ): CompositeEncoder {
         when (descriptor.kind) {
             StructureKind.LIST ->
                 when {
@@ -110,7 +116,10 @@ internal class BasicMsgPackEncoder(
                         result.add(MsgPackType.Array.ARRAY32)
                         result.addAll(collectionSize.toInt().splitToByteArray().toList())
                     }
-                    else -> throw MsgPackSerializationException.serialization(result, "Collection too long (max size = ${MsgPackType.Array.MAX_ARRAY32_LENGTH}, size = $collectionSize)!")
+                    else -> throw MsgPackSerializationException.serialization(
+                        result,
+                        "Collection too long (max size = ${MsgPackType.Array.MAX_ARRAY32_LENGTH}, size = $collectionSize)!",
+                    )
                 }
 
             StructureKind.CLASS, StructureKind.OBJECT, StructureKind.MAP ->
@@ -126,7 +135,10 @@ internal class BasicMsgPackEncoder(
                         result.add(MsgPackType.Map.MAP32)
                         result.addAll(collectionSize.toInt().splitToByteArray().toList())
                     }
-                    else -> throw MsgPackSerializationException.serialization(result, "Object too long (max size = ${MsgPackType.Map.MAX_MAP32_LENGTH}, size = $collectionSize)!")
+                    else -> throw MsgPackSerializationException.serialization(
+                        result,
+                        "Object too long (max size = ${MsgPackType.Map.MAX_MAP32_LENGTH}, size = $collectionSize)!",
+                    )
                 }
 
             else -> throw MsgPackSerializationException.serialization(result, "Unsupported collection type: ${descriptor.kind}")
@@ -134,7 +146,10 @@ internal class BasicMsgPackEncoder(
         return this
     }
 
-    override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
+    override fun <T> encodeSerializableValue(
+        serializer: SerializationStrategy<T>,
+        value: T,
+    ) {
         if (serializer == ByteArraySerializer()) {
             encodeByteArray(value as ByteArray)
         } else {
@@ -148,14 +163,14 @@ internal class BasicMsgPackEncoder(
 }
 
 internal class MsgPackEncoder(
-    private val basicMsgPackEncoder: BasicMsgPackEncoder
+    private val basicMsgPackEncoder: BasicMsgPackEncoder,
 ) : Encoder by basicMsgPackEncoder, CompositeEncoder by basicMsgPackEncoder {
     override val serializersModule: SerializersModule = basicMsgPackEncoder.serializersModule
     val result = basicMsgPackEncoder.result
 }
 
 internal class ExtensionTypeEncoder(
-    private val basicMsgPackEncoder: BasicMsgPackEncoder
+    private val basicMsgPackEncoder: BasicMsgPackEncoder,
 ) : AbstractEncoder() {
     override val serializersModule: SerializersModule = basicMsgPackEncoder.serializersModule
     val result = basicMsgPackEncoder.result
@@ -180,90 +195,146 @@ internal class ExtensionTypeEncoder(
         bytesWritten += 1
     }
 
-    override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
+    override fun <T> encodeSerializableValue(
+        serializer: SerializationStrategy<T>,
+        value: T,
+    ) {
         val value = value as ByteArray
         if (size == null) {
             size = value.size
-            val maxSize = when (type) {
-                MsgPackType.Ext.EXT8 -> MsgPackType.Ext.MAX_EXT8_LENGTH
-                MsgPackType.Ext.EXT16 -> MsgPackType.Ext.MAX_EXT16_LENGTH
-                MsgPackType.Ext.EXT32 -> MsgPackType.Ext.MAX_EXT32_LENGTH
-                else -> throw MsgPackSerializationException.serialization(result, "Unexpected extension type: $type")
-            }.toLong()
-            if (size!!.toLong() > maxSize) throw MsgPackSerializationException.serialization(result, "Size ($size) too long for extension type ($maxSize)!")
+            val maxSize =
+                when (type) {
+                    MsgPackType.Ext.EXT8 -> MsgPackType.Ext.MAX_EXT8_LENGTH
+                    MsgPackType.Ext.EXT16 -> MsgPackType.Ext.MAX_EXT16_LENGTH
+                    MsgPackType.Ext.EXT32 -> MsgPackType.Ext.MAX_EXT32_LENGTH
+                    else -> throw MsgPackSerializationException.serialization(result, "Unexpected extension type: $type")
+                }.toLong()
+            if (size!!.toLong() > maxSize) {
+                throw MsgPackSerializationException.serialization(
+                    result,
+                    "Size ($size) too long for extension type ($maxSize)!",
+                )
+            }
             result.addAll(
                 when (type) {
                     MsgPackType.Ext.EXT8 -> size!!.toByte().splitToByteArray()
                     MsgPackType.Ext.EXT16 -> size!!.toShort().splitToByteArray()
                     MsgPackType.Ext.EXT32 -> size!!.toInt().splitToByteArray()
                     else -> throw MsgPackSerializationException.serialization(result, "Unexpected extension type: $type")
-                }
+                },
             )
             result.add(typeId!!)
         } else {
-            if (value.size != size) throw MsgPackSerializationException.serialization(result, "Invalid size for fixed size extension type! Expected $size but found ${value.size}")
+            if (value.size != size) {
+                throw MsgPackSerializationException.serialization(
+                    result,
+                    "Invalid size for fixed size extension type! Expected $size but found ${value.size}",
+                )
+            }
         }
         result.addAll(value)
     }
 }
 
 internal class MsgPackClassEncoder(
-    private val basicMsgPackEncoder: BasicMsgPackEncoder
+    private val basicMsgPackEncoder: BasicMsgPackEncoder,
 ) : Encoder by basicMsgPackEncoder, CompositeEncoder by basicMsgPackEncoder {
     override val serializersModule: SerializersModule = basicMsgPackEncoder.serializersModule
     val result = basicMsgPackEncoder.result
 
-    private fun encodeName(descriptor: SerialDescriptor, index: Int) {
+    private fun encodeName(
+        descriptor: SerialDescriptor,
+        index: Int,
+    ) {
         encodeString(descriptor.getElementName(index))
     }
 
-    override fun encodeBooleanElement(descriptor: SerialDescriptor, index: Int, value: Boolean) {
+    override fun encodeBooleanElement(
+        descriptor: SerialDescriptor,
+        index: Int,
+        value: Boolean,
+    ) {
         encodeName(descriptor, index)
         encodeBoolean(value)
     }
 
-    override fun encodeByteElement(descriptor: SerialDescriptor, index: Int, value: Byte) {
+    override fun encodeByteElement(
+        descriptor: SerialDescriptor,
+        index: Int,
+        value: Byte,
+    ) {
         encodeName(descriptor, index)
         encodeByte(value)
     }
 
-    override fun encodeCharElement(descriptor: SerialDescriptor, index: Int, value: Char) {
+    override fun encodeCharElement(
+        descriptor: SerialDescriptor,
+        index: Int,
+        value: Char,
+    ) {
         encodeName(descriptor, index)
         encodeChar(value)
     }
 
-    override fun encodeDoubleElement(descriptor: SerialDescriptor, index: Int, value: Double) {
+    override fun encodeDoubleElement(
+        descriptor: SerialDescriptor,
+        index: Int,
+        value: Double,
+    ) {
         encodeName(descriptor, index)
         encodeDouble(value)
     }
 
-    override fun encodeFloatElement(descriptor: SerialDescriptor, index: Int, value: Float) {
+    override fun encodeFloatElement(
+        descriptor: SerialDescriptor,
+        index: Int,
+        value: Float,
+    ) {
         encodeName(descriptor, index)
         encodeFloat(value)
     }
 
     @ExperimentalSerializationApi
-    override fun encodeInlineElement(descriptor: SerialDescriptor, index: Int): Encoder {
+    override fun encodeInlineElement(
+        descriptor: SerialDescriptor,
+        index: Int,
+    ): Encoder {
         encodeName(descriptor, index)
         return basicMsgPackEncoder.encodeInline(descriptor)
     }
 
-    override fun encodeIntElement(descriptor: SerialDescriptor, index: Int, value: Int) {
+    override fun encodeIntElement(
+        descriptor: SerialDescriptor,
+        index: Int,
+        value: Int,
+    ) {
         encodeName(descriptor, index)
         encodeInt(value)
     }
 
-    override fun encodeLongElement(descriptor: SerialDescriptor, index: Int, value: Long) {
+    override fun encodeLongElement(
+        descriptor: SerialDescriptor,
+        index: Int,
+        value: Long,
+    ) {
         encodeName(descriptor, index)
         encodeLong(value)
     }
 
-    override fun encodeShortElement(descriptor: SerialDescriptor, index: Int, value: Short) {
+    override fun encodeShortElement(
+        descriptor: SerialDescriptor,
+        index: Int,
+        value: Short,
+    ) {
         encodeName(descriptor, index)
         encodeShort(value)
     }
 
-    override fun encodeStringElement(descriptor: SerialDescriptor, index: Int, value: String) {
+    override fun encodeStringElement(
+        descriptor: SerialDescriptor,
+        index: Int,
+        value: String,
+    ) {
         encodeName(descriptor, index)
         encodeString(value)
     }
@@ -277,7 +348,7 @@ internal class MsgPackClassEncoder(
         descriptor: SerialDescriptor,
         index: Int,
         serializer: SerializationStrategy<T>,
-        value: T?
+        value: T?,
     ) {
         encodeName(descriptor, index)
         encodeNullableSerializableValue(serializer, value)
@@ -287,7 +358,7 @@ internal class MsgPackClassEncoder(
         descriptor: SerialDescriptor,
         index: Int,
         serializer: SerializationStrategy<T>,
-        value: T
+        value: T,
     ) {
         encodeName(descriptor, index)
         encodeSerializableValue(serializer, value)
@@ -296,5 +367,5 @@ internal class MsgPackClassEncoder(
 
 data class InlineEncoderHelper(
     val serializersModule: SerializersModule,
-    val outputBuffer: MsgPackDataOutputBuffer
+    val outputBuffer: MsgPackDataOutputBuffer,
 )

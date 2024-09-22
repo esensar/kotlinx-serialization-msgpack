@@ -6,7 +6,6 @@ import kotlin.test.assertNull
 import kotlin.test.fail
 
 internal class MsgPackDataInputBufferTest {
-
     @Test
     fun testEmptyBuffer() {
         val buffer = MsgPackDataInputBuffer(byteArrayOf())

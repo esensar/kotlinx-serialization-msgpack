@@ -24,9 +24,8 @@ internal class BasicMsgPackDecoder(
     override val serializersModule: SerializersModule,
     val dataBuffer: MsgPackDataInputBuffer,
     private val msgUnpacker: MsgUnpacker = BasicMsgUnpacker(dataBuffer),
-    val inlineDecoders: Map<SerialDescriptor, (InlineDecoderHelper) -> Decoder> = mapOf()
+    val inlineDecoders: Map<SerialDescriptor, (InlineDecoderHelper) -> Decoder> = mapOf(),
 ) : AbstractDecoder(), MsgPackTypeDecoder {
-
     internal fun decodeElementIndexInternal(descriptor: SerialDescriptor): Int {
         if (descriptor.kind in arrayOf(StructureKind.CLASS, StructureKind.OBJECT)) {
             val next = dataBuffer.peekSafely()
@@ -45,6 +44,7 @@ internal class BasicMsgPackDecoder(
         }
         return 0
     }
+
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
         val result = decodeElementIndexInternal(descriptor)
         if (result == CompositeDecoder.UNKNOWN_NAME && configuration.ignoreUnknownKeys) {
@@ -204,7 +204,7 @@ internal class BasicMsgPackDecoder(
 }
 
 internal class MsgPackDecoder(
-    private val basicMsgPackDecoder: BasicMsgPackDecoder
+    private val basicMsgPackDecoder: BasicMsgPackDecoder,
 ) : Decoder by basicMsgPackDecoder, CompositeDecoder by basicMsgPackDecoder, MsgPackTypeDecoder by basicMsgPackDecoder {
     override val serializersModule: SerializersModule = basicMsgPackDecoder.serializersModule
 }
@@ -212,7 +212,7 @@ internal class MsgPackDecoder(
 internal class ClassMsgPackDecoder(
     private val basicMsgPackDecoder: BasicMsgPackDecoder,
     private val configuration: MsgPackConfiguration,
-    private val size: Int
+    private val size: Int,
 ) : Decoder by basicMsgPackDecoder, CompositeDecoder by basicMsgPackDecoder, MsgPackTypeDecoder by basicMsgPackDecoder {
     override val serializersModule: SerializersModule = basicMsgPackDecoder.serializersModule
 
@@ -233,7 +233,7 @@ internal class ClassMsgPackDecoder(
 }
 
 internal class ExtensionTypeDecoder(
-    private val basicMsgPackDecoder: BasicMsgPackDecoder
+    private val basicMsgPackDecoder: BasicMsgPackDecoder,
 ) : CompositeDecoder, AbstractDecoder(), MsgPackTypeDecoder by basicMsgPackDecoder {
     private val dataBuffer = basicMsgPackDecoder.dataBuffer
     var type: Byte? = null
@@ -273,6 +273,7 @@ internal class ExtensionTypeDecoder(
             throw AssertionError()
         }
     }
+
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
         return if (bytesRead <= 2) bytesRead else CompositeDecoder.DECODE_DONE
     }
@@ -284,12 +285,12 @@ internal class ExtensionTypeDecoder(
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
         bytesRead += 1
         return dataBuffer.takeNext(
-            size!!
+            size!!,
         ) as T
     }
 }
 
 data class InlineDecoderHelper(
     val serializersModule: SerializersModule,
-    val inputBuffer: MsgPackDataInputBuffer
+    val inputBuffer: MsgPackDataInputBuffer,
 )

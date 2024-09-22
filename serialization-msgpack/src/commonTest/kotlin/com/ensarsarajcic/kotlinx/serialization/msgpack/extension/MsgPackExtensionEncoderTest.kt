@@ -11,7 +11,6 @@ import kotlin.test.assertEquals
 
 // TODO More tests
 internal class MsgPackExtensionEncoderTest {
-
     @Test
     fun testExtensionEncode() {
         val input = MsgPackExtension(0xd4.toByte(), 0x01, byteArrayOf(0x01))

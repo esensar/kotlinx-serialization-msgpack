@@ -16,7 +16,7 @@ internal class MsgPackEncoderTest {
     fun testBooleanEncode() {
         testPairs(
             MsgPackEncoder::encodeBoolean,
-            *TestData.booleanTestPairs
+            *TestData.booleanTestPairs,
         )
     }
 
@@ -31,7 +31,7 @@ internal class MsgPackEncoderTest {
     fun testByteEncode() {
         testPairs(
             MsgPackEncoder::encodeByte,
-            *TestData.byteTestPairs
+            *TestData.byteTestPairs,
         )
     }
 
@@ -53,7 +53,7 @@ internal class MsgPackEncoderTest {
             *TestData.shortTestPairs.map { it.first to it.second.toInt() }.toTypedArray(),
             *TestData.uByteTestPairs.map { it.first to it.second.toInt() }.toTypedArray(),
             *TestData.intTestPairs,
-            *TestData.uShortTestPairs
+            *TestData.uShortTestPairs,
         )
     }
 
@@ -67,7 +67,7 @@ internal class MsgPackEncoderTest {
             *TestData.intTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
             *TestData.uShortTestPairs.map { it.first to it.second.toLong() }.toTypedArray(),
             *TestData.longTestPairs,
-            *TestData.uIntTestPairs
+            *TestData.uIntTestPairs,
         )
     }
 
@@ -75,7 +75,7 @@ internal class MsgPackEncoderTest {
     fun testFloatEncode() {
         testPairs(
             MsgPackEncoder::encodeFloat,
-            *TestData.floatTestPairs
+            *TestData.floatTestPairs,
         )
     }
 
@@ -83,7 +83,7 @@ internal class MsgPackEncoderTest {
     fun testDoubleEncode() {
         testPairs(
             MsgPackEncoder::encodeDouble,
-            *TestData.doubleTestPairs
+            *TestData.doubleTestPairs,
         )
     }
 
@@ -93,7 +93,7 @@ internal class MsgPackEncoderTest {
             MsgPackEncoder::encodeString,
             *TestData.fixStrTestPairs,
             *TestData.str8TestPairs,
-            *TestData.str16TestPairs
+            *TestData.str16TestPairs,
         )
     }
 
@@ -101,7 +101,7 @@ internal class MsgPackEncoderTest {
     fun testBinaryEncode() {
         testPairs(
             { this.encodeSerializableValue(serializer<ByteArray>(), it) },
-            *TestData.bin8TestPairs
+            *TestData.bin8TestPairs,
         )
     }
 
@@ -175,7 +175,10 @@ internal class MsgPackEncoderTest {
         }
     }
 
-    private fun <INPUT> testPairs(encodeFunction: MsgPackEncoder.(INPUT) -> Unit, vararg pairs: Pair<String, INPUT>) {
+    private fun <INPUT> testPairs(
+        encodeFunction: MsgPackEncoder.(INPUT) -> Unit,
+        vararg pairs: Pair<String, INPUT>,
+    ) {
         pairs.forEach { (result, input) ->
             MsgPackEncoder(BasicMsgPackEncoder(MsgPackConfiguration.default, SerializersModule {})).also {
                 it.encodeFunction(input)
