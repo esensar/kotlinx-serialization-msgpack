@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+- Updated kotlin version to `2.0.20`
+- Updated `kotlinx.serialization` version to `1.7.3`
 
 ## [0.5.5] - 2023-04-29
 - Removed redundant call to serialize in BaseMsgPackExtensionSerializer ([#92][i92] and [#95][p95])

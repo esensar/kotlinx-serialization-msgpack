@@ -7,11 +7,7 @@ plugins {
 }
 
 kotlin {
-    jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
-        }
-    }
+    jvm()
     js {
         browser {
             testTask {
@@ -21,10 +17,15 @@ kotlin {
             }
         }
     }
-    ios()
+    applyDefaultHierarchyTemplate()
+    jvm()
+    iosX64()
+    iosArm64()
     iosSimulatorArm64()
-    tvos()
-    watchos()
+    tvosX64()
+    tvosArm64()
+    watchosX64()
+    watchosArm64()
     macosX64()
     macosArm64()
     mingwX64()
@@ -39,23 +40,23 @@ kotlin {
             languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
         }
 
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation(project(":serialization-msgpack"))
             }
         }
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
             }
         }
-        val jvmTest by getting {
+        jvmTest {
             dependencies {
                 implementation(kotlin("test-junit"))
             }
         }
-        val jsTest by getting {
+        jsTest {
             dependencies {
                 implementation(kotlin("test-js"))
             }
