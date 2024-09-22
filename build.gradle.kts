@@ -3,6 +3,10 @@ plugins {
     kotlin("plugin.serialization") version Dependencies.Versions.kotlin apply false
 }
 
+repositories {
+    mavenCentral()
+}
+
 buildscript {
     repositories {
         maven("https://plugins.gradle.org/m2/")
