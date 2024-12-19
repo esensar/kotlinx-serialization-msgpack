@@ -5,13 +5,34 @@ interface MsgPackDataBuffer {
 }
 
 class MsgPackDataOutputBuffer() : MsgPackDataBuffer {
-    private val bytes = mutableListOf<Byte>()
+    private val byteArrays = mutableListOf<ByteArray>()
 
-    fun add(byte: Byte) = bytes.add(byte)
-    fun addAll(bytes: List<Byte>) = this.bytes.addAll(bytes)
-    fun addAll(bytes: ByteArray) = this.bytes.addAll(bytes.toList())
+    fun add(byte: Byte) {
+        byteArrays.add(ByteArray(1) { byte })
+    }
 
-    override fun toByteArray() = bytes.toByteArray()
+    fun addAll(bytes: List<Byte>) {
+        if (bytes.isNotEmpty()) {
+            byteArrays.add(bytes.toByteArray())
+        }
+    }
+
+    fun addAll(bytes: ByteArray) {
+        if (bytes.isNotEmpty()) {
+            byteArrays.add(bytes)
+        }
+    }
+
+    override fun toByteArray(): ByteArray {
+        val totalSize = byteArrays.sumOf { it.size }
+        val outputArray = ByteArray(totalSize)
+        var currentIndex = 0
+        byteArrays.forEach {
+            it.copyInto(outputArray, currentIndex)
+            currentIndex += it.size
+        }
+        return outputArray
+    }
 }
 
 class MsgPackDataInputBuffer(private val byteArray: ByteArray) : MsgPackDataBuffer {
