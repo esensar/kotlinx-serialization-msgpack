@@ -110,5 +110,9 @@ gradle-app.setting
 
 # Cache of project
 .gradletasknamecache
+
+.classpath
+.project
+.settings
 .kotlin
 kotlin-js-store/
