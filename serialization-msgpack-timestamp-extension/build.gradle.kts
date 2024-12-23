@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
@@ -68,7 +66,7 @@ kotlin {
                 implementation(kotlin("test-junit"))
             }
         }
-        jvmBenchmark {
+        val jvmBenchmark by getting {
             dependencies {
                 implementation(kotlinx("benchmark-runtime", Dependencies.Versions.benchmark))
             }
