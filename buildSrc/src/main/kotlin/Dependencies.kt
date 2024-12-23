@@ -5,5 +5,6 @@ object Dependencies {
         const val datetime = "0.6.1"
         const val ktlintGradle = "12.1.2"
         const val dokkaGradle = "2.0.0"
+        const val benchmark = "0.4.13"
     }
 }
