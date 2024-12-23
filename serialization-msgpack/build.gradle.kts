@@ -7,6 +7,11 @@ plugins {
 }
 
 kotlin {
+    jvm {
+        compilations.all {
+            kotlinOptions.jvmTarget = "1.8"
+        }
+    }
     js {
         browser {
             testTask {
@@ -18,8 +23,8 @@ kotlin {
     }
     applyDefaultHierarchyTemplate()
     jvm()
-    iosX64()
     iosArm64()
+    iosX64()
     iosSimulatorArm64()
     tvosX64()
     tvosArm64()
