@@ -2,8 +2,9 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
-- Updated kotlin version to `2.0.20`
+- Updated kotlin version to `2.1.0`
 - Updated `kotlinx.serialization` version to `1.7.3`
+- Improved performance and heap usage of serialization by creating less byte objects ([#102][p102])
 
 ## [0.5.5] - 2023-04-29
 - Removed redundant call to serialize in BaseMsgPackExtensionSerializer ([#92][i92] and [#95][p95])
@@ -149,3 +150,4 @@ MsgPack.default.encodeToByteArray(...)
 [p94]: https://github.com/esensar/kotlinx-serialization-msgpack/pull/94
 [p95]: https://github.com/esensar/kotlinx-serialization-msgpack/pull/95
 [p99]: https://github.com/esensar/kotlinx-serialization-msgpack/pull/99
+[p102]: https://github.com/esensar/kotlinx-serialization-msgpack/pull/102
