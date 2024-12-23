@@ -1,13 +1,21 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("maven-publish")
     id("signing")
     id("org.jetbrains.dokka")
+    id("org.jetbrains.kotlinx.benchmark")
 }
 
 kotlin {
-    jvm()
+    applyDefaultHierarchyTemplate()
+    jvm {
+        compilations.create("benchmark") {
+            associateWith(this@jvm.compilations.getByName("main"))
+        }
+    }
     js {
         browser {
             testTask {
@@ -17,10 +25,9 @@ kotlin {
             }
         }
     }
-    applyDefaultHierarchyTemplate()
-    jvm()
     iosX64()
     iosArm64()
+    iosX64()
     iosSimulatorArm64()
     tvosX64()
     tvosArm64()
@@ -61,10 +68,21 @@ kotlin {
                 implementation(kotlin("test-junit"))
             }
         }
+        jvmBenchmark {
+            dependencies {
+                implementation(kotlinx("benchmark-runtime", Dependencies.Versions.benchmark))
+            }
+        }
         jsTest {
             dependencies {
                 implementation(kotlin("test-js"))
             }
         }
+    }
+}
+
+benchmark {
+    targets {
+        register("jvmBenchmark")
     }
 }

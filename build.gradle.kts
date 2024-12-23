@@ -1,6 +1,7 @@
 plugins {
     kotlin("multiplatform") version Dependencies.Versions.kotlin apply false
     kotlin("plugin.serialization") version Dependencies.Versions.kotlin apply false
+    id("org.jetbrains.kotlinx.benchmark") version Dependencies.Versions.benchmark apply false
 }
 
 repositories {
