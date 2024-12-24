@@ -14,6 +14,9 @@ kotlin {
         }
     }
     js {
+        compilations.create("benchmark") {
+            associateWith(this@js.compilations.getByName("main"))
+        }
         browser {
             testTask {
                 useKarma {
@@ -21,6 +24,7 @@ kotlin {
                 }
             }
         }
+        nodejs {}
     }
     applyDefaultHierarchyTemplate()
     iosArm64()
@@ -76,11 +80,18 @@ kotlin {
                 implementation(kotlin("test-js"))
             }
         }
+        val jsBenchmark by getting {
+            dependencies {
+                implementation(kotlinx("benchmark-runtime", Dependencies.Versions.benchmark))
+                implementation(npm("@msgpack/msgpack", ">2.0.0 <3.0.0"))
+            }
+        }
     }
 }
 
 benchmark {
     targets {
         register("jvmBenchmark")
+        register("jsBenchmark")
     }
 }
