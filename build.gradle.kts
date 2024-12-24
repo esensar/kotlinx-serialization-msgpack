@@ -42,15 +42,6 @@ allprojects {
 
 subprojects {
     afterEvaluate {
-        val dokkaHtml = tasks["dokkaHtml"]
-        tasks {
-            create<Jar>("javadocJar") {
-                dependsOn(dokkaHtml)
-                archiveClassifier.set("javadoc")
-                from(dokkaHtml)
-            }
-        }
-
         configure<SigningExtension> {
             isRequired = false
             sign(extensions.getByType<PublishingExtension>().publications)
@@ -58,7 +49,16 @@ subprojects {
 
         configure<PublishingExtension> {
             publications.withType(MavenPublication::class) {
-                artifact(tasks["javadocJar"])
+                val publication = this
+                val dokkaHtml = tasks["dokkaGenerate"]
+                val javadocJar =
+                    tasks.register<Jar>("${publication.name}JavadocJar") {
+                        dependsOn(dokkaHtml)
+                        archiveClassifier.set("javadoc")
+                        archiveBaseName.set("${archiveBaseName.get()}-${publication.name}")
+                        from(dokkaHtml)
+                    }
+                artifact(javadocJar)
                 pom {
                     name.set("Kotlinx Serialization MsgPack")
                     description.set("MsgPack format support for kotlinx.serialization")
