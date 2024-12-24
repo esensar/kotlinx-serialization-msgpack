@@ -17,7 +17,7 @@ jobs:
       - name: Run tests with Gradle
         run: ./gradlew allTests
       - name: Generate dokka HTML
-        run: ./gradlew -Porg.gradle.jvmargs="-Xmx8g" dokkaHtml
+        run: ./gradlew -Porg.gradle.jvmargs="-Xmx8g" dokkaGenerate
       - name: Decode signing key
         run: |
           mkdir -p ~/.gradle
