@@ -1,5 +1,6 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.benchmark.Benchmark
 import kotlinx.benchmark.BenchmarkMode
 import kotlinx.benchmark.BenchmarkTimeUnit
@@ -11,6 +12,7 @@ import kotlinx.benchmark.State
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToByteArray
+import org.msgpack.jackson.dataformat.MessagePackFactory
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(BenchmarkTimeUnit.NANOSECONDS)
@@ -45,7 +47,7 @@ open class SerializeBenchmarks {
 
     // The actual benchmark method
     @Benchmark
-    fun benchmarkMethod() {
+    fun benchmarkKotlinxSerializationMsgpack() {
         val instance =
             SampleClassWithNestedClass(
                 testString = "testString",
@@ -67,5 +69,31 @@ open class SerializeBenchmarks {
                 secondNested = SampleClassWithNestedClass.NestedClass(null),
             )
         MsgPack.encodeToByteArray(instance)
+    }
+
+    @Benchmark
+    fun benchmarkMsgpackJava() {
+        val instance =
+            SampleClassWithNestedClass(
+                testString = "testString",
+                testInt = 10,
+                testBoolean = true,
+                testNested = SampleClassWithNestedClass.NestedClass(5),
+                testSample = SampleClass(testString = "testString2", testInt = 17, testBoolean = false),
+                testSampleList =
+                    listOf(
+                        SampleClass("testString3", testInt = 25, testBoolean = true),
+                        SampleClass("testString4", testInt = 100, testBoolean = false),
+                    ),
+                testSampleMap =
+                    mapOf(
+                        "testString5" to SampleClass("testString5", testInt = 12, testBoolean = false),
+                        "testString6" to SampleClass("testString6", testInt = 15, testBoolean = true),
+                    ),
+                extraBytes = byteArrayOf(0x12, 0x13, 0x14, 0x15),
+                secondNested = SampleClassWithNestedClass.NestedClass(null),
+            )
+        val objectMapper = ObjectMapper(MessagePackFactory())
+        objectMapper.writeValueAsBytes(instance)
     }
 }

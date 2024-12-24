@@ -67,6 +67,8 @@ kotlin {
         val jvmBenchmark by getting {
             dependencies {
                 implementation(kotlinx("benchmark-runtime", Dependencies.Versions.benchmark))
+                implementation("org.msgpack:msgpack-core:0.9.8")
+                implementation("org.msgpack:jackson-dataformat-msgpack:0.9.8")
             }
         }
         jsTest {
