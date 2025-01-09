@@ -116,7 +116,7 @@ MsgPack.default.encodeToByteArray(...)
 - `MsgPackDynamicSerializer` as placeholder for future [contextual serializer](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/serializers.md#contextual-serialization)
 - Full implementation of msgpack spec excluding extension types and bin format family
 
-[Unreleased]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.5.6...main
+[Unreleased]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.6.0...main
 [0.2.0]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.1.0...0.2.0
 [0.2.1]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.2.0...0.2.1
 [0.3.0]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.2.1...0.3.0
@@ -132,6 +132,8 @@ MsgPack.default.encodeToByteArray(...)
 [0.5.4]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.5.3...0.5.4
 [0.5.5]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.5.4...0.5.5
 [0.5.6]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.5.5...0.5.6
+[0.5.7]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.5.6...0.5.7
+[0.6.0]: https://github.com/esensar/kotlinx-serialization-msgpack/compare/0.5.7...0.6.0
 [i6]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/6
 [i9]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/9
 [i10]: https://github.com/esensar/kotlinx-serialization-msgpack/issues/10
