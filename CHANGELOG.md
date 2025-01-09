@@ -3,7 +3,11 @@ All notable changes to this project will be documented in this file. This change
 
 ## [Unreleased]
 
+## [0.5.7] - 2025-01-09
+- Same as 0.5.6, but with kotlin version set at `1.8.10`
+
 ## [0.5.6] - 2024-12-23
+**THIS VERSION SHOULD NOT BE USED - if you are using Kotlin 2.x, use versions 0.6.0 and above, if not, use 0.5.7**
 - Updated kotlin version to `2.1.0`
 - Updated `kotlinx.serialization` version to `1.7.3`
 - Improved performance and heap usage of serialization by creating less byte objects ([#102][p102])
