@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file. This change
 
 ## [Unreleased]
 
+## [0.6.0] - 2025-01-09
+- Same as 0.5.6
+
 ## [0.5.7] - 2025-01-09
 - Same as 0.5.6, but with kotlin version set at `1.8.10`
 
