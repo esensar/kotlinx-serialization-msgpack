@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file. This change
 
 ## [Unreleased]
 
+## [0.5.7] - 2025-01-09
+- Same as 0.5.6, but with kotlin version set at `1.8.10`
+
 ## [0.5.5] - 2023-04-29
 - Removed redundant call to serialize in BaseMsgPackExtensionSerializer ([#92][i92] and [#95][p95])
 - Added mac os arm64 target ([#93][i93] and [#94][p94])
