@@ -4,6 +4,6 @@ object Dependencies {
         const val serialization = "1.4.0"
         const val datetime = "0.4.0"
         const val ktlintGradle = "10.2.0"
-        const val dokkaGradle = "1.5.0"
+        const val dokkaGradle = "1.9.20"
     }
 }

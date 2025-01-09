@@ -42,23 +42,23 @@ kotlin {
             languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
         }
 
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 api(kotlinxSerialization("core"))
             }
         }
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
             }
         }
-        val jvmTest by getting {
+        jvmTest {
             dependencies {
                 implementation(kotlin("test-junit"))
             }
         }
-        val jsTest by getting {
+        jsTest {
             dependencies {
                 implementation(kotlin("test-js"))
             }
