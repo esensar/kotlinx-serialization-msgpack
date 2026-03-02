@@ -95,33 +95,26 @@ open class MsgPackNullableDynamicSerializer(
         encoder: Encoder,
         value: Any?,
     ) {
-        if (value == null) encoder.encodeNull()
-        when (value!!::class) {
-            Boolean::class -> encoder.encodeBoolean(value as Boolean)
-            Byte::class -> encoder.encodeByte(value as Byte)
-            Short::class -> encoder.encodeShort(value as Short)
-            Int::class -> encoder.encodeInt(value as Int)
-            Long::class -> encoder.encodeLong(value as Long)
-            Float::class -> encoder.encodeFloat(value as Float)
-            Double::class -> encoder.encodeDouble(value as Double)
-            String::class -> encoder.encodeString(value as String)
-            ByteArray::class -> encoder.encodeSerializableValue(ByteArraySerializer(), value as ByteArray)
-            else -> {
-                when (value) {
-                    is Map<*, *> -> MapSerializer(this, this).serialize(encoder, value as Map<Any?, Any?>)
-                    is Array<*> -> ArraySerializer(this).serialize(encoder, value.map { it }.toTypedArray())
-                    is List<*> -> ListSerializer(this).serialize(encoder, value.map { it })
-                    is Map.Entry<*, *> -> MapEntrySerializer(this, this).serialize(encoder, value)
-                    else ->
-                        {
-                            if (dynamicMsgPackExtensionSerializer.canSerialize(value)) {
-                                dynamicMsgPackExtensionSerializer.serialize(encoder, value)
-                            } else {
-                                encoder.encodeSerializableValue(value::class.serializer() as KSerializer<Any>, value)
-                            }
-                        }
-                }
-            }
+        // Use ::class matching for numeric types instead of `is` checks because on Kotlin/JS
+        // all numbers are JavaScript doubles, and `is Byte` matches any integer in byte range
+        // regardless of the declared Kotlin type, causing incorrect encoding.
+        when {
+            value == null -> encoder.encodeNull()
+            value is Boolean -> encoder.encodeBoolean(value)
+            value is String -> encoder.encodeString(value)
+            value is ByteArray -> encoder.encodeSerializableValue(ByteArraySerializer(), value)
+            value is Map<*, *> -> MapSerializer(this, this).serialize(encoder, value as Map<Any?, Any?>)
+            value is Array<*> -> ArraySerializer(this).serialize(encoder, value as Array<Any?>)
+            value is List<*> -> ListSerializer(this).serialize(encoder, value)
+            value is Map.Entry<*, *> -> MapEntrySerializer(this, this).serialize(encoder, value)
+            value::class == Byte::class -> encoder.encodeByte(value as Byte)
+            value::class == Short::class -> encoder.encodeShort(value as Short)
+            value::class == Int::class -> encoder.encodeInt(value as Int)
+            value::class == Long::class -> encoder.encodeLong(value as Long)
+            value::class == Float::class -> encoder.encodeFloat(value as Float)
+            value::class == Double::class -> encoder.encodeDouble(value as Double)
+            dynamicMsgPackExtensionSerializer.canSerialize(value) -> dynamicMsgPackExtensionSerializer.serialize(encoder, value)
+            else -> encoder.encodeSerializableValue(value::class.serializer() as KSerializer<Any>, value)
         }
     }
 }
