@@ -78,11 +78,11 @@ internal class BasicMsgPackEncoder(
         }
     }
 
-    override fun encodeInline(inlineDescriptor: SerialDescriptor): Encoder {
-        if (inlineEncoders.containsKey(inlineDescriptor)) {
-            return inlineEncoders[inlineDescriptor]!!(InlineEncoderHelper(serializersModule, result))
+    override fun encodeInline(descriptor: SerialDescriptor): Encoder {
+        if (inlineEncoders.containsKey(descriptor)) {
+            return inlineEncoders[descriptor]!!(InlineEncoderHelper(serializersModule, result))
         }
-        return super.encodeInline(inlineDescriptor)
+        return super.encodeInline(descriptor)
     }
 
     override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder {
@@ -114,7 +114,7 @@ internal class BasicMsgPackEncoder(
                     }
                     collectionSize <= MsgPackType.Array.MAX_ARRAY32_LENGTH -> {
                         result.add(MsgPackType.Array.ARRAY32)
-                        result.addAll(collectionSize.toInt().splitToByteArray().toList())
+                        result.addAll(collectionSize.splitToByteArray().toList())
                     }
                     else -> throw MsgPackSerializationException.serialization(
                         result,
@@ -133,7 +133,7 @@ internal class BasicMsgPackEncoder(
                     }
                     collectionSize <= MsgPackType.Map.MAX_MAP32_LENGTH -> {
                         result.add(MsgPackType.Map.MAP32)
-                        result.addAll(collectionSize.toInt().splitToByteArray().toList())
+                        result.addAll(collectionSize.splitToByteArray().toList())
                     }
                     else -> throw MsgPackSerializationException.serialization(
                         result,
@@ -219,7 +219,7 @@ internal class ExtensionTypeEncoder(
                 when (type) {
                     MsgPackType.Ext.EXT8 -> size!!.toByte().splitToByteArray()
                     MsgPackType.Ext.EXT16 -> size!!.toShort().splitToByteArray()
-                    MsgPackType.Ext.EXT32 -> size!!.toInt().splitToByteArray()
+                    MsgPackType.Ext.EXT32 -> size!!.splitToByteArray()
                     else -> throw MsgPackSerializationException.serialization(result, "Unexpected extension type: $type")
                 },
             )

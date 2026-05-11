@@ -90,6 +90,7 @@ open class MsgPackNullableDynamicSerializer(
     @OptIn(InternalSerializationApi::class)
     final override val descriptor: SerialDescriptor = buildSerialDescriptor("MsgPackNullableDynamic", SerialKind.CONTEXTUAL)
 
+    @Suppress("UNCHECKED_CAST")
     @OptIn(InternalSerializationApi::class)
     final override fun serialize(
         encoder: Encoder,

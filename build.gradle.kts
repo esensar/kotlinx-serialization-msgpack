@@ -1,21 +1,10 @@
 plugins {
-    kotlin("multiplatform") version Dependencies.Versions.kotlin apply false
-    kotlin("plugin.serialization") version Dependencies.Versions.kotlin apply false
-    id("org.jetbrains.kotlinx.benchmark") version Dependencies.Versions.benchmark apply false
-}
-
-repositories {
-    mavenCentral()
-}
-
-buildscript {
-    repositories {
-        maven("https://plugins.gradle.org/m2/")
-    }
-    dependencies {
-        classpath("org.jlleitschuh.gradle:ktlint-gradle:${Dependencies.Versions.ktlintGradle}")
-        classpath("org.jetbrains.dokka:dokka-gradle-plugin:${Dependencies.Versions.dokkaGradle}")
-    }
+    alias(libs.plugins.kotlin.multiplatform) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.kotlinx.serialization) apply false
+    alias(libs.plugins.kotlinx.benchmark) apply false
+    alias(libs.plugins.ktlint) apply false
+    alias(libs.plugins.dokka) apply false
 }
 
 val snapshot: String? by project
@@ -29,15 +18,8 @@ val sonatypePasswordEnv: String? = System.getenv()["SONATYPE_PASSWORD"]
 val sonatypeUsernameEnv: String? = System.getenv()["SONATYPE_USERNAME"]
 
 allprojects {
-    group = Config.group
+    group = "com.ensarsarajcic.kotlinx"
     version = version.toString() + if (snapshot == "true") "-SNAPSHOT" else ""
-
-    apply(plugin = "org.jlleitschuh.gradle.ktlint")
-
-    repositories {
-        mavenLocal()
-        mavenCentral()
-    }
 }
 
 subprojects {

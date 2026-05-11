@@ -152,7 +152,7 @@ internal class BasicMsgPacker : MsgPacker {
                     byteArrayOf(MsgPackType.String.STR16) + bytes.size.toShort().splitToByteArray()
                 }
                 bytes.size <= MsgPackType.String.MAX_STR32_LENGTH -> {
-                    byteArrayOf(MsgPackType.String.STR32) + bytes.size.toInt().splitToByteArray()
+                    byteArrayOf(MsgPackType.String.STR32) + bytes.size.splitToByteArray()
                 }
                 else -> throw MsgPackSerializationException.packingError(
                     "String too long. Byte size: ${bytes.size}. Max size: ${MsgPackType.String.MAX_STR32_LENGTH}",
@@ -171,7 +171,7 @@ internal class BasicMsgPacker : MsgPacker {
                     byteArrayOf(MsgPackType.Bin.BIN16) + value.size.toShort().splitToByteArray()
                 }
                 value.size <= MsgPackType.Bin.MAX_BIN32_LENGTH -> {
-                    byteArrayOf(MsgPackType.Bin.BIN32) + value.size.toInt().splitToByteArray()
+                    byteArrayOf(MsgPackType.Bin.BIN32) + value.size.splitToByteArray()
                 }
                 else -> throw MsgPackSerializationException.packingError(
                     "Byte array too long. Byte size: ${value.size}. Max size: ${MsgPackType.Bin.MAX_BIN32_LENGTH}",

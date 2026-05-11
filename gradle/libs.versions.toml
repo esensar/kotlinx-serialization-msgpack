@@ -1,0 +1,31 @@
+[versions]
+
+androidGradle = "9.2.1"
+androidMinSdk = "28"
+androidTargetSdk = "36"
+
+kotlin = "2.3.21"
+kotlinxSerialization = "1.11.0"
+kotlinxBenchmark = "0.4.17"
+ktlint = "14.2.0"
+dokka = "2.2.0"
+
+msgpak = "0.9.12"
+
+[libraries]
+
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlinx-benchmark-runtime = { module = "org.jetbrains.kotlinx:kotlinx-benchmark-runtime", version.ref = "kotlinxBenchmark" }
+kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerialization" }
+
+msgpak-core = { module = "org.msgpack:msgpack-core", version.ref = "msgpak" }
+msgpak-dataformat = { module = "org.msgpack:jackson-dataformat-msgpack", version.ref = "msgpak" }
+
+[plugins]
+
+android-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "androidGradle" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinx-benchmark = { id = "org.jetbrains.kotlinx.benchmark", version.ref = "kotlinxBenchmark" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
