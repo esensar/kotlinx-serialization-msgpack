@@ -34,7 +34,7 @@ import kotlin.jvm.JvmOverloads
  *
  * @see MsgPack.Default The instance using default configurations.
  */
-@OptIn(ExperimentalSerializationApi::class)
+@OptIn(ExperimentalSerializationApi::class, InternalMsgPackApi::class)
 open class MsgPack
     @JvmOverloads
     constructor(

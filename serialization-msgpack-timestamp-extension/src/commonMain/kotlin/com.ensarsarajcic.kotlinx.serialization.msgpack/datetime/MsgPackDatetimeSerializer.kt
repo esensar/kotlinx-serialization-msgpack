@@ -4,7 +4,7 @@ import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.BaseMsgPackExt
 import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackExtension
 import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackTimestamp
 import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackTimestampExtensionSerializer
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 sealed class BaseMsgPackDatetimeSerializer(private val outputType: Byte) : BaseMsgPackExtensionSerializer<Instant>() {
     init {
@@ -22,27 +22,29 @@ sealed class BaseMsgPackDatetimeSerializer(private val outputType: Byte) : BaseM
     }
 
     override fun serialize(extension: Instant): MsgPackExtension {
-        val timestamp =
-            when (outputType) {
-                0.toByte() -> {
-                    MsgPackTimestamp.T32(extension.epochSeconds)
-                }
-                1.toByte() -> {
-                    MsgPackTimestamp.T64(extension.epochSeconds, extension.nanosecondsOfSecond)
-                }
-                2.toByte() -> {
-                    MsgPackTimestamp.T92(extension.epochSeconds, extension.nanosecondsOfSecond.toLong())
-                }
-                else -> throw AssertionError()
+        val timestamp = when (outputType) {
+            0.toByte() -> {
+                MsgPackTimestamp.T32(extension.epochSeconds)
             }
+
+            1.toByte() -> {
+                MsgPackTimestamp.T64(extension.epochSeconds, extension.nanosecondsOfSecond)
+            }
+
+            2.toByte() -> {
+                MsgPackTimestamp.T92(extension.epochSeconds, extension.nanosecondsOfSecond.toLong())
+            }
+
+            else -> throw AssertionError()
+        }
         return timestampSerializer.serialize(timestamp)
     }
 
     override val extTypeId: Byte = -1
 }
 
-class MsgPackTimestamp32DatetimeSerializer() : BaseMsgPackDatetimeSerializer(0)
+class MsgPackTimestamp32DatetimeSerializer : BaseMsgPackDatetimeSerializer(0)
 
-class MsgPackTimestamp64DatetimeSerializer() : BaseMsgPackDatetimeSerializer(1)
+class MsgPackTimestamp64DatetimeSerializer : BaseMsgPackDatetimeSerializer(1)
 
-class MsgPackTimestamp92DatetimeSerializer() : BaseMsgPackDatetimeSerializer(2)
+class MsgPackTimestamp92DatetimeSerializer : BaseMsgPackDatetimeSerializer(2)
