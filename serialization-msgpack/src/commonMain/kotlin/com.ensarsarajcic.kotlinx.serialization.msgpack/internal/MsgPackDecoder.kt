@@ -120,11 +120,11 @@ internal class BasicMsgPackDecoder(
         }
     }
 
-    override fun decodeInline(inlineDescriptor: SerialDescriptor): Decoder {
-        if (inlineDecoders.containsKey(inlineDescriptor)) {
-            return inlineDecoders[inlineDescriptor]!!(InlineDecoderHelper(serializersModule, dataBuffer))
+    override fun decodeInline(descriptor: SerialDescriptor): Decoder {
+        if (inlineDecoders.containsKey(descriptor)) {
+            return inlineDecoders[descriptor]!!(InlineDecoderHelper(serializersModule, dataBuffer))
         }
-        return super.decodeInline(inlineDescriptor)
+        return super.decodeInline(descriptor)
     }
 
     override fun decodeCollectionSize(descriptor: SerialDescriptor): Int {
@@ -178,6 +178,7 @@ internal class BasicMsgPackDecoder(
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
         return if (deserializer == ByteArraySerializer()) {
             decodeByteArray() as T
@@ -282,6 +283,7 @@ internal class ExtensionTypeDecoder(
         return size ?: 0
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
         bytesRead += 1
         return dataBuffer.takeNext(

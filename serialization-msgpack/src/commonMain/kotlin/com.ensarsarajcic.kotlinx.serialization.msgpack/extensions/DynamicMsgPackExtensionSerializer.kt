@@ -11,6 +11,7 @@ open class DynamicMsgPackExtensionSerializer : BaseMsgPackExtensionSerializer<An
             return serializer.deserialize(extension)
         }
 
+        @Suppress("UNCHECKED_CAST")
         fun serialize(value: Any?): MsgPackExtension {
             return serializer.serialize(value as T)
         }

@@ -1,17 +1,32 @@
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.serialization")
-    id("maven-publish")
-    id("signing")
-    id("org.jetbrains.dokka")
-    id("org.jetbrains.kotlinx.benchmark")
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.kotlinx.benchmark)
+    alias(libs.plugins.dokka)
+    alias(libs.plugins.ktlint)
+    signing
+    `maven-publish`
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(libs.versions.java.get().toInt()))
+    }
 }
 
 kotlin {
+    jvmToolchain(libs.versions.java.get().toInt())
     jvm {
         compilations.create("benchmark") {
             associateWith(this@jvm.compilations.getByName("main"))
         }
+    }
+    android {
+        namespace = "$group.core"
+        compileSdk = libs.versions.androidTargetSdk.get().toInt()
+        minSdk = libs.versions.androidMinSdk.get().toInt()
+        lint.targetSdk = libs.versions.androidTargetSdk.get().toInt()
     }
     js {
         compilations.create("benchmark") {
@@ -24,27 +39,23 @@ kotlin {
                 }
             }
         }
-        nodejs {}
+        nodejs()
     }
-    applyDefaultHierarchyTemplate()
+
     iosArm64()
     iosX64()
     iosSimulatorArm64()
-    tvosX64()
     tvosArm64()
-    watchosX64()
     watchosArm64()
-    macosX64()
     macosArm64()
     mingwX64()
     linuxX64()
+    // TODO: remove deprecated targets in next release
+    macosX64()
+    tvosX64()
+    watchosX64()
 
-    fun kotlinx(
-        name: String,
-        version: String,
-    ): String = "org.jetbrains.kotlinx:kotlinx-$name:$version"
-
-    fun kotlinxSerialization(name: String) = kotlinx("serialization-$name", Dependencies.Versions.serialization)
+    applyDefaultHierarchyTemplate()
 
     sourceSets {
         all {
@@ -54,35 +65,24 @@ kotlin {
 
         commonMain {
             dependencies {
-                api(kotlinxSerialization("core"))
+                api(libs.kotlinx.serialization.core)
             }
         }
         commonTest {
             dependencies {
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
+                implementation(libs.kotlin.test)
             }
         }
-        jvmTest {
+        named("jvmBenchmark") {
             dependencies {
-                implementation(kotlin("test-junit"))
+                implementation(libs.kotlinx.benchmark.runtime)
+                implementation(libs.msgpak.core)
+                implementation(libs.msgpak.dataformat)
             }
         }
-        val jvmBenchmark by getting {
+        named("jsBenchmark") {
             dependencies {
-                implementation(kotlinx("benchmark-runtime", Dependencies.Versions.benchmark))
-                implementation("org.msgpack:msgpack-core:0.9.8")
-                implementation("org.msgpack:jackson-dataformat-msgpack:0.9.8")
-            }
-        }
-        jsTest {
-            dependencies {
-                implementation(kotlin("test-js"))
-            }
-        }
-        val jsBenchmark by getting {
-            dependencies {
-                implementation(kotlinx("benchmark-runtime", Dependencies.Versions.benchmark))
+                implementation(libs.kotlinx.benchmark.runtime)
                 implementation(npm("@msgpack/msgpack", ">2.0.0 <3.0.0"))
             }
         }
