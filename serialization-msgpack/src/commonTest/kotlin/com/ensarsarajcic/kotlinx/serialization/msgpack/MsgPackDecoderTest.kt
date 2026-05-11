@@ -13,6 +13,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@OptIn(InternalMsgPackApi::class)
 internal class MsgPackDecoderTest {
     @Test
     fun testBooleanDecode() {

@@ -1,6 +1,7 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack.internal
 
 import com.ensarsarajcic.kotlinx.serialization.msgpack.MsgPackConfiguration
+import com.ensarsarajcic.kotlinx.serialization.msgpack.InternalMsgPackApi
 import com.ensarsarajcic.kotlinx.serialization.msgpack.MsgPackNullableDynamicSerializer
 import com.ensarsarajcic.kotlinx.serialization.msgpack.exceptions.MsgPackSerializationException
 import com.ensarsarajcic.kotlinx.serialization.msgpack.stream.MsgPackDataInputBuffer
@@ -19,7 +20,8 @@ interface MsgPackTypeDecoder {
     fun peekNextType(): Byte
 }
 
-internal class BasicMsgPackDecoder(
+@OptIn(InternalMsgPackApi::class)
+class BasicMsgPackDecoder @InternalMsgPackApi constructor(
     private val configuration: MsgPackConfiguration,
     override val serializersModule: SerializersModule,
     val dataBuffer: MsgPackDataInputBuffer,
@@ -30,15 +32,18 @@ internal class BasicMsgPackDecoder(
         if (descriptor.kind in arrayOf(StructureKind.CLASS, StructureKind.OBJECT)) {
             val next = dataBuffer.peekSafely()
             if (next != null && MsgPackType.String.isString(next)) {
-                val fieldName = kotlin.runCatching { decodeString() }.getOrNull() ?: return CompositeDecoder.UNKNOWN_NAME
+                val fieldName = kotlin.runCatching { decodeString() }.getOrNull()
+                    ?: return CompositeDecoder.UNKNOWN_NAME
                 val index = descriptor.getElementIndex(fieldName)
                 return if (index == CompositeDecoder.UNKNOWN_NAME && configuration.ignoreUnknownKeys) {
                     MsgPackNullableDynamicSerializer.deserialize(this)
                     index
-                } else {
+                }
+                else {
                     index
                 }
-            } else {
+            }
+            else {
                 return CompositeDecoder.DECODE_DONE
             }
         }
@@ -107,81 +112,93 @@ internal class BasicMsgPackDecoder(
     fun decodeByteArray(): ByteArray {
         return if (configuration.rawCompatibility) {
             val next = dataBuffer.peek()
-            if (MsgPackType.String.FIXSTR_SIZE_MASK.test(next) ||
-                next == MsgPackType.String.STR16 ||
-                next == MsgPackType.String.STR32
-            ) {
+            if (MsgPackType.String.FIXSTR_SIZE_MASK.test(next) || next == MsgPackType.String.STR16 || next == MsgPackType.String.STR32) {
                 msgUnpacker.unpackString().encodeToByteArray()
-            } else {
+            }
+            else {
                 msgUnpacker.unpackByteArray()
             }
-        } else {
+        }
+        else {
             msgUnpacker.unpackByteArray()
         }
     }
 
-    override fun decodeInline(inlineDescriptor: SerialDescriptor): Decoder {
-        if (inlineDecoders.containsKey(inlineDescriptor)) {
-            return inlineDecoders[inlineDescriptor]!!(InlineDecoderHelper(serializersModule, dataBuffer))
+    override fun decodeInline(descriptor: SerialDescriptor): Decoder {
+        if (inlineDecoders.containsKey(descriptor)) {
+            return inlineDecoders[descriptor]!!(InlineDecoderHelper(serializersModule, dataBuffer))
         }
-        return super.decodeInline(inlineDescriptor)
+        return super.decodeInline(descriptor)
     }
 
     override fun decodeCollectionSize(descriptor: SerialDescriptor): Int {
         val next = dataBuffer.requireNextByte()
         return when (descriptor.kind) {
-            StructureKind.LIST ->
-                when {
-                    MsgPackType.Array.FIXARRAY_SIZE_MASK.test(next) -> MsgPackType.Array.FIXARRAY_SIZE_MASK.unMaskValue(next).toInt()
-                    next == MsgPackType.Array.ARRAY16 -> dataBuffer.takeNext(2).joinToNumber()
-                    next == MsgPackType.Array.ARRAY32 -> {
-                        if (configuration.preventOverflows) {
-                            val number = dataBuffer.takeNext(4).joinToNumber<Long>()
-                            if (number !in Int.MIN_VALUE..Int.MAX_VALUE) {
-                                throw MsgPackSerializationException.overflowError(dataBuffer)
-                            } else {
-                                number.toInt()
-                            }
-                        } else {
-                            dataBuffer.takeNext(4).joinToNumber()
+            StructureKind.LIST -> when {
+                MsgPackType.Array.FIXARRAY_SIZE_MASK.test(next) -> MsgPackType.Array.FIXARRAY_SIZE_MASK.unMaskValue(next)
+                    .toInt()
+
+                next == MsgPackType.Array.ARRAY16 -> dataBuffer.takeNext(2).joinToNumber()
+                next == MsgPackType.Array.ARRAY32 -> {
+                    if (configuration.preventOverflows) {
+                        val number = dataBuffer.takeNext(4).joinToNumber<Long>()
+                        if (number !in Int.MIN_VALUE..Int.MAX_VALUE) {
+                            throw MsgPackSerializationException.overflowError(dataBuffer)
+                        }
+                        else {
+                            number.toInt()
                         }
                     }
-                    else -> {
-                        throw MsgPackSerializationException.deserialization(dataBuffer, "Unknown array type: $next")
+                    else {
+                        dataBuffer.takeNext(4).joinToNumber()
                     }
                 }
 
-            StructureKind.CLASS, StructureKind.OBJECT, StructureKind.MAP ->
-                when {
-                    MsgPackType.Map.FIXMAP_SIZE_MASK.test(next) -> MsgPackType.Map.FIXMAP_SIZE_MASK.unMaskValue(next).toInt()
-                    next == MsgPackType.Map.MAP16 -> dataBuffer.takeNext(2).joinToNumber()
-                    next == MsgPackType.Map.MAP32 -> {
-                        if (configuration.preventOverflows) {
-                            val number = dataBuffer.takeNext(4).joinToNumber<Long>()
-                            if (number !in Int.MIN_VALUE..Int.MAX_VALUE) {
-                                throw MsgPackSerializationException.overflowError(dataBuffer)
-                            } else {
-                                number.toInt()
-                            }
-                        } else {
-                            dataBuffer.takeNext(4).joinToNumber()
+                else -> {
+                    throw MsgPackSerializationException.deserialization(dataBuffer, "Unknown array type: $next")
+                }
+            }
+
+            StructureKind.CLASS, StructureKind.OBJECT, StructureKind.MAP -> when {
+                MsgPackType.Map.FIXMAP_SIZE_MASK.test(next) -> MsgPackType.Map.FIXMAP_SIZE_MASK.unMaskValue(next)
+                    .toInt()
+
+                next == MsgPackType.Map.MAP16 -> dataBuffer.takeNext(2).joinToNumber()
+                next == MsgPackType.Map.MAP32 -> {
+                    if (configuration.preventOverflows) {
+                        val number = dataBuffer.takeNext(4).joinToNumber<Long>()
+                        if (number !in Int.MIN_VALUE..Int.MAX_VALUE) {
+                            throw MsgPackSerializationException.overflowError(dataBuffer)
+                        }
+                        else {
+                            number.toInt()
                         }
                     }
-                    else -> {
-                        throw MsgPackSerializationException.deserialization(dataBuffer, "Unknown map type: $next")
+                    else {
+                        dataBuffer.takeNext(4).joinToNumber()
                     }
                 }
+
+                else -> {
+                    throw MsgPackSerializationException.deserialization(dataBuffer, "Unknown map type: $next")
+                }
+            }
 
             else -> {
-                throw MsgPackSerializationException.deserialization(dataBuffer, "Unsupported collection: ${descriptor.kind}")
+                throw MsgPackSerializationException.deserialization(
+                    dataBuffer,
+                    "Unsupported collection: ${descriptor.kind}"
+                )
             }
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
         return if (deserializer == ByteArraySerializer()) {
             decodeByteArray() as T
-        } else {
+        }
+        else {
             super.decodeSerializableValue(deserializer)
         }
     }
@@ -224,7 +241,8 @@ internal class ClassMsgPackDecoder(
         if (result != CompositeDecoder.DECODE_DONE) decodedElements++
         return if (result == CompositeDecoder.UNKNOWN_NAME && configuration.ignoreUnknownKeys) {
             decodeElementIndex(descriptor)
-        } else {
+        }
+        else {
             result
         }
     }
@@ -250,26 +268,32 @@ internal class ExtensionTypeDecoder(
             val byte = dataBuffer.requireNextByte()
             bytesRead++
             if (!MsgPackType.Ext.isExt(byte)) {
-                throw MsgPackSerializationException.deserialization(dataBuffer, "Unexpected byte: $byte. Expected extension type byte!")
+                throw MsgPackSerializationException.deserialization(
+                    dataBuffer,
+                    "Unexpected byte: $byte. Expected extension type byte!"
+                )
             }
             type = byte
             if (MsgPackType.Ext.SIZES.containsKey(type)) {
                 size = MsgPackType.Ext.SIZES[type]
             }
             type!!
-        } else if (bytesRead == 1 && size != null) {
+        }
+        else if (bytesRead == 1 && size != null) {
             val byte = dataBuffer.requireNextByte()
             bytesRead++
             typeId = byte
             typeId!!
-        } else if (bytesRead == 1 && size == null) {
+        }
+        else if (bytesRead == 1 && size == null) {
             val sizeSize = MsgPackType.Ext.SIZE_SIZE[type]
             bytesRead += sizeSize!!
             size = dataBuffer.takeNext(sizeSize).joinToNumber()
             val byte = dataBuffer.requireNextByte()
             typeId = byte
             typeId!!
-        } else {
+        }
+        else {
             throw AssertionError()
         }
     }
@@ -282,6 +306,7 @@ internal class ExtensionTypeDecoder(
         return size ?: 0
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
         bytesRead += 1
         return dataBuffer.takeNext(

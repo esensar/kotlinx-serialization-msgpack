@@ -2,11 +2,11 @@ package com.ensarsarajcic.kotlinx.serialization.msgpack.datetime
 
 import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackExtension
 import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackTimestamp
-import kotlinx.datetime.Instant
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.fail
+import kotlin.time.Instant
 
 class MsgPackDatetimeSerializerTest {
     private val t32TestPairs =

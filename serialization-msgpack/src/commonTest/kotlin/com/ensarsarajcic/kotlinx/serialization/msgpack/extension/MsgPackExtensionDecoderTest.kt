@@ -1,6 +1,7 @@
 package com.ensarsarajcic.kotlinx.serialization.msgpack.extension
 
 import com.ensarsarajcic.kotlinx.serialization.msgpack.CustomExtensionType
+import com.ensarsarajcic.kotlinx.serialization.msgpack.InternalMsgPackApi
 import com.ensarsarajcic.kotlinx.serialization.msgpack.MsgPackConfiguration
 import com.ensarsarajcic.kotlinx.serialization.msgpack.extensions.MsgPackExtension
 import com.ensarsarajcic.kotlinx.serialization.msgpack.hexStringToByteArray
@@ -11,6 +12,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 // TODO More tests
+@OptIn(InternalMsgPackApi::class)
 internal class MsgPackExtensionDecoderTest {
     @Test
     fun testExtensionDecode() {

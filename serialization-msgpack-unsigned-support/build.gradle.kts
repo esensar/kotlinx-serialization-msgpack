@@ -1,17 +1,36 @@
+@file:OptIn(ExperimentalWasmDsl::class)
+
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.serialization")
-    id("maven-publish")
-    id("signing")
-    id("org.jetbrains.dokka")
-    id("org.jetbrains.kotlinx.benchmark")
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.dokka)
+    alias(libs.plugins.ktlint)
+    signing
+    `maven-publish`
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(libs.versions.java.get().toInt()))
+    }
 }
 
 kotlin {
+    withSourcesJar()
+    jvmToolchain(libs.versions.java.get().toInt())
     jvm {
         compilations.create("benchmark") {
             associateWith(this@jvm.compilations.getByName("main"))
         }
+    }
+    android {
+        namespace = "$group.unsigned"
+        compileSdk = libs.versions.androidTargetSdk.get().toInt()
+        minSdk = libs.versions.androidMinSdk.get().toInt()
+        lint.targetSdk = libs.versions.androidTargetSdk.get().toInt()
     }
     js {
         browser {
@@ -21,26 +40,37 @@ kotlin {
                 }
             }
         }
+        nodejs()
     }
-    applyDefaultHierarchyTemplate()
+    wasmJs {
+        browser {
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                }
+            }
+        }
+        nodejs()
+    }
+
+    androidNativeX86()
+    androidNativeX64()
+    androidNativeArm64()
+    androidNativeArm32()
     iosArm64()
     iosX64()
     iosSimulatorArm64()
-    tvosX64()
     tvosArm64()
-    watchosX64()
     watchosArm64()
-    macosX64()
     macosArm64()
     mingwX64()
     linuxX64()
+    // TODO: remove deprecated targets in next release
+    macosX64()
+    tvosX64()
+    watchosX64()
 
-    fun kotlinx(
-        name: String,
-        version: String,
-    ): String = "org.jetbrains.kotlinx:kotlinx-$name:$version"
-
-    fun kotlinxSerialization(name: String) = kotlinx("serialization-$name", Dependencies.Versions.serialization)
+    applyDefaultHierarchyTemplate()
 
     sourceSets {
         all {
@@ -55,30 +85,8 @@ kotlin {
         }
         commonTest {
             dependencies {
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
+                implementation(libs.kotlin.test)
             }
         }
-        jvmTest {
-            dependencies {
-                implementation(kotlin("test-junit"))
-            }
-        }
-        val jvmBenchmark by getting {
-            dependencies {
-                implementation(kotlinx("benchmark-runtime", Dependencies.Versions.benchmark))
-            }
-        }
-        jsTest {
-            dependencies {
-                implementation(kotlin("test-js"))
-            }
-        }
-    }
-}
-
-benchmark {
-    targets {
-        register("jvmBenchmark")
     }
 }

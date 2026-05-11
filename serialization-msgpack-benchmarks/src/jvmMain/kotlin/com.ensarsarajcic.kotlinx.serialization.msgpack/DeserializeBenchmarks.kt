@@ -18,6 +18,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.modules.SerializersModule
 import org.msgpack.jackson.dataformat.MessagePackFactory
 
+@OptIn(InternalMsgPackApi::class)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(BenchmarkTimeUnit.NANOSECONDS)
 @Measurement(iterations = 20, time = 1, timeUnit = BenchmarkTimeUnit.SECONDS)
@@ -26,24 +27,18 @@ open class DeserializeBenchmarks {
     @Serializable
     @JsonIgnoreProperties(ignoreUnknown = true)
     class SampleClassWithNestedClass(
-        @JsonProperty("testString")
-        var testString: String,
-        @JsonProperty("testInt")
-        var testInt: Int,
-        @JsonProperty("testBoolean")
-        var testBoolean: Boolean,
-        @JsonProperty("testNested")
-        var testNested: NestedClass,
-        @JsonProperty("secondNested")
-        var secondNested: NestedClass? = null,
+        @JsonProperty("testString") var testString: String,
+        @JsonProperty("testInt") var testInt: Int,
+        @JsonProperty("testBoolean") var testBoolean: Boolean,
+        @JsonProperty("testNested") var testNested: NestedClass,
+        @JsonProperty("secondNested") var secondNested: NestedClass? = null,
     ) {
         constructor() : this("", 0, false, NestedClass(null), null)
 
         @Serializable
         @JsonIgnoreProperties(ignoreUnknown = true)
         class NestedClass(
-            @JsonProperty("testInt")
-            var testInt: Int? = null,
+            @JsonProperty("testInt") var testInt: Int? = null,
         ) {
             constructor() : this(null)
         }
@@ -52,14 +47,12 @@ open class DeserializeBenchmarks {
     // The actual benchmark method
     @Benchmark
     fun benchmarkKotlinxSerializationMsgpack() {
-        val decoder =
-            BasicMsgPackDecoder(
-                MsgPackConfiguration.default.copy(ignoreUnknownKeys = true),
-                SerializersModule {
-                },
-                @Suppress("ktlint:standard:max-line-length")
-                "85aa74657374537472696e67a3646566a774657374496e747bab74657374426f6f6c65616ec3aa746573744e657374656483aa74657374537472696e67a3646566ab74657374426f6f6c65616ec3ae616e6f74686572556e6b6e6f776ea474657374ac7365636f6e644e657374656481ab74657374426f6f6c65616ec2".hexStringToByteArray().toMsgPackBuffer(),
-            )
+        val decoder = BasicMsgPackDecoder(
+            MsgPackConfiguration.default.copy(ignoreUnknownKeys = true),
+            SerializersModule {},
+            @Suppress("ktlint:standard:max-line-length") "85aa74657374537472696e67a3646566a774657374496e747bab74657374426f6f6c65616ec3aa746573744e657374656483aa74657374537472696e67a3646566ab74657374426f6f6c65616ec3ae616e6f74686572556e6b6e6f776ea474657374ac7365636f6e644e657374656481ab74657374426f6f6c65616ec2".hexStringToByteArray()
+                .toMsgPackBuffer(),
+        )
         SampleClassWithNestedClass.serializer().deserialize(decoder)
     }
 
@@ -67,8 +60,7 @@ open class DeserializeBenchmarks {
     fun benchmarkMsgpackJava() {
         val objectMapper = ObjectMapper(MessagePackFactory())
         objectMapper.readValue(
-            @Suppress("ktlint:standard:max-line-length")
-            "85aa74657374537472696e67a3646566a774657374496e747bab74657374426f6f6c65616ec3aa746573744e657374656483aa74657374537472696e67a3646566ab74657374426f6f6c65616ec3ae616e6f74686572556e6b6e6f776ea474657374ac7365636f6e644e657374656481ab74657374426f6f6c65616ec2".hexStringToByteArray(),
+            @Suppress("ktlint:standard:max-line-length") "85aa74657374537472696e67a3646566a774657374496e747bab74657374426f6f6c65616ec3aa746573744e657374656483aa74657374537472696e67a3646566ab74657374426f6f6c65616ec3ae616e6f74686572556e6b6e6f776ea474657374ac7365636f6e644e657374656481ab74657374426f6f6c65616ec2".hexStringToByteArray(),
             object : TypeReference<SampleClassWithNestedClass>() {},
         )
     }
